@@ -1,0 +1,239 @@
+# Classes for ASM<instr>
+
+# ASM Instructions
+# movl
+# addl
+# addq
+# subl
+# subq
+# imull
+# idivl
+# jl
+# jle
+# je
+# jnz
+# ret
+# call
+# pushq
+# popq
+# .label
+# cmpl
+# negl
+# xorl
+# xchgl
+# cltd
+# jmp
+# leaq
+
+# Base class for ASM objects with src and dest
+class ASMSrcDestBase(object):
+	def __init__(self, src, dest):
+		self.src = src
+		self.dest = dest
+
+# mov src, dest
+class ASMMov(ASMSrcDestBase):
+	pass
+
+class ASMMovL(ASMMov):
+	def __str__(self):
+		return "\tmovl\t" + str(self.src) + ", " + str(self.dest)
+
+class ASMMovQ(ASMMov):
+	def __str__(self):
+		return "\tmovq\t" + str(self.src) + ", " + str(self.dest)
+
+# add src, dest
+class ASMAdd(ASMSrcDestBase):
+	pass
+
+class ASMAddL(ASMAdd):
+	def __str__(self):
+		return "\taddl\t" + str(self.src) + ", " + str(self.dest)
+
+class ASMAddQ(ASMAdd):
+	def __str__(self):
+		return "\taddq\t" + str(self.src) + ", " + str(self.dest)
+
+# sub src, dest
+class ASMSub(ASMSrcDestBase):
+	pass
+
+class ASMSubL(ASMSub):
+	def __str__(self):
+		return "\tsubl\t" + str(self.src) + ", " + str(self.dest)
+
+class ASMSubQ(ASMSub):
+	def __str__(self):
+		return "\tsubq\t" + str(self.src) + ", " + str(self.dest)
+
+# imul src, dest
+class ASMImul(ASMSrcDestBase):
+	pass
+
+class ASMImulL(ASMImul):
+	def __str__(self):
+		return "\timull\t" + str(self.src) + ", " + str(self.dest)
+
+# idiv divisor
+class ASMIdiv(ASMSrcDestBase):
+	pass
+
+class ASMIdivL(ASMIdiv):
+	def __init__(self, divisor):
+		self.divisor = divisor
+
+	def __str__(self):
+		return "\tidivl\t" + str(self.divisor)
+
+# jxx .label
+class ASMJmp(object):
+	def __init__(self, label):
+		self.label = label
+
+	def __str__(self):
+		return "\tjmp\t" + str(self.label)
+
+class ASMJmpL(ASMJmp):
+	def __str__(self):
+		return "\tjl\t" + str(self.label)
+
+class ASMJmpLe(ASMJmp):
+	def __str__(self):
+		return "\tjle\t" + str(self.label)
+
+class ASMJmpEq(ASMJmp):
+	def __str__(self):
+		return "\tje\t" + str(self.label)
+
+class ASMJmpNz(ASMJmp):
+	def __str__(self):
+		return "\tjnz\t" + str(self.label)
+
+# push src
+class ASMPushQ(object):
+	def __init__(self, src):
+		self.src = src
+
+	def __str__(self):
+		return "\tpushq\t" + str(self.src)
+
+# pop dest
+class ASMPopQ(object):
+	def __init__(self, dest):
+		self.dest = dest
+
+	def __str__(self):
+		return "\tpopq\t" + str(self.dest)
+
+# .label:
+class ASMLabel(object):
+	def __init__(self, label):
+		self.label = label
+
+	def __str__(self):
+		return str(self.label) + ":"
+
+# cmpl src, dest
+class ASMCmpL(ASMSrcDestBase):
+	def __str__(self):
+		return "\tcmpl\t" + str(self.src) + ", " + str(self.dest)
+
+# test reg1, reg2
+class ASMTest(ASMSrcDestBase):
+	pass
+
+class ASMTestL(ASMTest):
+	def __str__(self):
+		return "\ttest\t" + str(self.src) + ", " + str(self.dest)
+
+# negl reg
+class ASMNegL(object):
+	def __init__(self, reg):
+		self.reg = reg
+
+	def __str__(self):
+		return "\tnegl\t" + str(self.reg)
+
+# xorl src, dest
+class ASMXorL(ASMSrcDestBase):
+	def __str__(self):
+		return "\txorl\t" + str(self.src) + ", " + str(self.dest)
+
+# xchgl src, dest
+class ASMXchgL(ASMSrcDestBase):
+	def __str__(self):
+		return "\txchgl\t" + str(self.src) + ", " + str(self.dest)
+
+# cltd
+class ASMCltd(object):
+	def __str__(self):
+		return "\tcltd"
+
+# leaq src, dest
+class ASMLeaQ(ASMSrcDestBase):
+	def __str__(self):
+		return "\tleaq\t" + str(self.src) + ", " + str(self.dest)
+
+# call function
+class ASMCall(object):
+	def __init__(self, function_name):
+		self.function_name = function_name
+
+	def __str__(self):
+		return "\tcall\t" + str(self.function_name) 
+
+# ret
+class ASMRet(object):
+	def __str__(self):
+		return "\tret"
+
+# leave
+class ASMLeave(object):
+	def __str__(self):
+		return "\tleave"
+
+# comments
+class ASMComment(object):
+	def __init__(self, comment):
+		self.comment = comment
+
+	def __str__(self):
+		return "\t# " + str(self.comment)
+
+
+if __name__ == "__main__":
+	asm_instr_list = []
+
+	# All instructions
+	asm_instr_list.append(ASMMovL("$777", "%eax"))
+	asm_instr_list.append(ASMAddL("%eax", "%ebx"))
+	asm_instr_list.append(ASMAddQ("%rax", "%rbx"))
+	asm_instr_list.append(ASMSubL("%eax", "%ebx"))
+	asm_instr_list.append(ASMSubQ("%rax", "%rbx"))
+	asm_instr_list.append(ASMImulL("%eax", "%ebx"))
+	asm_instr_list.append(ASMIdivL("%ecx"))
+	asm_instr_list.append(ASMJmpL(".label"))
+	asm_instr_list.append(ASMJmpLe(".label"))
+	asm_instr_list.append(ASMJmpEq(".label"))
+	asm_instr_list.append(ASMJmpNz(".label"))
+	asm_instr_list.append(ASMCall("printf"))
+	asm_instr_list.append(ASMRet())
+	asm_instr_list.append(ASMPushQ("%rax"))
+	asm_instr_list.append(ASMPopQ("%rax"))
+	asm_instr_list.append(ASMLabel(".label"))
+	asm_instr_list.append(ASMCmpL("%eax", "%ebx"))
+	asm_instr_list.append(ASMNegL("%eax"))
+	asm_instr_list.append(ASMXorL("$1", "%eax"))
+	asm_instr_list.append(ASMXchgL("%eax", "%ebx"))
+	asm_instr_list.append(ASMCltd())
+	asm_instr_list.append(ASMLeaQ("4(%rax)", "%rsi"))
+
+	# Test making a simple plus operation
+	# asm_instr_list.append(ASMMovL("$777", "%ebx"))
+	# asm_instr_list.append(ASMMovL("$9001", "%ecx"))
+	# asm_instr_list.append(ASMMovL("%ebx", "%eax"))
+	# asm_instr_list.append(ASMAddL("%ecx", "%eax"))
+
+	for instr in asm_instr_list:
+		print instr
