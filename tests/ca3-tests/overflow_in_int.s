@@ -9,6 +9,8 @@ main:
 	pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$0, %rsp
+	# default Int
+	movl	$0, %r10d
 	# begin in_int
 	subq	$4, %rsp
 	pushq	%rax
@@ -36,7 +38,10 @@ main:
 	movl	(%rsp), %r8d
 	addq	$4, %rsp
 	# end in_int
-	movl	%r8d, %r8d
+	# assign
+	movl	%r8d, %r10d
+	# assign
+	movl	%r10d, %r9d
 	# begin out_int
 	pushq	%rax
 	pushq	%rcx
@@ -47,7 +52,7 @@ main:
 	pushq	%r9
 	pushq	%r10
 	pushq	%r11
-	movl	%r8d, %esi
+	movl	%r9d, %esi
 	movl	$.int_fmt_string, %edi
 	movl	$0, %eax
 	call	printf
@@ -61,6 +66,9 @@ main:
 	popq	%rcx
 	popq	%rax
 	# end out_int
-	movl	%r8d, %eax
+	# assign
+	movl	%r8d, %r9d
+	# return
+	movl	%r9d, %eax
 	leave
 	ret

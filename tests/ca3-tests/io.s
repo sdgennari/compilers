@@ -121,7 +121,9 @@ main:
 	popq	%rcx
 	popq	%rax
 	# end out_int
+	# assign
+	movl	%r8d, %r9d
 	# return
-	movl	%r8d, %eax
+	movl	%r9d, %eax
 	leave
 	ret

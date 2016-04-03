@@ -49,7 +49,7 @@ def allocate_registers(original_register_graph, block_list, original_combined_li
 			# Add selected register to spill list
 			registers_to_spill_list.append(node_to_remove)
 
-			print "Spilling", node_to_remove
+			# print "Spilling", node_to_remove
 		else:
 			registers_to_color_list.append(node_to_remove)
 		# -- end if
@@ -186,13 +186,15 @@ def build_register_graph(block_list):
 		for idx, live_set in enumerate(block.live_set_list):
 
 			tac_instr = block.instr_list[idx]
-			# assignee = None
-			# if hasattr(tac_instr, "assignee"):
-			# 	assignee = tac_instr.assignee
 
-			# # If the assignee is not in the graph, add it
-			# if assignee != None and assignee not in register_graph:
-			# 	register_graph[assignee] = set()
+			# Check if the current instr has an assignee
+			assignee = None
+			if hasattr(tac_instr, "assignee"):
+				assignee = tac_instr.assignee
+
+			# If the assignee is not in the graph, add it
+			if assignee != None and assignee not in register_graph:
+				register_graph[assignee] = set()
 
 			# Registers in the same live set should have edges in the graph
 			for i in range(len(live_set)):
@@ -217,9 +219,9 @@ def build_register_graph(block_list):
 				# -- end j loop
 
 				# Handle assignee explicitly
-				# if assignee != None:
-				# 	register_graph[reg1].add(assignee)
-				# 	register_graph[assignee].add(reg1)
+				if assignee != None:
+					register_graph[reg1].add(assignee)
+					register_graph[assignee].add(reg1)
 
 			# -- end i loop
 		# -- end live_set loop
@@ -247,7 +249,7 @@ if __name__ == "__main__":
 	
 	# for block in block_list:
 	# 	for instr, live_set in zip(block.instr_list, block.live_set_list):
-	# 		print instr
+	# 		print instr, "\t\t\t", live_set
 	# print
 	# sys.exit(1)
 

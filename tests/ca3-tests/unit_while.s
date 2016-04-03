@@ -9,22 +9,31 @@ main:
 	pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$0, %rsp
-	movl	$0, %r9d
+	# default Int
+	movl	$0, %r10d
 	jmp	.loop_start_2
 .loop_start_2:
-	movl	$10, %r8d
-	cmpl	%r8d, %r9d
-	movl	$1, %r10d
+	# assign
+	movl	%r10d, %r9d
+	movl	$10, %r11d
+	# comp LT
+	cmpl	%r11d, %r9d
+	movl	$1, %r8d
 	jl	.asm_label_1
-	movl	$0, %r10d
+	movl	$0, %r8d
 .asm_label_1:
-	movl	%r10d, %r8d
-	xorl	$1, %r8d
-	test	%r10d, %r10d
-	jnz	.loop_body_2
+	# not
+	movl	%r8d, %r9d
+	xorl	$1, %r9d
+	# branch .loop_body_2
 	test	%r8d, %r8d
+	jnz	.loop_body_2
+	# branch .loop_exit_2
+	test	%r9d, %r9d
 	jnz	.loop_exit_2
 .loop_body_2:
+	# assign
+	movl	%r10d, %r9d
 	# begin out_int
 	pushq	%rax
 	pushq	%rcx
@@ -49,11 +58,19 @@ main:
 	popq	%rcx
 	popq	%rax
 	# end out_int
-	movl	$1, %r8d
-	addl	%r9d, %r8d
-	movl	%r8d, %r9d
+	# assign
+	movl	%r10d, %r9d
+	movl	$1, %r10d
+	# plus
+	movl	%r9d, %r8d
+	addl	%r10d, %r8d
+	# assign
+	movl	%r8d, %r10d
 	jmp	.loop_start_2
 .loop_exit_2:
+	# assign
+	movl	%r9d, %r8d
+	# return
 	movl	%r8d, %eax
 	leave
 	ret

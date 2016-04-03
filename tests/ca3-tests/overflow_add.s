@@ -9,13 +9,29 @@ main:
 	pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$0, %rsp
-	movl	$2147483647, %r8d
-	movl	%r8d, %r8d
+	# default Int
+	movl	$0, %r8d
+	# default Int
+	movl	$0, %r9d
+	# default Int
+	movl	$0, %r8d
 	movl	$2147483647, %r9d
-	movl	%r9d, %r9d
-	movl	%r8d, %r8d
-	addl	%r9d, %r8d
-	movl	%r8d, %r8d
+	# assign
+	movl	%r9d, %r8d
+	movl	$2147483647, %r10d
+	# assign
+	movl	%r10d, %r9d
+	# assign
+	movl	%r8d, %r10d
+	# assign
+	movl	%r9d, %r8d
+	# plus
+	movl	%r10d, %r9d
+	addl	%r8d, %r9d
+	# assign
+	movl	%r9d, %r8d
+	# assign
+	movl	%r8d, %r9d
 	# begin out_int
 	pushq	%rax
 	pushq	%rcx
@@ -26,7 +42,7 @@ main:
 	pushq	%r9
 	pushq	%r10
 	pushq	%r11
-	movl	%r8d, %esi
+	movl	%r9d, %esi
 	movl	$.int_fmt_string, %edi
 	movl	$0, %eax
 	call	printf
@@ -40,6 +56,9 @@ main:
 	popq	%rcx
 	popq	%rax
 	# end out_int
-	movl	%r8d, %eax
+	# assign
+	movl	%r8d, %r9d
+	# return
+	movl	%r9d, %eax
 	leave
 	ret

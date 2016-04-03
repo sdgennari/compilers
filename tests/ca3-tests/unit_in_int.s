@@ -36,6 +36,7 @@ main:
 	movl	(%rsp), %r8d
 	addq	$4, %rsp
 	# end in_int
+	# return
 	movl	%r8d, %eax
 	leave
 	ret

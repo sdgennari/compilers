@@ -9,6 +9,10 @@ main:
 	pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$0, %rsp
+	# default Int
+	movl	$0, %r11d
+	# default Int
+	movl	$0, %r12d
 	# begin in_int
 	subq	$4, %rsp
 	pushq	%rax
@@ -66,9 +70,13 @@ main:
 	addq	$4, %rsp
 	# end in_int
 	# assign
-	movl	%r8d, %r10d
+	movl	%r8d, %r12d
+	# assign
+	movl	%r11d, %r9d
+	# assign
+	movl	%r12d, %r10d
 	# comp LT
-	cmpl	%r10d, %r11d
+	cmpl	%r10d, %r9d
 	movl	$1, %r8d
 	jl	.asm_label_1
 	movl	$0, %r8d
@@ -83,6 +91,8 @@ main:
 	test	%r9d, %r9d
 	jnz	.if_else_2
 .if_then_2:
+	# assign
+	movl	%r11d, %r9d
 	# begin out_int
 	pushq	%rax
 	pushq	%rcx
@@ -93,7 +103,7 @@ main:
 	pushq	%r9
 	pushq	%r10
 	pushq	%r11
-	movl	%r11d, %esi
+	movl	%r9d, %esi
 	movl	$.int_fmt_string, %edi
 	movl	$0, %eax
 	call	printf
@@ -108,9 +118,11 @@ main:
 	popq	%rax
 	# end out_int
 	# assign
-	movl	%r8d, %r8d
+	movl	%r8d, %r9d
 	jmp	.if_exit_2
 .if_else_2:
+	# assign
+	movl	%r12d, %r9d
 	# begin out_int
 	pushq	%rax
 	pushq	%rcx
@@ -121,7 +133,7 @@ main:
 	pushq	%r9
 	pushq	%r10
 	pushq	%r11
-	movl	%r10d, %esi
+	movl	%r9d, %esi
 	movl	$.int_fmt_string, %edi
 	movl	$0, %eax
 	call	printf
@@ -136,9 +148,11 @@ main:
 	popq	%rax
 	# end out_int
 	# assign
-	movl	%r8d, %r8d
+	movl	%r8d, %r9d
 	jmp	.if_exit_2
 .if_exit_2:
+	# assign
+	movl	%r9d, %r8d
 	# return
 	movl	%r8d, %eax
 	leave

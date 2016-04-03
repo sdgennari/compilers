@@ -9,7 +9,7 @@ main:
 	pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$0, %rsp
-	movl	$777, %r8d
+	movl	$777, %r9d
 	# begin out_int
 	pushq	%rax
 	pushq	%rcx
@@ -20,7 +20,7 @@ main:
 	pushq	%r9
 	pushq	%r10
 	pushq	%r11
-	movl	%r8d, %esi
+	movl	%r9d, %esi
 	movl	$.int_fmt_string, %edi
 	movl	$0, %eax
 	call	printf
@@ -34,6 +34,7 @@ main:
 	popq	%rcx
 	popq	%rax
 	# end out_int
+	# return
 	movl	%r8d, %eax
 	leave
 	ret

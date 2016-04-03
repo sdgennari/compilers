@@ -9544,6 +9544,8 @@ main:
 	popq	%rcx
 	popq	%rax
 	# end out_int
+	# assign
+	movl	%r8d, %r8d
 	# return
 	movl	%r8d, %eax
 	leave

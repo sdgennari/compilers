@@ -266,7 +266,9 @@ main:
 	movl	%r8d, %r9d
 	jmp	.if_exit_4
 .if_exit_4:
+	# assign
+	movl	%r9d, %r8d
 	# return
-	movl	%r9d, %eax
+	movl	%r8d, %eax
 	leave
 	ret
