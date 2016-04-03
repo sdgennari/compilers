@@ -1,0 +1,25 @@
+label Main_main_1 			[]
+t$2 <- default Int 			[]
+t$3 <- default Int 			[]
+t$4 <- default Int 			[]
+
+# a <- 111, a
+t$7 <- int 111 				[]
+t$2 <- t$7 					['t$7']
+
+# b <- 222
+t$9 <- int 222 				[]
+t$3 <- t$9 					['t$9']
+
+# c <- 333
+t$11 <- int 333 			['t$3']
+t$4 <- t$11 				['t$3', 't$11']
+
+# a <- b + c
+t$14 <- t$3 				['t$3', 't$4']
+t$15 <- t$4 				['t$14', 't$4']
+t$13 <- + t$14 t$15 		['t$15', 't$14']
+t$2 <- t$13 				['t$13']
+
+# return
+return t$2 					['t$2']

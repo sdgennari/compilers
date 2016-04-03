@@ -389,7 +389,8 @@ def gen_tac_for_binding(ast_binding):
 		tac_list.append(TACDefault(assignee_symbol, ast_binding.binding_type))
 	else:
 		# let_binding_init
-		tac_list.append(TACAssign(assignee_symbol, gen_tac_for_exp(ast_binding.exp)))
+		exp_symbol = gen_tac_for_exp(ast_binding.exp)
+		tac_list.append(TACAssign(assignee_symbol, exp_symbol))
 
 	# NOTE: No need to return a symbol since all items are added to symbol table
 
@@ -417,8 +418,11 @@ def gen_tac_for_exp(ast_exp):
 
 	elif isinstance(ast_exp, ASTExpIdentifier):
 		# ExpIdentifier: (self, line, ident_line, ident)
-		# For an identifier, return the appropriate symbol from the symbol table
-		return get_symbol(ast_exp.ident)
+		# For an identifier, get appropriate symbol from the symbol table
+		ident_symbol = get_symbol(ast_exp.ident)
+
+		# Assign the ident symbol to the asignee symbol
+		tac_list.append(TACAssign(assignee_symbol, ident_symbol))
 
 	elif isinstance(ast_exp, ASTExpIfThenElse):
 		# ExpIfThenElse: (self, line, cond_exp, then_exp, else_exp)
@@ -442,7 +446,6 @@ def gen_tac_for_exp(ast_exp):
 		tac_list.append(TACLabel(then_label))
 		then_symbol = gen_tac_for_exp(ast_exp.then_exp)
 		tac_list.append(TACAssign(assignee_symbol, then_symbol))
-
 		# Jump over 'else' exp
 		tac_list.append(TACJmp(exit_label))
 
@@ -451,7 +454,6 @@ def gen_tac_for_exp(ast_exp):
 		tac_list.append(TACLabel(else_label))
 		else_symbol = gen_tac_for_exp(ast_exp.else_exp)
 		tac_list.append(TACAssign(assignee_symbol, else_symbol))
-
 		# Jump to exit label to preserve child info in basic blocks
 		tac_list.append(TACJmp(exit_label))
 
@@ -527,10 +529,11 @@ def gen_tac_for_exp(ast_exp):
 		# Handle expression after 'in'
 		return_symbol = gen_tac_for_exp(ast_exp.exp)
 
+		# Store the 'in' expression in assignee
+		tac_list.append(TACAssign(assignee_symbol, return_symbol))
+
 		# Remove symbol table from stack
 		symbol_table_list.pop()
-
-		return return_symbol
 
 	# Handle all binary expressions together
 	elif isinstance(ast_exp, ASTExpBinaryArith):
@@ -637,6 +640,9 @@ def gen_tac_for_feature(ast_feature, class_name):
 		if ast_feature.ident != "main":
 			return
 
+		# Add symbol table for method
+		symbol_table_list.append({})
+
 		# Label for start of method
 		label = str(class_name)+"_"+str(ast_feature.ident)+"_"+new_label_num()
 		tac_list.append(TACLabel(label))
@@ -646,15 +652,19 @@ def gen_tac_for_feature(ast_feature, class_name):
 		return_symbol = gen_tac_for_exp(ast_feature.body_exp)
 		tac_list.append(TACReturn(return_symbol))
 
+		symbol_table_list.pop()
+
 	elif isinstance(ast_feature, ASTAttrInit):
 		# AttrInit: (self, ident_line, ident, type_line, feature_type, exp)
-		attr_symbol = add_attr_symbol(ast_feature.ident)
+		# attr_symbol = add_attr_symbol(ast_feature.ident)
+		attr_symbol = add_symbol(ast_feature.ident)
 		exp_symbol = gen_tac_for_exp(ast_feature.exp)
 		tac_list.append(TACAssign(attr_symbol, exp_symbol))
 
 	elif isinstance(ast_feature, ASTAttrNoInit):
 		# AttrNoInit: (self, ident_line, ident, type_line, feature_type)
-		attr_symbol = add_attr_symbol(ast_feature.ident)
+		# attr_symbol = add_attr_symbol(ast_feature.ident)
+		attr_symbol = add_symbol(ast_feature.ident)
 		tac_list.append(TACDefault(attr_symbol, ast_feature.feature_type))
 
 def gen_tac_for_class(ast_class):

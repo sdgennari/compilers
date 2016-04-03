@@ -1,0 +1,82 @@
+comment start
+label Main_main_0
+t$1 <- default Int
+t$2 <- default Int
+t$3 <- default Bool
+t$1 <- int 7
+t$4 <- t$1
+t$2 <- int 3
+t$5 <- t$2
+t$8 <- t$1
+t$9 <- t$2
+t$7 <- < t$8 t$9
+t$23 <- not t$7
+bt t$23 Main_main_2
+bt t$7 Main_main_1
+comment then branch
+label Main_main_1
+t$10 <- int 1
+jmp Main_main_4
+comment else branch
+label Main_main_2
+t$11 <- int 0
+jmp Main_main_6
+comment if-join
+label Main_main_3
+t$14 <- t$1
+t$15 <- t$2
+t$13 <- <= t$14 t$15
+t$24 <- not t$13
+bt t$24 Main_main_9
+bt t$13 Main_main_8
+comment fcall-pre to out_int
+label Main_main_4
+t$6 <- call out_int t$10
+jmp Main_main_3
+comment fcall-pre to out_int
+label Main_main_6
+t$6 <- call out_int t$11
+jmp Main_main_3
+comment then branch
+label Main_main_8
+t$16 <- int 1
+jmp Main_main_11
+comment else branch
+label Main_main_9
+t$17 <- int 0
+jmp Main_main_13
+comment if-join
+label Main_main_10
+t$19 <- t$1
+t$20 <- t$2
+t$18 <- = t$19 t$20
+t$25 <- not t$18
+bt t$25 Main_main_16
+bt t$18 Main_main_15
+comment fcall-pre to out_int
+label Main_main_11
+t$12 <- call out_int t$16
+jmp Main_main_10
+comment fcall-pre to out_int
+label Main_main_13
+t$12 <- call out_int t$17
+jmp Main_main_10
+comment then branch
+label Main_main_15
+t$21 <- int 1
+jmp Main_main_18
+comment else branch
+label Main_main_16
+t$22 <- int 0
+jmp Main_main_20
+comment if-join
+label Main_main_17
+return t$0
+comment fcall-pre to out_int
+label Main_main_18
+t$0 <- call out_int t$21
+jmp Main_main_17
+comment fcall-pre to out_int
+label Main_main_20
+t$0 <- call out_int t$22
+jmp Main_main_17

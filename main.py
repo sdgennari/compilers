@@ -49,7 +49,7 @@ def allocate_registers(original_register_graph, block_list, original_combined_li
 			# Add selected register to spill list
 			registers_to_spill_list.append(node_to_remove)
 
-			# print "Spilling", node_to_remove
+			print "Spilling", node_to_remove
 		else:
 			registers_to_color_list.append(node_to_remove)
 		# -- end if
@@ -60,7 +60,8 @@ def allocate_registers(original_register_graph, block_list, original_combined_li
 			register_graph[adj_node].discard(node_to_remove)
 
 		# Remove node from combined live ranges
-		combined_live_ranges.pop(node_to_remove)
+		if node_to_remove in combined_live_ranges:
+			combined_live_ranges.pop(node_to_remove)
 
 		# print "Removed", node_to_remove
 	# -- end while
@@ -182,7 +183,16 @@ def build_register_graph(block_list):
 	register_graph = {}
 
 	for block in block_list:
-		for live_set in block.live_set_list:
+		for idx, live_set in enumerate(block.live_set_list):
+
+			tac_instr = block.instr_list[idx]
+			# assignee = None
+			# if hasattr(tac_instr, "assignee"):
+			# 	assignee = tac_instr.assignee
+
+			# # If the assignee is not in the graph, add it
+			# if assignee != None and assignee not in register_graph:
+			# 	register_graph[assignee] = set()
 
 			# Registers in the same live set should have edges in the graph
 			for i in range(len(live_set)):
@@ -205,6 +215,12 @@ def build_register_graph(block_list):
 					register_graph[reg1].add(reg2)
 					register_graph[reg2].add(reg1)
 				# -- end j loop
+
+				# Handle assignee explicitly
+				# if assignee != None:
+				# 	register_graph[reg1].add(assignee)
+				# 	register_graph[assignee].add(reg1)
+
 			# -- end i loop
 		# -- end live_set loop
 	# -- end block loop
@@ -229,11 +245,11 @@ if __name__ == "__main__":
 
 	computeLiveSets(block_list)
 	
-	for block in block_list:
-		for live_set in block.live_set_list:
-			print live_set
-	print
-	sys.exit(1)
+	# for block in block_list:
+	# 	for instr, live_set in zip(block.instr_list, block.live_set_list):
+	# 		print instr
+	# print
+	# sys.exit(1)
 
 	is_done = False
 	while not is_done:
@@ -247,9 +263,9 @@ if __name__ == "__main__":
 	# -- end while loop
 
 	# Print debugging info
-	for block in block_list:
-		for idx in range(0, len(block.live_set_list)):
-			print str(block.instr_list[idx]) + "\t\t\t\t" + str(block.live_set_list[idx])
+	# for block in block_list:
+	# 	for idx in range(0, len(block.live_set_list)):
+	# 		print str(block.instr_list[idx]) + "\t\t\t\t" + str(block.live_set_list[idx])
 	# sys.exit(1)
 
 	# print "Spilled:",len(spilled_registers)

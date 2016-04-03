@@ -133,7 +133,7 @@ def gen_asm_for_tac_store(tac_store):
 
 	dest = str(offset) + "(%rbp)"
 
-	asm_instr_list.store(ASMComment("store"))
+	asm_instr_list.append(ASMComment("store"))
 	asm_instr_list.append(ASMMovL(src, dest))
 
 def gen_asm_for_tac_load(tac_load):

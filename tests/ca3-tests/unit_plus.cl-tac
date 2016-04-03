@@ -1,0 +1,13 @@
+comment start
+label Main_main_0
+t$1 <- int 1
+t$2 <- int 2
+t$3 <- default Int
+t$5 <- t$1
+t$6 <- t$2
+t$3 <- + t$5 t$6
+t$4 <- t$3
+t$7 <- t$3
+t$8 <- t$1
+t$0 <- + t$7 t$8
+return t$0

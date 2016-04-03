@@ -1,0 +1,55 @@
+# ---- Main_main_0
+LIVE_IN = _
+LIVE_OUT = _
+Parents = []
+Chilren = 3, 4
+
+label Main_main_0
+t$1 <- default Int 		_
+t$2 <- default Int 		_
+t$1 <- int 5 			t1
+t$3 <- t$1 				t1
+t$2 <- call in_int 		_
+t$4 <- t$2 				t2
+t$6 <- t$2				t2
+t$7 <- int 3 			t6
+t$5 <- < t$6 t$7 		t6, t7
+t$8 <- not t$5 			t5
+bt t$8 Main_main_4		t5, t8
+bt t$5 Main_main_3		t5
+						_
+
+
+# ---- Main_main_3
+LIVE_IN = _
+LIVE_OUT = t0
+Parents = 0
+Children = 5
+
+label Main_main_3		_
+t$2 <- int 7  			_
+t$0 <- t$2 				t2
+jmp Main_main_5 		t0
+						t0
+
+# ---- Main_main_4
+LIVE_IN = _
+LIVE_OUT = t0
+Parents = 0
+Children = 5
+
+label Main_main_4		_
+t$2 <- int 8			_
+t$0 <- t$2				t2
+jmp Main_main_5 		t0
+						t0
+
+# ---- Main_main_5
+LIVE_IN = t0
+LIVE_OUT = _
+Parents = 3, 4
+Children = 0
+
+label Main_main_5		t0
+return t$0 				t0
+						_
