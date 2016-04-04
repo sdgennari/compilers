@@ -11,15 +11,24 @@ import sys
 
 DIVIDER_STRING = "\t\t\t## ========================================\n"
 
-def get_vtable_string():
-	# Makes the vtables for all classes
+# Map: (class_name, method_name) -> vtable index
+vtable_offset_map = {}
+
+# Formats line with prefix '.quad'
+def format_quad_line(string):
+	return "\t\t\t.quad " + string + "\n"
+
+# Makes the vtables for all classes
+def get_vtables_string():
+	global vtable_offset_map
+
 	result = ""
 	for class_name in sorted(implementation_map.keys()):
 		result += DIVIDER_STRING
 
 		# Add label info for vtable
-		result += ".globl " + class_name + "..vtable\n"
-		result += class_name + "..vtable:\t\t## vtable for " + class_name + "\n"
+		result += ".globl " + get_vtable_str(class_name) + "\n"
+		result += get_vtable_str(class_name) + ":\t\t## vtable for " + class_name + "\n"
 
 		# Add type_name and 'new' implicit method
 		# ---- TODO Set this to the correct type name label
@@ -27,31 +36,111 @@ def get_vtable_string():
 		result += format_quad_line(class_name + "..new")
 
 		# Iterate through all methods and add entries
-		for ast_method in implementation_map[class_name]:
+		offset = 2			# Account for 2 entries above when calculating idx
+		for idx, ast_method in enumerate(implementation_map[class_name]):
 			method_name = ast_method.ident
 			result += format_quad_line(class_name + ".." + method_name)
+			tup = (class_name, method_name)
+			vtable_offset_map[tup] = idx + offset
 
 	return result
 
-def format_quad_line(string):
-	return "\t\t\t.quad " + string + "\n"
-
+# Makes the type name strings for all classes
 def get_type_name_strings():
-	# Make the type name strings for all classes
 	result = DIVIDER_STRING
 	for class_name in sorted(class_map.keys()):
 		result += ".globl " + class_name + " \n"
-		result += class_name + ":\t\t## type_name string for " + class_name + "\n"
+		result += class_name + ":\t\t\t## type_name string for " + class_name + "\n"
 		result += "\t.asciz \"" + class_name + "\"\n"
 
 	return result
+
+def get_vtable_str(type_name):
+	return type_name + "..vtable"
+
+# Determines the size of a type based on its attributes
+def calculate_type_size(type_name):
+	return 3 + len(class_map[type_name])
+
+def get_constructor_string():
+	result = DIVIDER_STRING
+	for type_name in sorted(class_map.keys()):
+		result += ".globl " + type_name + "..new\n"
+		result += type_name + "..new:\t\t## Constructor for " + type_name + "\n"
+
+		# Note: This asm code is unoptimized
+		asm_instr_list = gen_asm_for_constructor(type_name)
+
+		# Add all asm instrs to result
+		for asm_instr in asm_instr_list:
+			result += str(asm_instr)
+
+		result += DIVIDER_STRING
+
+	return result
+
+# Generates assembly to allocate 
+def gen_asm_for_constructor(type_name):
+	asm_instr_list = gen_asm_for_method_start()
+
+	# Allocate space for the object based on the size via calloc(obj_size {rdi}, 8 {rsi})
+	obj_size = calculate_type_size(type_name)
+	size_str = format_asm_const_string(obj_size)
+	asm_instr_list += [
+		ASMComment("Allocate space for " + type_name),
+		ASMMovQ("$8", "%rsi"),
+		ASMMovQ(size_str, "%rdi"),
+		ASMCall("calloc")
+	]
+	# Pointer to object now in RAX
+
+	# Store type_tag, obj_size, vtable
+	# ---- TODO Get type tag for obj
+	type_tag = 777
+	vtable_str = get_vtable_str(type_name)
+	asm_instr_list += [
+		ASMComment("Store type_tag, obj_size, vtable"),
+		ASMMovQ(format_asm_const_string(type_tag), "0(%rax)"),
+		ASMMovQ(format_asm_const_string(obj_size), "8(%rax)"),
+		ASMMovQ(format_asm_const_string(vtable_str), "16(%rax)")
+	]
+
+	# Generate code for each attribute
+	# ---- TODO Generate code for each attribute
+
+	asm_instr_list += gen_asm_for_method_end()
+	return asm_instr_list
+
+def format_asm_const_string(const_int):
+	return "$" + str(const_int)
+
+# Generate list of asm intructions for the beginning of each method
+#		pushq	%rbp
+#		movq	%rsp, %rbp
+def gen_asm_for_method_start():
+	return [
+		ASMPushQ("%rbp"),
+		ASMMovQ("%rsp", "%rbp")
+	]
+
+# Generate list of asm instructions for end of each method call
+#		leave
+# 		ret
+def gen_asm_for_method_end():
+	return [
+		ASMComment("Method cleanup"),
+		ASMLeave(),
+		ASMRet()
+	]
 
 if __name__ == "__main__":
 	input_filename = sys.argv[1]
 	prog_ast_root = get_input_list_from_annotated_ast(input_filename)
 
-	print get_vtable_string()
+	print get_vtables_string()
+	print get_constructor_string()
 	print get_type_name_strings()
+
 
 	'''
 	gen_tac_for_ast(prog_ast_root)

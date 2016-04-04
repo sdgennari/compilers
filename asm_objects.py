@@ -37,11 +37,11 @@ class ASMMov(ASMSrcDestBase):
 
 class ASMMovL(ASMMov):
 	def __str__(self):
-		return "\tmovl\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\tmovl\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 class ASMMovQ(ASMMov):
 	def __str__(self):
-		return "\tmovq\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\tmovq\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # add src, dest
 class ASMAdd(ASMSrcDestBase):
@@ -49,11 +49,11 @@ class ASMAdd(ASMSrcDestBase):
 
 class ASMAddL(ASMAdd):
 	def __str__(self):
-		return "\taddl\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\taddl\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 class ASMAddQ(ASMAdd):
 	def __str__(self):
-		return "\taddq\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\taddq\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # sub src, dest
 class ASMSub(ASMSrcDestBase):
@@ -61,11 +61,11 @@ class ASMSub(ASMSrcDestBase):
 
 class ASMSubL(ASMSub):
 	def __str__(self):
-		return "\tsubl\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\tsubl\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 class ASMSubQ(ASMSub):
 	def __str__(self):
-		return "\tsubq\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\tsubq\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # imul src, dest
 class ASMImul(ASMSrcDestBase):
@@ -73,7 +73,7 @@ class ASMImul(ASMSrcDestBase):
 
 class ASMImulL(ASMImul):
 	def __str__(self):
-		return "\timull\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\timull\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # idiv divisor
 class ASMIdiv(ASMSrcDestBase):
@@ -84,7 +84,7 @@ class ASMIdivL(ASMIdiv):
 		self.divisor = divisor
 
 	def __str__(self):
-		return "\tidivl\t" + str(self.divisor)
+		return "\t\t\tidivl\t" + str(self.divisor) + "\n"
 
 # jxx .label
 class ASMJmp(object):
@@ -92,23 +92,23 @@ class ASMJmp(object):
 		self.label = label
 
 	def __str__(self):
-		return "\tjmp\t" + str(self.label)
+		return "\t\t\tjmp\t" + str(self.label) + "\n"
 
 class ASMJmpL(ASMJmp):
 	def __str__(self):
-		return "\tjl\t" + str(self.label)
+		return "\t\t\tjl\t" + str(self.label) + "\n"
 
 class ASMJmpLe(ASMJmp):
 	def __str__(self):
-		return "\tjle\t" + str(self.label)
+		return "\t\t\tjle\t" + str(self.label) + "\n"
 
 class ASMJmpEq(ASMJmp):
 	def __str__(self):
-		return "\tje\t" + str(self.label)
+		return "\t\t\tje\t" + str(self.label) + "\n"
 
 class ASMJmpNz(ASMJmp):
 	def __str__(self):
-		return "\tjnz\t" + str(self.label)
+		return "\t\t\tjnz\t" + str(self.label) + "\n"
 
 # push src
 class ASMPushQ(object):
@@ -116,7 +116,7 @@ class ASMPushQ(object):
 		self.src = src
 
 	def __str__(self):
-		return "\tpushq\t" + str(self.src)
+		return "\t\t\tpushq\t" + str(self.src) + "\n"
 
 # pop dest
 class ASMPopQ(object):
@@ -124,7 +124,7 @@ class ASMPopQ(object):
 		self.dest = dest
 
 	def __str__(self):
-		return "\tpopq\t" + str(self.dest)
+		return "\t\t\tpopq\t" + str(self.dest) + "\n"
 
 # .label:
 class ASMLabel(object):
@@ -132,12 +132,12 @@ class ASMLabel(object):
 		self.label = label
 
 	def __str__(self):
-		return str(self.label) + ":"
+		return str(self.label) + ":\n"
 
 # cmpl src, dest
 class ASMCmpL(ASMSrcDestBase):
 	def __str__(self):
-		return "\tcmpl\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\tcmpl\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # test reg1, reg2
 class ASMTest(ASMSrcDestBase):
@@ -145,7 +145,7 @@ class ASMTest(ASMSrcDestBase):
 
 class ASMTestL(ASMTest):
 	def __str__(self):
-		return "\ttest\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\ttest\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # negl reg
 class ASMNegL(object):
@@ -153,27 +153,27 @@ class ASMNegL(object):
 		self.reg = reg
 
 	def __str__(self):
-		return "\tnegl\t" + str(self.reg)
+		return "\t\t\tnegl\t" + str(self.reg) + "\n"
 
 # xorl src, dest
 class ASMXorL(ASMSrcDestBase):
 	def __str__(self):
-		return "\txorl\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\txorl\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # xchgl src, dest
 class ASMXchgL(ASMSrcDestBase):
 	def __str__(self):
-		return "\txchgl\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\txchgl\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # cltd
 class ASMCltd(object):
 	def __str__(self):
-		return "\tcltd"
+		return "\t\t\tcltd\n"
 
 # leaq src, dest
 class ASMLeaQ(ASMSrcDestBase):
 	def __str__(self):
-		return "\tleaq\t" + str(self.src) + ", " + str(self.dest)
+		return "\t\t\tleaq\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # call function
 class ASMCall(object):
@@ -181,17 +181,17 @@ class ASMCall(object):
 		self.function_name = function_name
 
 	def __str__(self):
-		return "\tcall\t" + str(self.function_name) 
+		return "\t\t\tcall\t" + str(self.function_name)  + "\n"
 
 # ret
 class ASMRet(object):
 	def __str__(self):
-		return "\tret"
+		return "\t\t\tret\n"
 
 # leave
 class ASMLeave(object):
 	def __str__(self):
-		return "\tleave"
+		return "\t\t\tleave\n"
 
 # comments
 class ASMComment(object):
@@ -199,7 +199,7 @@ class ASMComment(object):
 		self.comment = comment
 
 	def __str__(self):
-		return "\t# " + str(self.comment)
+		return "\t\t\t## " + str(self.comment) + "\n"
 
 
 if __name__ == "__main__":
@@ -236,4 +236,4 @@ if __name__ == "__main__":
 	# asm_instr_list.append(ASMAddL("%ecx", "%eax"))
 
 	for instr in asm_instr_list:
-		print instr
+		print instr,

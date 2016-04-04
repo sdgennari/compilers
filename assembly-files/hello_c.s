@@ -28,20 +28,22 @@ String:
 	.type	main, @function
 main:
 .LFB0:
-	.cfi_startproc
 	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
 	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movl	$String, %edi
-	movl	$0, %eax
-	call	printf
-	movl	$0, %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+
+	## Allocate space for Object
+	movq	$8, %rsi
+	movq	$3, %rdi
+	call	calloc
+
+	## Store type_tag, obj_size, vtable
+	movq	$777, 0(%rax)
+	movq	$3, 8(%rax)
+	movq	$String, 16(%rax)
+
+	leave
 	ret
-	.cfi_endproc
+	
 .LFE0:
 	.size	main, .-main
 	.ident	"GCC: (Ubuntu 4.8.4-2ubuntu1~14.04.1) 4.8.4"
