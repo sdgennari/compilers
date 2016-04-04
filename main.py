@@ -5,12 +5,15 @@ from ast_nodes import *
 from tac_to_asm import *
 from ast_to_tac import *
 from allocate_registers import *
+from deserialize_ast import *
 import copy
 import sys
 
 if __name__ == "__main__":
 	input_filename = sys.argv[1]
 	prog_ast_root = get_input_list_from_annotated_ast(input_filename)
+
+	'''
 	gen_tac_for_ast(prog_ast_root)
 
 	block_list = buildBasicBlocks(tac_list)
@@ -54,3 +57,4 @@ if __name__ == "__main__":
 	for asm_instr in asm_instr_list:
 		output_file.write(str(asm_instr))
 		output_file.write("\n")
+	'''

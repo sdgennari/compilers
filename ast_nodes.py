@@ -71,6 +71,7 @@ class ASTMethod(ASTFeature):
 		self.type_line = type_line
 		self.ret_typ = ret_typ
 		self.body_exp = body_exp
+		self.containing_class = None
 
 	def __str__(self):
 		result = "method\n"
@@ -424,3 +425,17 @@ class ASTExpCaseElem(object):
 		result += str(self.type_line) + "\n" + str(self.case_type) + "\n"
 		result += str(self.exp)
 		return result
+
+# Predefined internal expressions
+class ASTExpInternal(ASTExp):
+	def __init__(self, class_method, body_type):
+		self.class_method = class_method
+		self.body_type = body_type
+
+	def __str__(self):
+		result = "0\n"
+		result += str(self.body_type) + "\n"
+		result += "internal\n"
+		result += str(self.class_method)
+		return result
+
