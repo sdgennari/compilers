@@ -1,0 +1,81 @@
+			## ========================================
+.globl Bool..vtable
+Bool..vtable:		## vtable for Bool
+			.quad type_name_Bool
+			.quad Bool..new
+			.quad Bool..abort
+			.quad Bool..copy
+			.quad Bool..type_name
+			## ========================================
+.globl IO..vtable
+IO..vtable:		## vtable for IO
+			.quad type_name_IO
+			.quad IO..new
+			.quad IO..abort
+			.quad IO..copy
+			.quad IO..type_name
+			.quad IO..in_int
+			.quad IO..in_string
+			.quad IO..out_int
+			.quad IO..out_string
+			## ========================================
+.globl Int..vtable
+Int..vtable:		## vtable for Int
+			.quad type_name_Int
+			.quad Int..new
+			.quad Int..abort
+			.quad Int..copy
+			.quad Int..type_name
+			## ========================================
+.globl Main..vtable
+Main..vtable:		## vtable for Main
+			.quad type_name_Main
+			.quad Main..new
+			.quad Main..abort
+			.quad Main..copy
+			.quad Main..type_name
+			.quad Main..in_int
+			.quad Main..in_string
+			.quad Main..out_int
+			.quad Main..out_string
+			.quad Main..main
+			## ========================================
+.globl Object..vtable
+Object..vtable:		## vtable for Object
+			.quad type_name_Object
+			.quad Object..new
+			.quad Object..abort
+			.quad Object..copy
+			.quad Object..type_name
+			## ========================================
+.globl String..vtable
+String..vtable:		## vtable for String
+			.quad type_name_String
+			.quad String..new
+			.quad String..abort
+			.quad String..copy
+			.quad String..type_name
+			.quad String..concat
+			.quad String..length
+			.quad String..substr
+
+			## ========================================
+.globl Bool 
+Bool:		## type_name string for Bool
+	.asciz "Bool"
+.globl IO 
+IO:		## type_name string for IO
+	.asciz "IO"
+.globl Int 
+Int:		## type_name string for Int
+	.asciz "Int"
+.globl Main 
+Main:		## type_name string for Main
+	.asciz "Main"
+.globl Object 
+Object:		## type_name string for Object
+	.asciz "Object"
+.globl String 
+String:		## type_name string for String
+	.asciz "String"
+
