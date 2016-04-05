@@ -69,7 +69,7 @@ Bool..new:		## Constructor for Bool
 			movq	$4, %rdi
 			call	calloc
 			## Store type_tag, obj_size, vtable
-			movq	$777, 0(%rax)
+			movq	$1, 0(%rax)
 			movq	$4, 8(%rax)
 			movq	$Bool..vtable, 16(%rax)
 			## Method cleanup
@@ -85,7 +85,7 @@ IO..new:		## Constructor for IO
 			movq	$3, %rdi
 			call	calloc
 			## Store type_tag, obj_size, vtable
-			movq	$777, 0(%rax)
+			movq	$3, 0(%rax)
 			movq	$3, 8(%rax)
 			movq	$IO..vtable, 16(%rax)
 			## Method cleanup
@@ -101,7 +101,7 @@ Int..new:		## Constructor for Int
 			movq	$4, %rdi
 			call	calloc
 			## Store type_tag, obj_size, vtable
-			movq	$777, 0(%rax)
+			movq	$2, 0(%rax)
 			movq	$4, 8(%rax)
 			movq	$Int..vtable, 16(%rax)
 			## Method cleanup
@@ -117,7 +117,7 @@ Main..new:		## Constructor for Main
 			movq	$3, %rdi
 			call	calloc
 			## Store type_tag, obj_size, vtable
-			movq	$777, 0(%rax)
+			movq	$10, 0(%rax)
 			movq	$3, 8(%rax)
 			movq	$Main..vtable, 16(%rax)
 			## Method cleanup
@@ -133,7 +133,7 @@ Object..new:		## Constructor for Object
 			movq	$3, %rdi
 			call	calloc
 			## Store type_tag, obj_size, vtable
-			movq	$777, 0(%rax)
+			movq	$4, 0(%rax)
 			movq	$3, 8(%rax)
 			movq	$Object..vtable, 16(%rax)
 			## Method cleanup
@@ -149,7 +149,7 @@ String..new:		## Constructor for String
 			movq	$4, %rdi
 			call	calloc
 			## Store type_tag, obj_size, vtable
-			movq	$777, 0(%rax)
+			movq	$5, 0(%rax)
 			movq	$4, 8(%rax)
 			movq	$String..vtable, 16(%rax)
 			## Method cleanup

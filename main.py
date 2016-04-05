@@ -13,6 +13,8 @@ DIVIDER_STRING = "\t\t\t## ========================================\n"
 
 # Map: (class_name, method_name) -> vtable index
 vtable_offset_map = {}
+# Map: type_name -> type_tag int
+type_tag_map = {}
 
 # Formats line with prefix '.quad'
 def format_quad_line(string):
@@ -95,8 +97,7 @@ def gen_asm_for_constructor(type_name):
 	# Pointer to object now in RAX
 
 	# Store type_tag, obj_size, vtable
-	# ---- TODO Get type tag for obj
-	type_tag = 777
+	type_tag = type_tag_map[type_name]
 	vtable_str = get_vtable_str(type_name)
 	asm_instr_list += [
 		ASMComment("Store type_tag, obj_size, vtable"),
@@ -133,14 +134,29 @@ def gen_asm_for_method_end():
 		ASMRet()
 	]
 
+def make_global_type_tag_map():
+	global type_tag_map
+
+	# Handle built in types explicitly
+	built_in_types = ["Bool", "Int", "IO", "Object", "String"]
+	for idx, type_name in enumerate(built_in_types):
+		type_tag_map[type_name] = idx+1
+
+	# Give all other types tags >= offset
+	offset = 10
+	remaining_types = [type_name for type_name in class_map if type_name not in built_in_types]
+	for idx, type_name in enumerate(sorted(remaining_types)):
+		type_tag_map[type_name] = idx + offset
+
 if __name__ == "__main__":
 	input_filename = sys.argv[1]
 	prog_ast_root = get_input_list_from_annotated_ast(input_filename)
 
+	make_global_type_tag_map()
+
 	print get_vtables_string()
 	print get_constructor_string()
 	print get_type_name_strings()
-
 
 	'''
 	gen_tac_for_ast(prog_ast_root)
