@@ -1,5 +1,6 @@
 class Main inherits IO {
-	some_attr : Int <- 777 + 888;
+	some_attr : Int <- 777;
+	another_attr : Int;
 
 	main() : Object {
 		{

@@ -68,11 +68,17 @@ Bool..new:		## Constructor for Bool
 			movq	$8, %rsi
 			movq	$4, %rdi
 			call	calloc
+			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
-			movq	$1, 0(%rax)
-			movq	$4, 8(%rax)
-			movq	$Bool..vtable, 16(%rax)
-			## Method cleanup
+			movq	$0, 0(%rbx)
+			movq	$4, 8(%rbx)
+			movq	$Bool..vtable, 16(%rbx)
+			## Create default attrs
+			## self[3] holds val (RawInt)
+			movl	$0, 24(%rbx)
+			## Initialize attrs
+			## Assign self register to %rax
+			movq	%rbx, %rax
 			leave
 			ret
 			## ========================================
@@ -84,11 +90,15 @@ IO..new:		## Constructor for IO
 			movq	$8, %rsi
 			movq	$3, %rdi
 			call	calloc
+			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
-			movq	$3, 0(%rax)
-			movq	$3, 8(%rax)
-			movq	$IO..vtable, 16(%rax)
-			## Method cleanup
+			movq	$2, 0(%rbx)
+			movq	$3, 8(%rbx)
+			movq	$IO..vtable, 16(%rbx)
+			## Create default attrs
+			## Initialize attrs
+			## Assign self register to %rax
+			movq	%rbx, %rax
 			leave
 			ret
 			## ========================================
@@ -100,11 +110,17 @@ Int..new:		## Constructor for Int
 			movq	$8, %rsi
 			movq	$4, %rdi
 			call	calloc
+			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
-			movq	$2, 0(%rax)
-			movq	$4, 8(%rax)
-			movq	$Int..vtable, 16(%rax)
-			## Method cleanup
+			movq	$1, 0(%rbx)
+			movq	$4, 8(%rbx)
+			movq	$Int..vtable, 16(%rbx)
+			## Create default attrs
+			## self[3] holds val (RawInt)
+			movl	$0, 24(%rbx)
+			## Initialize attrs
+			## Assign self register to %rax
+			movq	%rbx, %rax
 			leave
 			ret
 			## ========================================
@@ -114,13 +130,29 @@ Main..new:		## Constructor for Main
 			movq	%rsp, %rbp
 			## Allocate space for Main
 			movq	$8, %rsi
-			movq	$3, %rdi
+			movq	$5, %rdi
 			call	calloc
+			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
-			movq	$10, 0(%rax)
-			movq	$3, 8(%rax)
-			movq	$Main..vtable, 16(%rax)
-			## Method cleanup
+			movq	$5, 0(%rbx)
+			movq	$5, 8(%rbx)
+			movq	$Main..vtable, 16(%rbx)
+			## Create default attrs
+			## self[3] holds some_attr (Int)
+			pushq	%rbx
+			call	Int..new
+			popq	%rbx
+			movq	%rax, 24(%rbx)
+			## self[4] holds another_attr (Int)
+			pushq	%rbx
+			call	Int..new
+			popq	%rbx
+			movq	%rax, 32(%rbx)
+			## Initialize attrs
+			## self[3] some_attr <- init exp
+			## ---- TODO: Generate asm for init exp
+			## Assign self register to %rax
+			movq	%rbx, %rax
 			leave
 			ret
 			## ========================================
@@ -132,11 +164,15 @@ Object..new:		## Constructor for Object
 			movq	$8, %rsi
 			movq	$3, %rdi
 			call	calloc
+			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
-			movq	$4, 0(%rax)
-			movq	$3, 8(%rax)
-			movq	$Object..vtable, 16(%rax)
-			## Method cleanup
+			movq	$3, 0(%rbx)
+			movq	$3, 8(%rbx)
+			movq	$Object..vtable, 16(%rbx)
+			## Create default attrs
+			## Initialize attrs
+			## Assign self register to %rax
+			movq	%rbx, %rax
 			leave
 			ret
 			## ========================================
@@ -148,32 +184,47 @@ String..new:		## Constructor for String
 			movq	$8, %rsi
 			movq	$4, %rdi
 			call	calloc
+			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
-			movq	$5, 0(%rax)
-			movq	$4, 8(%rax)
-			movq	$String..vtable, 16(%rax)
-			## Method cleanup
+			movq	$4, 0(%rbx)
+			movq	$4, 8(%rbx)
+			movq	$String..vtable, 16(%rbx)
+			## Create default attrs
+			## self[3] holds val (RawString)
+			movl	$empty.string, 24(%rbx)
+			## Initialize attrs
+			## Assign self register to %rax
+			movq	%rbx, %rax
 			leave
 			ret
 			## ========================================
 
 			## ========================================
-.globl Bool 
-Bool:			## type_name string for Bool
+.globl type_name_Bool 
+type_name_Bool:			## type_name string for Bool
 	.asciz "Bool"
-.globl IO 
-IO:			## type_name string for IO
+
+.globl type_name_IO 
+type_name_IO:			## type_name string for IO
 	.asciz "IO"
-.globl Int 
-Int:			## type_name string for Int
+
+.globl type_name_Int 
+type_name_Int:			## type_name string for Int
 	.asciz "Int"
-.globl Main 
-Main:			## type_name string for Main
+
+.globl type_name_Main 
+type_name_Main:			## type_name string for Main
 	.asciz "Main"
-.globl Object 
-Object:			## type_name string for Object
+
+.globl type_name_Object 
+type_name_Object:			## type_name string for Object
 	.asciz "Object"
-.globl String 
-String:			## type_name string for String
+
+.globl type_name_String 
+type_name_String:			## type_name string for String
 	.asciz "String"
+
+.globl empty.string
+empty.string:			## empty string for default Strings
+	.asciz ""
 
