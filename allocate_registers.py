@@ -8,7 +8,7 @@ import copy
 import re
 import sys
 
-NUM_REGISTERS = 14
+NUM_REGISTERS = 12
 register_colors = {}
 spilled_registers = []
 

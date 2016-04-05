@@ -108,6 +108,7 @@ def gen_asm_for_constructor(type_name):
 
 	# Generate code for each attribute
 	# ---- TODO Generate code for each attribute
+	# Note: Handle RawInt and RawString explicitly
 
 	asm_instr_list += gen_asm_for_method_end()
 	return asm_instr_list
@@ -152,20 +153,15 @@ if __name__ == "__main__":
 	input_filename = sys.argv[1]
 	prog_ast_root = get_input_list_from_annotated_ast(input_filename)
 
-	make_global_type_tag_map()
+	# make_global_type_tag_map()
 
-	print get_vtables_string()
-	print get_constructor_string()
-	print get_type_name_strings()
+	# print get_vtables_string()
+	# print get_constructor_string()
+	# print get_type_name_strings()
 
-	'''
 	gen_tac_for_ast(prog_ast_root)
 
 	block_list = buildBasicBlocks(tac_list)
-
-	# Remove dead code
-	# computeLiveSets(block_list)
-	# removeDeadCode(block_list)
 
 	computeLiveSets(block_list)
 
@@ -190,6 +186,11 @@ if __name__ == "__main__":
 
 	gen_asm_for_block_list(block_list, register_colors, spilled_registers)
 
+	# Print output
+	for asm_instr in asm_instr_list:
+		print asm_instr,
+
+	'''
 	old_file_ext_len = len("cl-type")
 	offset_from_end = -1 * old_file_ext_len
 	output_filename = input_filename[0:offset_from_end] + "s"

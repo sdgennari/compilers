@@ -268,3 +268,20 @@ class TACLoad(TACCustom):
 
 	def __str__(self):
 		return self.assignee + " <- load loc["+self.location+"]"
+
+class TACBox(TACCustom):
+	def __init__(self, assignee, op1, exp_type):
+		self.assignee = assignee
+		self.op1 = op1
+		self.exp_type = exp_type
+
+	def __str__(self):
+		return self.assignee + " <- box (" + self.exp_type + ") " + self.op1
+
+class TACUnbox(TACCustom):
+	def __init__(self, assignee, op1):
+		self.assignee = assignee
+		self.op1 = op1
+
+	def __str__(self):
+		return self.assignee + " <- unbox " + self.op1

@@ -64,6 +64,16 @@ def gen_tac_for_binding(ast_binding):
 
 	# NOTE: No need to return a symbol since all items are added to symbol table
 
+def gen_tac_for_box(unboxed_symbol, exp_type):
+	boxed_symbol = new_symbol()
+	tac_list.append(TACBox(boxed_symbol, unboxed_symbol, exp_type))
+	return boxed_symbol
+
+def gen_tac_for_unbox(boxed_symbol):
+	unboxed_symbol = new_symbol()
+	tac_list.append(TACUnbox(unboxed_symbol, boxed_symbol))
+	return unboxed_symbol
+
 def gen_tac_for_exp(ast_exp):
 	global tac_list
 
@@ -205,38 +215,116 @@ def gen_tac_for_exp(ast_exp):
 		# Remove symbol table from stack
 		symbol_table_list.pop()
 
-	# Handle all binary expressions together
-	elif isinstance(ast_exp, ASTExpBinaryArith):
-		# ExpBinaryArith: (self, line, left_exp, right_exp)
+	# Handle binary expressions together
+	# ExpBinaryArith: (self, line, left_exp, right_exp)
+	elif isinstance(ast_exp, ASTExpPlus):
+		# Generate tac for boxed values
+		lhs_symbol_boxed = gen_tac_for_exp(ast_exp.left_exp)
+		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
+
+		# Unbox values
+		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed)
+		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed)
+
+		# Use the unboxed values in the calculation
+		unboxed_assignee_symbol = new_symbol()
+		tac_list.append(TACPlus(unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+
+		# Box the answer and set assignee to pointer
+		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
+		
+	elif isinstance(ast_exp, ASTExpMinus):
+		# Generate tac for boxed values
+		lhs_symbol_boxed = gen_tac_for_exp(ast_exp.left_exp)
+		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
+
+		# Unbox values
+		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed)
+		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed)
+
+		# Use the unboxed values in the calculation
+		unboxed_assignee_symbol = new_symbol()
+		tac_list.append(TACMinus(unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+
+		# Box the answer and set assignee to pointer
+		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
+
+	elif isinstance(ast_exp, ASTExpTimes):
+		# Generate tac for boxed values
+		lhs_symbol_boxed = gen_tac_for_exp(ast_exp.left_exp)
+		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
+
+		# Unbox values
+		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed)
+		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed)
+
+		# Use the unboxed values in the calculation
+		unboxed_assignee_symbol = new_symbol()
+		tac_list.append(TACMult(unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+
+		# Box the answer and set assignee to pointer
+		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
+
+	elif isinstance(ast_exp, ASTExpDivide):
+		# Generate tac for boxed values
+		lhs_symbol_boxed = gen_tac_for_exp(ast_exp.left_exp)
+		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
+
+		# Unbox values
+		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed)
+		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed)
+
+		# Use the unboxed values in the calculation
+		unboxed_assignee_symbol = new_symbol()
+		tac_list.append(TACDiv(unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+
+		# Box the answer and set assignee to pointer
+		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
+
+	elif isinstance(ast_exp, ASTExpLt):
 		left_symbol = gen_tac_for_exp(ast_exp.left_exp)
 		right_symbol = gen_tac_for_exp(ast_exp.right_exp)
+		tac_list.append(TACCompL(assignee_symbol, left_symbol, right_symbol))
 
-		if isinstance(ast_exp, ASTExpPlus):
-			tac_list.append(TACPlus(assignee_symbol, left_symbol, right_symbol))
-		elif isinstance(ast_exp, ASTExpMinus):
-			tac_list.append(TACMinus(assignee_symbol, left_symbol, right_symbol))
-		elif isinstance(ast_exp, ASTExpTimes):
-			tac_list.append(TACMult(assignee_symbol, left_symbol, right_symbol))
-		elif isinstance(ast_exp, ASTExpDivide):
-			tac_list.append(TACDiv(assignee_symbol, left_symbol, right_symbol))
-		elif isinstance(ast_exp, ASTExpLt):
-			tac_list.append(TACCompL(assignee_symbol, left_symbol, right_symbol))
-		elif isinstance(ast_exp, ASTExpLe):
-			tac_list.append(TACCompLE(assignee_symbol, left_symbol, right_symbol))
-		elif isinstance(ast_exp, ASTExpEq):
-			tac_list.append(TACCompE(assignee_symbol, left_symbol, right_symbol))
+	elif isinstance(ast_exp, ASTExpLe):
+		left_symbol = gen_tac_for_exp(ast_exp.left_exp)
+		right_symbol = gen_tac_for_exp(ast_exp.right_exp)
+		tac_list.append(TACCompLE(assignee_symbol, left_symbol, right_symbol))
 
-	# Handle all unary expressions together
-	elif isinstance(ast_exp, ASTExpUnary):
-		# ExpUnary: (self, line, exp)
+	elif isinstance(ast_exp, ASTExpEq):
+		left_symbol = gen_tac_for_exp(ast_exp.left_exp)
+		right_symbol = gen_tac_for_exp(ast_exp.right_exp)
+		tac_list.append(TACCompE(assignee_symbol, left_symbol, right_symbol))
+
+	# Handle unary expressions together
+	# ExpUnary: (self, line, exp)
+	elif isinstance(ast_exp, ASTExpIsVoid):
 		exp_symbol = gen_tac_for_exp(ast_exp.exp)
+		tac_list.append(TACIsVoid(assignee_symbol, exp_symbol))
 
-		if isinstance(ast_exp, ASTExpIsVoid):
-			tac_list.append(TACIsVoid(assignee_symbol, exp_symbol))
-		elif isinstance(ast_exp, ASTExpTilde):
-			tac_list.append(TACNegArith(assignee_symbol, exp_symbol))
-		elif isinstance(ast_exp, ASTExpNot):
-			tac_list.append(TACNegBool(assignee_symbol, exp_symbol))
+	elif isinstance(ast_exp, ASTExpTilde):
+		# Get the boxed value
+		boxed_exp_symbol = gen_tac_for_exp(ast_exp.exp)
+
+		# Unbox the value and do 'not'
+		unboxed_exp_symbol = gen_tac_for_unbox(boxed_exp_symbol)
+		unboxed_assignee_symbol = new_symbol()
+		tac_list.append(TACNegArith(unboxed_assignee_symbol, unboxed_exp_symbol))
+
+		# Box the answer and set assignee to pointer
+		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
+
+	elif isinstance(ast_exp, ASTExpNot):
+		# Get the boxed value
+		boxed_exp_symbol = gen_tac_for_exp(ast_exp.exp)
+
+		# Unbox the value and do 'not'
+		unboxed_exp_symbol = gen_tac_for_unbox(boxed_exp_symbol)
+		unboxed_assignee_symbol = new_symbol()
+		tac_list.append(TACNegBool(unboxed_assignee_symbol, unboxed_exp_symbol))
+
+		# Box the answer and set assignee to pointer
+		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Bool")
 
 	elif isinstance(ast_exp, ASTExpSelfDispatch):
 		# ExpSelfDispatch: (self, line, ident_line, ident, exp_list=[])
@@ -301,7 +389,6 @@ def gen_tac_for_exp(ast_exp):
 
 	# Default return case
 	return assignee_symbol
-
 
 def gen_tac_for_feature(ast_feature, class_name):
 	global tac_list

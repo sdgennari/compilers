@@ -16,17 +16,15 @@ caller_saved_registers = [
 register_names_32 = [
 	"%r8d", "%r9d", "%r10d",
 	"%r11d", "%r12d", "%r13d",
-	"%r14d", "%r15d", "%ebx",
-	"%ecx", "%edx", "%esi",
-	"%edi", "%eax"
+	"%r14d", "%r15d", "%ecx",
+	"%edx", "%esi",	"%edi",
 ]
 
 register_names_64 = [
 	"%r8", "%r9", "%r10",
 	"%r11", "%r12", "%r13",
-	"%r14", "%r15", "%rbx",
-	"%rcx", "%rdx", "%rsi",
-	"%rdi", "%rax"
+	"%r14", "%r15", "%rcx",
+	"%rdx", "%rsi",	"%rdi",
 ]
 
 def next_asm_label():
@@ -40,8 +38,10 @@ def get_asm_register(tac_register, size=32):
 	# Get different name depending on register size
 	if size == 32:
 		register_name = register_names_32[asm_reg_idx]
-	else:
+	elif size == 64:
 		register_name = register_names_64[asm_reg_idx]
+	else:
+		raise ValueError("Invalid register size")
 
 	return register_name
 
@@ -337,6 +337,21 @@ def gen_asm_for_tac_comp_e(tac_comp_e):
 	asm_instr_list.append(ASMMovL("$0", dest))
 	asm_instr_list.append(ASMLabel(label))
 
+def gen_asm_for_tac_box(tac_box):
+	op1_reg = get_asm_register(tac_box.op1)
+	dest = get_asm_register(tac_box.assignee)
+
+	asm_instr_list.append(ASMComment("Boxing value of " + op1_reg + " into " + dest))
+	asm_instr_list.append(ASMComment("TODO"))
+
+def gen_asm_for_tac_unbox(tac_unbox):
+	op1_reg = get_asm_register(tac_unbox.op1, 64)
+	dest = get_asm_register(tac_unbox.assignee)
+
+	asm_instr_list.append(ASMComment("Unboxing value of " + op1_reg + " into " + dest))
+	op1_reg_offset = "24(" + op1_reg + ")"
+	asm_instr_list.append(ASMMovL(op1_reg_offset, dest))
+
 def gen_asm_for_tac_instr(tac_instr):
 	# Skip instructions whose assignees do not have colors
 	# This will only skip instructions that are never live (dead code)
@@ -407,6 +422,12 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	elif isinstance(tac_instr, TACCompE):
 		gen_asm_for_tac_comp_e(tac_instr)
+
+	elif isinstance(tac_instr, TACBox):
+		gen_asm_for_tac_box(tac_instr)
+
+	elif isinstance(tac_instr, TACUnbox):
+		gen_asm_for_tac_unbox(tac_instr)
 
 	else:
 		asm_instr_list.append("\t\t\t\t\t" + str(tac_instr))

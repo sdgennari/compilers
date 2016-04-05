@@ -351,9 +351,9 @@ def make_global_class_map(input_lines):
 	# -- end class loop
 	
 	# Add hard-coded val attribute to Int, Bool, and String for boxing/unboxing
-	class_map["Int"].append(ASTAttrNoInit(0, "val", 0, "Int"))
-	class_map["Bool"].append(ASTAttrNoInit(0, "val", 0, "Bool"))
-	class_map["String"].append(ASTAttrNoInit(0, "val", 0, "String"))
+	class_map["Int"].append(ASTAttrNoInit(0, "val", 0, "RawInt"))
+	class_map["Bool"].append(ASTAttrNoInit(0, "val", 0, "RawInt"))
+	class_map["String"].append(ASTAttrNoInit(0, "val", 0, "RawString"))
 
 def make_global_implementation_map(input_lines):
 	global implementation_map
