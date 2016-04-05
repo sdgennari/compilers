@@ -205,8 +205,6 @@ empty.string:			## empty string for default Strings
 
 
 
-
-
 	.text
 	.globl	main
 	.type	main, @function
