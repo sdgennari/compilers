@@ -117,9 +117,12 @@ def gen_asm_for_constructor(type_name):
 	vtable_str = get_vtable_str(type_name)
 	asm_instr_list += [
 		ASMComment("Store type_tag, obj_size, vtable"),
-		ASMMovQ(format_asm_const_string(type_tag), "0("+SELF_REG+")"),
-		ASMMovQ(format_asm_const_string(obj_size), "8("+SELF_REG+")"),
-		ASMMovQ(format_asm_const_string(vtable_str), "16("+SELF_REG+")")
+		ASMMovQ(format_asm_const_string(type_tag), "%rax"),
+		ASMMovQ("%rax", "0("+SELF_REG+")"),
+		ASMMovQ(format_asm_const_string(obj_size), "%rax"),
+		ASMMovQ("%rax", "8("+SELF_REG+")"),
+		ASMMovQ(format_asm_const_string(vtable_str), "%rax"),
+		ASMMovQ("%rax", "16("+SELF_REG+")")
 	]
 
 	# Note: Handle RawInt and RawString explicitly
@@ -131,13 +134,13 @@ def gen_asm_for_constructor(type_name):
 		mem_offset = str(8*idx) + "("+SELF_REG+")"
 
 		asm_instr_list.append(ASMComment("self[" + str(idx) + "] holds " + ast_attr.ident + " (" + ast_attr.feature_type +")"))
-		# Only Int and Bool can have a RawInt attr, always at self[3]
-		if ast_attr.feature_type == "RawInt":
+		# Only Int and Bool can have a raw.Int attr, always at self[3]
+		if ast_attr.feature_type == "raw.Int":
 			asm_instr_list.append(ASMMovL("$0", mem_offset))
 
-		# Only String can have a RawString attr, always at self[3]
-		elif ast_attr.feature_type == "RawString":
-			asm_instr_list.append(ASMMovL("$empty.string", mem_offset))
+		# Only String can have a raw.String attr, always at self[3]
+		elif ast_attr.feature_type == "raw.String":
+			asm_instr_list.append(ASMMovQ("$empty.string", mem_offset))
 
 		else: 
 			# Call default constructor for attr and assign to correct spot
@@ -217,7 +220,6 @@ if __name__ == "__main__":
 	print get_constructor_string()
 	print get_constants_string()
 
-	'''
 	gen_tac_for_ast(prog_ast_root)
 
 	block_list = buildBasicBlocks(tac_list)
@@ -227,6 +229,7 @@ if __name__ == "__main__":
 	# for block in block_list:
 	# 	print block
 	# print
+	# sys.exit(1)
 
 	# print "blocks:",len(block_list)
 
@@ -249,6 +252,7 @@ if __name__ == "__main__":
 	for asm_instr in asm_instr_list:
 		print asm_instr,
 
+	'''
 	old_file_ext_len = len("cl-type")
 	offset_from_end = -1 * old_file_ext_len
 	output_filename = input_filename[0:offset_from_end] + "s"

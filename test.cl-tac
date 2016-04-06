@@ -1,0 +1,26 @@
+Label: Main_main_1
+Parents: 
+Children: 
+Live In: set([])
+Live Out: set([])
+0	label Main_main_1
+1	t$2 <- default Int
+2	t$3 <- default Int
+3	t$4 <- default Int
+4	t$7 <- int 111
+5	t$2 <- t$7
+6	t$9 <- int 222
+7	t$3 <- t$9
+8	t$11 <- int 333
+9	t$4 <- t$11
+10	t$14 <- t$3
+11	t$15 <- t$4
+12	t$16 <- unbox t$14
+13	t$17 <- unbox t$15
+14	t$18 <- + t$16 t$17
+15	t$19 <- box (Int) t$18
+16	t$2 <- t$19
+17	t$1 <- t$2
+18	return t$1
+
+
