@@ -6,6 +6,9 @@ asm_instr_list = []
 register_color_map = {}
 spilled_register_location_map = {}
 asm_label_counter = 0
+const_string_label_counter = 0
+# Map constant strings to their label
+const_string_label_map = {}
 
 caller_saved_registers = [
 	"%rax", "%rcx", "%rdx",
@@ -14,7 +17,7 @@ caller_saved_registers = [
 ]
 
 register_names_32 = [
-	"%r8d", "%r9d", "%r10d",
+	"%r8d","%r9d", "%r10d",
 	"%r11d", "%r12d", "%r13d",
 	"%r14d", "%r15d", "%ecx",
 	"%edx", "%esi",	"%edi",
@@ -26,6 +29,17 @@ register_names_64 = [
 	"%r14", "%r15", "%rcx",
 	"%rdx", "%rsi",	"%rdi",
 ]
+
+def new_const_string_label():
+	global const_string_label_counter
+	const_string_label_counter += 1
+	return "string_" + str(const_string_label_counter)
+
+# Returns the label for the string or makes a new one
+def get_const_string_label(string):
+	if string not in const_string_label_map:
+		const_string_label_map[string] = new_const_string_label()
+	return const_string_label_map[string]
 
 def next_asm_label():
 	global asm_label_counter
@@ -51,43 +65,63 @@ def gen_asm_for_tac_const_int(tac_const_int):
 	dest = get_asm_register(tac_const_int.assignee, 64)
 	dest_reg_offset = "24("+dest+")"
 
+	# Create a new Int and put value into box
 	asm_instr_list.append(ASMComment("new const Int: " + str(tac_const_int.val)))
-
-	# Create a new Int
 	gen_asm_for_new_boxed_type("Int", dest)
-
-	# Put the value into the boxed Int
 	asm_instr_list.append(ASMMovL(src, dest_reg_offset))
 
-def gen_asm_for_tac_label(tac_label):
-	asm_label = "." + tac_label.label
-
-	asm_instr_list.append(ASMLabel(asm_label))
-
-# ---- TODO Update to box Bool
+# BOXED + UNBOXED
 def gen_asm_for_tac_const_bool(tac_const_bool):
 	if tac_const_bool.val == "true":
 		src = "$1"
 	else:
 		src = "$0"
 
-	dest = get_asm_register(tac_const_bool.assignee)
+	dest = get_asm_register(tac_const_bool.assignee, 64)
+	dest_reg_offset = "24("+dest+")"
+
+	# Create new Bool and put value into box
 	asm_instr_list.append(ASMComment("const Bool"))
-	asm_instr_list.append(ASMMovL(src, dest))
+	gen_asm_for_new_boxed_type("Bool", dest)
+	asm_instr_list.append(ASMMovL(src, dest_reg_offset))
 
-# ---- TODO Update to box Int
+# BOXED + UNBOXED
+def gen_asm_for_tac_const_string(tac_const_string):
+	src = "$" + get_const_string_label(tac_const_string.val)
+	dest = get_asm_register(tac_const_string.assignee, 64)
+	dest_reg_offset = "24("+dest+")"
+
+	# Create new String and put raw string ptr into box
+	asm_instr_list.append(ASMComment("const String"))
+	gen_asm_for_new_boxed_type("String", dest)
+	asm_instr_list.append(ASMMovQ(src, dest_reg_offset))
+
+# BOXED + UNBOXED
 def gen_asm_for_tac_default(tac_default):
-	if tac_default.type == "Int":
-		src = "$0"
-		dest = get_asm_register(tac_default.assignee)
-		asm_instr_list.append(ASMComment("default Int"))
-		asm_instr_list.append(ASMMovL(src, dest))
+	# Set default value to $0
+	src = "$0"
+	if tac_default.type == "String":
+		src = "$empty.string"
+	dest = get_asm_register(tac_default.assignee, 64)
 
-	elif tac_default.type == "Bool":
-		src = "$0"
-		dest = get_asm_register(tac_default.assignee)
-		asm_instr_list.append(ASMComment("default Bool"))
-		asm_instr_list.append(ASMMovL(src, dest))
+	asm_instr_list.append(ASMComment("default " + tac_default.type))
+	if tac_default.type == "Int" or tac_default.type == "Bool" or \
+			tac_default.type == "String":
+
+		# Make a new box for the type and store the value
+		dest_reg_offset = "24("+dest+")"
+		gen_asm_for_new_boxed_type(tac_default.type, dest)
+		asm_instr_list.append(ASMMovQ(src, dest_reg_offset))
+
+	else:
+		# Move null ptr into dest
+		asm_instr_list.append(ASMMovQ(src, dest))
+
+# BOXED + UNBOXED
+def gen_asm_for_tac_label(tac_label):
+	asm_label = "." + tac_label.label
+
+	asm_instr_list.append(ASMLabel(asm_label))
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_not(tac_neg_bool):
@@ -116,6 +150,12 @@ def gen_asm_for_tac_assign(tac_assign):
 
 	asm_instr_list.append(ASMComment("assign"))
 	asm_instr_list.append(ASMMovQ(src, dest))
+
+# BOXED + UNBOXED
+def gen_asm_for_tac_new(tac_new):
+	dest = get_asm_register(tac_new.assignee, 64)
+	asm_instr_list.append(ASMComment("new " + tac_new.type))
+	gen_asm_for_new_boxed_type(tac_new.type, dest)
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_return(tac_return):
@@ -373,8 +413,7 @@ def gen_asm_for_tac_comp_e(tac_comp_e):
 # BOXED + UNBOXED
 def gen_asm_for_tac_box(tac_box):
 	global asm_instr_list
-	# Note: Use 32 bit register for op1
-	op1_reg = get_asm_register(tac_box.op1)
+	op1_reg = get_asm_register(tac_box.op1, 64)
 	dest = get_asm_register(tac_box.assignee, 64)
 
 	constructor_method = tac_box.exp_type + "..new"
@@ -382,8 +421,7 @@ def gen_asm_for_tac_box(tac_box):
 
 	asm_instr_list.append(ASMComment("box value of " + op1_reg + " into " + dest),)
 	gen_asm_for_new_boxed_type(tac_box.exp_type, dest)
-	# Move 32-bit value into offset from box pointer 24(dest)
-	asm_instr_list.append(ASMMovL(op1_reg, dest_reg_offset))
+	asm_instr_list.append(ASMMovQ(op1_reg, dest_reg_offset))
 
 # BOXED + UNBOXED
 def gen_asm_for_new_boxed_type(type_name, dest_reg):
@@ -403,13 +441,11 @@ def gen_asm_for_new_boxed_type(type_name, dest_reg):
 # BOXED + UNBOXED
 def gen_asm_for_tac_unbox(tac_unbox):
 	op1_reg = get_asm_register(tac_unbox.op1, 64)
-
-	# Note: Use 32 bit register for dest
-	dest = get_asm_register(tac_unbox.assignee)
+	dest = get_asm_register(tac_unbox.assignee, 64)
 
 	asm_instr_list.append(ASMComment("unbox value of " + op1_reg + " into " + dest))
 	op1_reg_offset = "24(" + op1_reg + ")"
-	asm_instr_list.append(ASMMovL(op1_reg_offset, dest))
+	asm_instr_list.append(ASMMovQ(op1_reg_offset, dest))
 
 def gen_asm_for_tac_instr(tac_instr):
 	# Skip instructions whose assignees do not have colors
@@ -424,6 +460,9 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	elif isinstance(tac_instr, TACConstBool):
 		gen_asm_for_tac_const_bool(tac_instr)
+
+	elif isinstance(tac_instr, TACConstString):
+		gen_asm_for_tac_const_string(tac_instr)
 
 	elif isinstance(tac_instr, TACLabel):
 		gen_asm_for_tac_label(tac_instr)
@@ -488,8 +527,12 @@ def gen_asm_for_tac_instr(tac_instr):
 	elif isinstance(tac_instr, TACUnbox):
 		gen_asm_for_tac_unbox(tac_instr)
 
+	elif isinstance(tac_instr, TACAlloc):
+		gen_asm_for_tac_new(tac_instr)
+
 	else:
 		asm_instr_list.append("\t\t\t\t\t" + str(tac_instr))
+		raise NotImplementedError(str(tac_instr.__class__.__name__) + " not yet implemented")
 
 def add_initial_method_setup(stack_offset):
 	asm_instr_list.insert(1, ASMPushQ("%rbp"))

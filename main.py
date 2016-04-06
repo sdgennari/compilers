@@ -48,9 +48,15 @@ def get_vtables_string():
 
 	return result
 
+
+# ========================================
+# STRING CONSTANT METHODS
+# ========================================
+
 def get_constants_string():
 	result = get_type_name_strings()
 	result += get_empty_string()
+	result += gen_const_strings()
 	# ---- TODO: Get execption strings
 	return result
 
@@ -70,7 +76,20 @@ def get_empty_string():
 	result = ".globl empty.string\n"
 	result += "empty.string:\t\t\t## empty string for default Strings\n"
 	result += "\t.asciz \"\"\n"
+	result += "\n"
 	return result
+
+def gen_const_strings():
+	result = ""
+	for string in const_string_label_map:
+		label = const_string_label_map[string]
+		result += ".globl " + label + "\n"
+		result += label + ":\n"
+		result += "\t.asciz \"" + string + "\"\n"
+		result += "\n"
+	return result
+
+# ========================================
 
 def get_vtable_str(type_name):
 	return type_name + "..vtable"
@@ -200,12 +219,12 @@ def make_global_type_tag_map():
 	global type_tag_map
 
 	# Handle built in types explicitly
-	built_in_types = ["Bool", "Int", "IO", "Object", "String"]
+	built_in_types = ["Bool", "Int", "IO", "Object", "String", "Main"]
 	for idx, type_name in enumerate(built_in_types):
 		type_tag_map[type_name] = idx
 
 	# Give all other types tags >= offset
-	offset = 5
+	offset = len(built_in_types)
 	remaining_types = [type_name for type_name in class_map if type_name not in built_in_types]
 	for idx, type_name in enumerate(sorted(remaining_types)):
 		type_tag_map[type_name] = idx + offset
@@ -218,9 +237,7 @@ if __name__ == "__main__":
 
 	print get_vtables_string()
 	print get_constructor_string()
-	print get_constants_string()
 
-	'''
 	gen_tac_for_ast(prog_ast_root)
 
 	block_list = buildBasicBlocks(tac_list)
@@ -253,6 +270,9 @@ if __name__ == "__main__":
 	for asm_instr in asm_instr_list:
 		print asm_instr,
 
+	print get_constants_string()
+
+	'''
 	old_file_ext_len = len("cl-type")
 	offset_from_end = -1 * old_file_ext_len
 	output_filename = input_filename[0:offset_from_end] + "s"

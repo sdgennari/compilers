@@ -34,10 +34,6 @@ Main..vtable:		## vtable for Main
 			.quad Object.abort
 			.quad Object.copy
 			.quad Object.type_name
-			.quad IO.in_int
-			.quad IO.in_string
-			.quad IO.out_int
-			.quad IO.out_string
 			.quad Main.main
 			## ========================================
 .globl Object..vtable
@@ -139,30 +135,18 @@ Main..new:		## Constructor for Main
 			movq	%rsp, %rbp
 			## Allocate space for Main
 			movq	$8, %rsi
-			movq	$5, %rdi
+			movq	$3, %rdi
 			call	calloc
 			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
 			movq	$5, %rax
 			movq	%rax, 0(%rbx)
-			movq	$5, %rax
+			movq	$3, %rax
 			movq	%rax, 8(%rbx)
 			movq	$Main..vtable, %rax
 			movq	%rax, 16(%rbx)
 			## Create default attrs
-			## self[3] holds some_attr (Int)
-			pushq	%rbx
-			call	Int..new
-			popq	%rbx
-			movq	%rax, 24(%rbx)
-			## self[4] holds another_attr (Int)
-			pushq	%rbx
-			call	Int..new
-			popq	%rbx
-			movq	%rax, 32(%rbx)
 			## Initialize attrs
-			## self[3] some_attr <- init exp
-			## ---- TODO: Generate asm for init exp
 			## Assign self register to %rax
 			movq	%rbx, %rax
 			leave
@@ -217,7 +201,91 @@ String..new:		## Constructor for String
 			ret
 			## ========================================
 
-			## ========================================
+.Main_main_1:
+ 			pushq	%rbp
+ 			movq	%rsp, %rbp
+ 			subq	$0, %rsp
+ 			## default Int
+ 			pushq	%rsi
+ 			pushq	%rdi
+ 			call	Int..new
+ 			popq	%rdi
+ 			popq	%rsi
+ 			movq	%rax, %r8
+ 			movq	$0, 24(%r8)
+ 			## default Bool
+ 			pushq	%rsi
+ 			pushq	%rdi
+ 			call	Bool..new
+ 			popq	%rdi
+ 			popq	%rsi
+ 			movq	%rax, %r9
+ 			movq	$0, 24(%r9)
+ 			## default String
+ 			pushq	%rsi
+ 			pushq	%rdi
+ 			call	String..new
+ 			popq	%rdi
+ 			popq	%rsi
+ 			movq	%rax, %r8
+ 			movq	$empty.string, 24(%r8)
+ 			## default IO
+ 			movq	$0, %r9
+ 			## default Main
+ 			movq	$0, %r9
+ 			## new const Int: 777
+ 			pushq	%rsi
+ 			pushq	%rdi
+ 			call	Int..new
+ 			popq	%rdi
+ 			popq	%rsi
+ 			movq	%rax, %r9
+ 			movl	$777, 24(%r9)
+ 			## assign
+ 			movq	%r9, %r8
+ 			## const Bool
+ 			pushq	%rsi
+ 			pushq	%rdi
+ 			call	Bool..new
+ 			popq	%rdi
+ 			popq	%rsi
+ 			movq	%rax, %r8
+ 			movl	$1, 24(%r8)
+ 			## assign
+ 			movq	%r8, %r9
+ 			## const String
+ 			pushq	%rsi
+ 			pushq	%rdi
+ 			call	String..new
+ 			popq	%rdi
+ 			popq	%rsi
+ 			movq	%rax, %r9
+ 			movq	$string_1, 24(%r9)
+ 			## assign
+ 			movq	%r9, %r8
+ 			pushq	%rsi
+ 			pushq	%rdi
+ 			call	IO..new
+ 			popq	%rdi
+ 			popq	%rsi
+ 			movq	%rax, %r8
+ 			## assign
+ 			movq	%r8, %r9
+ 			pushq	%rsi
+ 			pushq	%rdi
+ 			call	Main..new
+ 			popq	%rdi
+ 			popq	%rsi
+ 			movq	%rax, %r8
+ 			## assign
+ 			movq	%r8, %r9
+ 			## assign
+ 			movq	%r9, %r8
+ 			## return
+ 			movq	%r8, %rax
+ 			leave
+ 			ret
+ 			## ========================================
 .globl type_name_Bool 
 type_name_Bool:			## type_name string for Bool
 	.asciz "Bool"
@@ -245,4 +313,9 @@ type_name_String:			## type_name string for String
 .globl empty.string
 empty.string:			## empty string for default Strings
 	.asciz ""
+
+.globl string_1
+string_1:
+	.asciz "hello cool\n"
+
 

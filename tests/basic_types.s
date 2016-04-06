@@ -34,10 +34,6 @@ Main..vtable:           ## virtual function table for Main
                         .quad Object.abort
                         .quad Object.copy
                         .quad Object.type_name
-                        .quad IO.in_int
-                        .quad IO.in_string
-                        .quad IO.out_int
-                        .quad IO.out_string
                         .quad Main.main
                         ## ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .globl Object..vtable
@@ -450,12 +446,12 @@ Main.main:              ## method definition
                         pushq %rbp
                         movq %rsp, %rbp
                         movq 16(%rbp), %r12
-                        ## stack room for temporaries: 5
-                        movq $40, %r14
+                        ## stack room for temporaries: 6
+                        movq $48, %r14
                         subq %r14, %rsp
                         ## return address handling
                         ## method body begins
-                        ## fp[0] holds local a (Int)
+                        ## fp[0] holds local i (Int)
                         ## new Int
                         pushq %rbp
                         pushq %r12
@@ -464,24 +460,32 @@ Main.main:              ## method definition
                         popq %r12
                         popq %rbp
                         movq %r13, 0(%rbp)
-                        ## fp[-1] holds local b (Int)
-                        ## new Int
+                        ## fp[-1] holds local b (Bool)
+                        ## new Bool
                         pushq %rbp
                         pushq %r12
-                        movq $Int..new, %r14
+                        movq $Bool..new, %r14
                         call *%r14
                         popq %r12
                         popq %rbp
                         movq %r13, -8(%rbp)
-                        ## fp[-2] holds local c (Int)
-                        ## new Int
+                        ## fp[-2] holds local s (String)
+                        ## new String
                         pushq %rbp
                         pushq %r12
-                        movq $Int..new, %r14
+                        movq $String..new, %r14
                         call *%r14
                         popq %r12
                         popq %rbp
+                        movq $the.empty.string, %r15
+                        movq %r15, 24(%r13)
                         movq %r13, -16(%rbp)
+                        ## fp[-3] holds local io (IO)
+                        movq $0, %r13
+                        movq %r13, -24(%rbp)
+                        ## fp[-4] holds local main (Main)
+                        movq $0, %r13
+                        movq %r13, -32(%rbp)
                         ## new Int
                         pushq %rbp
                         pushq %r12
@@ -489,49 +493,46 @@ Main.main:              ## method definition
                         call *%r14
                         popq %r12
                         popq %rbp
-                        movq $111, %r14
+                        movq $777, %r14
                         movq %r14, 24(%r13)
                         movq %r13, 0(%rbp)
-                        ## new Int
+                        ## new Bool
                         pushq %rbp
                         pushq %r12
-                        movq $Int..new, %r14
+                        movq $Bool..new, %r14
                         call *%r14
                         popq %r12
                         popq %rbp
-                        movq $222, %r14
+                        movq $1, %r14
                         movq %r14, 24(%r13)
                         movq %r13, -8(%rbp)
-                        ## new Int
+                        ## new String
                         pushq %rbp
                         pushq %r12
-                        movq $Int..new, %r14
+                        movq $String..new, %r14
                         call *%r14
                         popq %r12
                         popq %rbp
-                        movq $333, %r14
+                        ## string8 holds "hello cool\n"
+                        movq $string8, %r14
                         movq %r14, 24(%r13)
                         movq %r13, -16(%rbp)
-                        ## b
-                        movq -8(%rbp), %r13
-                        movq 24(%r13), %r13
-                        movq %r13, -24(%rbp)
-                        ## c
-                        movq -16(%rbp), %r13
-                        movq 24(%r13), %r13
-                        movq -24(%rbp), %r14
-                        addq %r14, %r13
-                        movq %r13, -24(%rbp)
-                        ## new Int
+                        ## new IO
                         pushq %rbp
                         pushq %r12
-                        movq $Int..new, %r14
+                        movq $IO..new, %r14
                         call *%r14
                         popq %r12
                         popq %rbp
-                        movq -24(%rbp), %r14
-                        movq %r14, 24(%r13)
-                        movq %r13, 0(%rbp)
+                        movq %r13, -24(%rbp)
+                        ## new Main
+                        pushq %rbp
+                        pushq %r12
+                        movq $Main..new, %r14
+                        call *%r14
+                        popq %r12
+                        popq %rbp
+                        movq %r13, -32(%rbp)
 .globl Main.main.end
 Main.main.end:          ## method body ends
                         ## return address handling
@@ -638,7 +639,7 @@ String.substr:          ## method definition
 			movq %rax, %r13
                         cmpq $0, %r13
 			jne l3
-                        movq $string8, %r13
+                        movq $string9, %r13
                         movq %r13, %rdi
 			call cooloutstr
                         movl $0, %edi
@@ -734,7 +735,23 @@ string7:                # "abort\\n"
 .byte 0
 
 .globl string8
-string8:                # "ERROR: 0: Exception: String.substr out of range\\n"
+string8:                # "hello cool\\n"
+.byte 104 # 'h'
+.byte 101 # 'e'
+.byte 108 # 'l'
+.byte 108 # 'l'
+.byte 111 # 'o'
+.byte  32 # ' '
+.byte  99 # 'c'
+.byte 111 # 'o'
+.byte 111 # 'o'
+.byte 108 # 'l'
+.byte  92 # '\\'
+.byte 110 # 'n'
+.byte 0
+
+.globl string9
+string9:                # "ERROR: 0: Exception: String.substr out of range\\n"
 .byte  69 # 'E'
 .byte  82 # 'R'
 .byte  82 # 'R'

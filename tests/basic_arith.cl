@@ -3,12 +3,18 @@ class Main inherits IO {
 		let
 			a : Int,
 			b : Int,
-			c : Int
+			c : Int,
+			d : Bool
 		in {
 			a <- 111;
 			b <- 222;
 			c <- 333;
-			a <- b + c;
+			a <- b + c; -- 555
+			a <- b - c; -- -111
+			a <- b / c; -- 0
+			a <- b * c; -- 73926
+			a <- ~a;	-- -73926
+			d <- not d; -- true
 		}
 	};
 };

@@ -69,9 +69,9 @@ def gen_tac_for_box(unboxed_symbol, exp_type):
 	tac_list.append(TACBox(boxed_symbol, unboxed_symbol, exp_type))
 	return boxed_symbol
 
-def gen_tac_for_unbox(boxed_symbol):
+def gen_tac_for_unbox(boxed_symbol, exp_type):
 	unboxed_symbol = new_symbol()
-	tac_list.append(TACUnbox(unboxed_symbol, boxed_symbol))
+	tac_list.append(TACUnbox(unboxed_symbol, boxed_symbol, exp_type))
 	return unboxed_symbol
 
 def gen_tac_for_exp(ast_exp):
@@ -223,8 +223,8 @@ def gen_tac_for_exp(ast_exp):
 		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
 
 		# Unbox values
-		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed)
-		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed)
+		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed, "Int")
+		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed, "Int")
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
@@ -239,8 +239,8 @@ def gen_tac_for_exp(ast_exp):
 		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
 
 		# Unbox values
-		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed)
-		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed)
+		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed, "Int")
+		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed, "Int")
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
@@ -255,8 +255,8 @@ def gen_tac_for_exp(ast_exp):
 		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
 
 		# Unbox values
-		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed)
-		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed)
+		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed, "Int")
+		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed, "Int")
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
@@ -271,8 +271,8 @@ def gen_tac_for_exp(ast_exp):
 		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
 
 		# Unbox values
-		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed)
-		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed)
+		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed, "Int")
+		rhs_symbol_unboxed = gen_tac_for_unbox(rhs_symbol_boxed, "Int")
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
@@ -307,7 +307,7 @@ def gen_tac_for_exp(ast_exp):
 		boxed_exp_symbol = gen_tac_for_exp(ast_exp.exp)
 
 		# Unbox the value and do 'not'
-		unboxed_exp_symbol = gen_tac_for_unbox(boxed_exp_symbol)
+		unboxed_exp_symbol = gen_tac_for_unbox(boxed_exp_symbol, "Int")
 		unboxed_assignee_symbol = new_symbol()
 		tac_list.append(TACNegArith(unboxed_assignee_symbol, unboxed_exp_symbol))
 
@@ -319,7 +319,7 @@ def gen_tac_for_exp(ast_exp):
 		boxed_exp_symbol = gen_tac_for_exp(ast_exp.exp)
 
 		# Unbox the value and do 'not'
-		unboxed_exp_symbol = gen_tac_for_unbox(boxed_exp_symbol)
+		unboxed_exp_symbol = gen_tac_for_unbox(boxed_exp_symbol, "Bool")
 		unboxed_assignee_symbol = new_symbol()
 		tac_list.append(TACNegBool(unboxed_assignee_symbol, unboxed_exp_symbol))
 

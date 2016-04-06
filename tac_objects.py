@@ -257,7 +257,6 @@ class TACCustom:
 class TACStore(TACCustom):
 	def __init__(self, op1):
 		self.op1 = op1
-
 	def __str__(self):
 		return "store " + self.op1
 
@@ -279,9 +278,10 @@ class TACBox(TACCustom):
 		return self.assignee + " <- box (" + self.exp_type + ") " + self.op1
 
 class TACUnbox(TACCustom):
-	def __init__(self, assignee, op1):
+	def __init__(self, assignee, op1, exp_type):
 		self.assignee = assignee
 		self.op1 = op1
+		self.exp_type = exp_type
 
 	def __str__(self):
-		return self.assignee + " <- unbox " + self.op1
+		return self.assignee + " <- unbox (" + self.exp_type + ") " + self.op1
