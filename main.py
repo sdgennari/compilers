@@ -42,7 +42,7 @@ def get_vtables_string():
 		offset = 2			# Account for 2 entries above when calculating idx
 		for idx, ast_method in enumerate(implementation_map[class_name]):
 			method_name = ast_method.ident
-			result += format_quad_line(class_name + ".." + method_name)
+			result += format_quad_line(ast_method.containing_class + "." + method_name)
 			tup = (class_name, method_name)
 			vtable_offset_map[tup] = idx + offset
 
@@ -220,6 +220,7 @@ if __name__ == "__main__":
 	print get_constructor_string()
 	print get_constants_string()
 
+	'''
 	gen_tac_for_ast(prog_ast_root)
 
 	block_list = buildBasicBlocks(tac_list)
@@ -252,7 +253,6 @@ if __name__ == "__main__":
 	for asm_instr in asm_instr_list:
 		print asm_instr,
 
-	'''
 	old_file_ext_len = len("cl-type")
 	offset_from_end = -1 * old_file_ext_len
 	output_filename = input_filename[0:offset_from_end] + "s"
