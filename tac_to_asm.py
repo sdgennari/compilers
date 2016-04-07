@@ -10,14 +10,21 @@ const_string_label_counter = 0
 # Map constant strings to their label
 const_string_label_map = {}
 
+# Note: explicitly exclude rax
 caller_saved_registers = [
-	"%rax", "%rcx", "%rdx",
-	"%rsi", "%rdi", "%r8",
-	"%r9", "%r10", "%r11",
+	"%rcx", "%rdx", "%rsi",
+	"%rdi",	"%r8",	"%r9",
+	"%r10",	"%r11",
+]
+
+# Note: explicitly exlcude ebx, ebp, esp
+callee_saved_registers = [
+	"%r12", "%r13", "%r14",
+	"%r15"
 ]
 
 register_names_32 = [
-	"%r8d","%r9d", "%r10d",
+	"%r8d", "%r9d", "%r10d",
 	"%r11d", "%r12d", "%r13d",
 	"%r14d", "%r15d", "%ecx",
 	"%edx", "%esi",	"%edi",
@@ -427,16 +434,18 @@ def gen_asm_for_tac_box(tac_box):
 def gen_asm_for_new_boxed_type(type_name, dest_reg):
 	global asm_instr_list
 	constructor_method = type_name + "..new"
-	asm_instr_list += [
-		# Note: <box_type>..new only changes %rsi and %rdi, so only have to push them
-		ASMPushQ("%rsi"),
-		ASMPushQ("%rdi"),
-		ASMCall(constructor_method),
-		ASMPopQ("%rdi"),
-		ASMPopQ("%rsi"),
-		# Move pointer to alloc'd space from rax into dest
-		ASMMovQ("%rax", dest_reg),
-	]
+
+	asm_instr_list.append(ASMComment("push caller-saved regs"))
+	for reg in caller_saved_registers:
+		asm_instr_list.append(ASMPushQ(reg))
+
+	asm_instr_list.append(ASMCall(constructor_method))
+
+	asm_instr_list.append(ASMComment("pop caller-saved regs"))
+	for reg in reversed(caller_saved_registers):
+		asm_instr_list.append(ASMPopQ(reg))
+
+	asm_instr_list.append(ASMMovQ("%rax", dest_reg))
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_unbox(tac_unbox):

@@ -9,7 +9,7 @@ from deserialize_ast import *
 import copy
 import sys
 
-DIVIDER_STRING = "\t\t\t## ========================================\n"
+DIVIDER_STRING = "\t\t\t## ::::::::::::::::::::::::::::::::::::::::\n"
 SELF_REG = "%rbx"
 
 # Map: (class_name, method_name) -> vtable index
@@ -21,13 +21,19 @@ type_tag_map = {}
 def format_quad_line(string):
 	return "\t\t\t.quad " + string + "\n"
 
+def get_header_comment_string(title):
+	result = DIVIDER_STRING
+	result += "\t\t\t##  " + title + "\n"
+	result += DIVIDER_STRING
+	result += "\n"
+	return result
+
 # Makes the vtables for all classes
 def get_vtables_string():
 	global vtable_offset_map
 
-	result = ""
+	result = get_header_comment_string("VTABLES")
 	for class_name in sorted(implementation_map.keys()):
-		result += DIVIDER_STRING
 
 		# Add label info for vtable
 		result += ".globl " + get_vtable_str(class_name) + "\n"
@@ -46,15 +52,18 @@ def get_vtables_string():
 			tup = (class_name, method_name)
 			vtable_offset_map[tup] = idx + offset
 
+		result += "\n"
+
 	return result
 
 
 # ========================================
-# STRING CONSTANT METHODS
+#  STRING CONSTANT METHODS
 # ========================================
 
 def get_constants_string():
-	result = get_type_name_strings()
+	result = get_header_comment_string("CONSTANT STRINGS")
+	result += get_type_name_strings()
 	result += get_empty_string()
 	result += gen_const_strings()
 	# ---- TODO: Get execption strings
@@ -62,11 +71,11 @@ def get_constants_string():
 
 # Makes the type name strings for all classes
 def get_type_name_strings():
-	result = DIVIDER_STRING
+	result = ""
 	for class_name in sorted(class_map.keys()):
 		result += ".globl type_name_" + class_name + " \n"
 		result += "type_name_" + class_name + ":\t\t\t## type_name string for " + class_name + "\n"
-		result += "\t.asciz \"" + class_name + "\"\n"
+		result += "\t\t\t.asciz \"" + class_name + "\"\n"
 		result += "\n"
 
 	return result
@@ -75,7 +84,7 @@ def get_type_name_strings():
 def get_empty_string():
 	result = ".globl empty.string\n"
 	result += "empty.string:\t\t\t## empty string for default Strings\n"
-	result += "\t.asciz \"\"\n"
+	result += "\t\t\t.asciz \"\"\n"
 	result += "\n"
 	return result
 
@@ -85,7 +94,7 @@ def gen_const_strings():
 		label = const_string_label_map[string]
 		result += ".globl " + label + "\n"
 		result += label + ":\n"
-		result += "\t.asciz \"" + string + "\"\n"
+		result += "\t\t\t.asciz \"" + string + "\"\n"
 		result += "\n"
 	return result
 
@@ -99,7 +108,7 @@ def calculate_type_size(type_name):
 	return 3 + len(class_map[type_name])
 
 def get_constructor_string():
-	result = DIVIDER_STRING
+	result = get_header_comment_string("CONSTRUCTORS")
 	for type_name in sorted(class_map.keys()):
 		result += ".globl " + type_name + "..new\n"
 		result += type_name + "..new:\t\t## Constructor for " + type_name + "\n"
@@ -111,13 +120,18 @@ def get_constructor_string():
 		for asm_instr in asm_instr_list:
 			result += str(asm_instr)
 
-		result += DIVIDER_STRING
+		result += "\n"
 
 	return result
 
-# Generates assembly to allocate 
+# Generates assembly for 'new' constructor
 def gen_asm_for_constructor(type_name):
 	asm_instr_list = gen_asm_for_method_start()
+
+	# Push all callee-saved registers
+	asm_instr_list.append(ASMComment("push callee-saved regs"))
+	for reg in callee_saved_registers:
+		asm_instr_list.append(ASMPushQ(reg))
 
 	# Allocate space for the object based on the size via calloc(obj_size {rdi}, 8 {rsi})
 	obj_size = calculate_type_size(type_name)
@@ -146,7 +160,7 @@ def gen_asm_for_constructor(type_name):
 
 	# Note: Handle RawInt and RawString explicitly
 	# 1. Store default values for each attribute
-	asm_instr_list.append(ASMComment("Create default attrs"))
+	asm_instr_list.append(ASMComment("create default attrs"))
 	for i, ast_attr in enumerate(class_map[type_name]):
 		# Add 3 to the list index to handle 3 implicit fields
 		idx = i + 3
@@ -173,7 +187,7 @@ def gen_asm_for_constructor(type_name):
 
 
 	# 2. Init each attribute based on expression
-	asm_instr_list.append(ASMComment("Initialize attrs"))
+	asm_instr_list.append(ASMComment("initialize attrs"))
 	for i, ast_attr in enumerate(class_map[type_name]):
 		idx = i + 3;
 		mem_offset = str(8*idx) + "("+SELF_REG+")"
@@ -187,9 +201,15 @@ def gen_asm_for_constructor(type_name):
 
 	# Move the pointer to self into rax to return it
 	asm_instr_list += [
-		ASMComment("Assign self register to %rax"),
+		ASMComment("assign self register to %rax"),
 		ASMMovQ(SELF_REG, "%rax")
 	]
+
+	# Pop all callee-saved registers
+	asm_instr_list.append(ASMComment("pop callee-saved regs"))
+	for reg in reversed(callee_saved_registers):
+		asm_instr_list.append(ASMPopQ(reg))
+
 	asm_instr_list += gen_asm_for_method_end()
 	return asm_instr_list
 
@@ -210,7 +230,6 @@ def gen_asm_for_method_start():
 # 		ret
 def gen_asm_for_method_end():
 	return [
-		# ASMComment("Method cleanup"),
 		ASMLeave(),
 		ASMRet()
 	]
@@ -229,6 +248,20 @@ def make_global_type_tag_map():
 	for idx, type_name in enumerate(sorted(remaining_types)):
 		type_tag_map[type_name] = idx + offset
 
+
+# ========================================
+#  METHOD IMPLEMENTATIONS
+# ========================================
+
+def get_methods_string():
+	result = get_header_comment_string("METHOD IMPLEMENTATIONS")
+	# ---- TODO: Generate asm for each method
+	return result
+
+# ========================================
+#  MAIN
+# ========================================
+
 if __name__ == "__main__":
 	input_filename = sys.argv[1]
 	prog_ast_root = get_input_list_from_annotated_ast(input_filename)
@@ -237,6 +270,7 @@ if __name__ == "__main__":
 
 	print get_vtables_string()
 	print get_constructor_string()
+	print get_methods_string()
 
 	gen_tac_for_ast(prog_ast_root)
 
@@ -270,6 +304,7 @@ if __name__ == "__main__":
 	for asm_instr in asm_instr_list:
 		print asm_instr,
 
+	# Note: This must be called AFTER asm for all expressions has been generated
 	print get_constants_string()
 
 	'''
