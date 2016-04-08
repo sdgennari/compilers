@@ -1,5 +1,6 @@
 from tac_objects import *
 from asm_objects import *
+from shared_vars import *
 
 # Initialize global vars
 asm_instr_list = []
@@ -9,19 +10,8 @@ asm_label_counter = 0
 const_string_label_counter = 0
 # Map constant strings to their label
 const_string_label_map = {}
-
-# Note: explicitly exclude rax
-caller_saved_registers = [
-	"%rcx", "%rdx", "%rsi",
-	"%rdi",	"%r8",	"%r9",
-	"%r10",	"%r11",
-]
-
-# Note: explicitly exlcude ebx, ebp, esp
-callee_saved_registers = [
-	"%r12", "%r13", "%r14",
-	"%r15"
-]
+# Keep track of the current type
+current_type = ""
 
 register_names_32 = [
 	"%r8d", "%r9d", "%r10d",
@@ -456,6 +446,37 @@ def gen_asm_for_tac_unbox(tac_unbox):
 	op1_reg_offset = "24(" + op1_reg + ")"
 	asm_instr_list.append(ASMMovQ(op1_reg_offset, dest))
 
+# BOXED + UNBOXED
+def gen_asm_for_tac_load_attr(tac_load_attr):
+	global attr_offset_map, current_type
+
+	# Get the offset from the self ptr
+	tup = (current_type, tac_load_attr.ident)
+	attr_idx = attr_offset_map[tup]
+	self_offset = 8 * attr_idx
+
+	# Move the contents of the attr into assignee
+	src = str(self_offset)+"("+SELF_REG+")"
+	dest = get_asm_register(tac_load_attr.assignee, 64)
+	asm_instr_list.append(ASMComment("Load self[" + str(attr_idx) + "] (" + \
+		tac_load_attr.ident + ") into " + dest))
+	asm_instr_list.append(ASMMovQ(src, dest))
+
+def gen_asm_for_tac_store_attr(tac_store_attr):
+	global attr_offset_map, current_type
+
+	# Get the offset from the self ptr
+	tup = (current_type, tac_store_attr.ident)
+	attr_idx = attr_offset_map[tup]
+	self_offset = 8 * attr_idx
+
+	# Move the value into the attr
+	src = get_asm_register(tac_store_attr.op1)
+	dest = str(self_offset)+"("+SELF_REG+")"
+	asm_instr_list.append(ASMComment("Store " + src + " in self[" + str(attr_idx) + \
+		"] (" + tac_store_attr.ident + ")"))
+	asm_instr_list.append(ASMMovQ(src, dest))
+
 def gen_asm_for_tac_instr(tac_instr):
 	# Skip instructions whose assignees do not have colors
 	# This will only skip instructions that are never live (dead code)
@@ -539,8 +560,13 @@ def gen_asm_for_tac_instr(tac_instr):
 	elif isinstance(tac_instr, TACAlloc):
 		gen_asm_for_tac_new(tac_instr)
 
+	elif isinstance(tac_instr, TACLoadAttr):
+		gen_asm_for_tac_load_attr(tac_instr)
+
+	elif isinstance(tac_instr, TACStoreAttr):
+		gen_asm_for_tac_store_attr(tac_instr)
+
 	else:
-		asm_instr_list.append("\t\t\t\t\t" + str(tac_instr))
 		raise NotImplementedError(str(tac_instr.__class__.__name__) + " not yet implemented")
 
 def add_initial_method_setup(stack_offset):
@@ -551,8 +577,11 @@ def add_initial_method_setup(stack_offset):
 	dest = "%rsp"
 	asm_instr_list.insert(3, ASMSubQ(src, dest))
 
-def gen_asm_for_block_list(block_list, register_colors, spilled_registers):
-	global register_color_map, spilled_register_location_map
+def gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name):
+	global register_color_map, spilled_register_location_map, current_type
+
+	# Set the current type
+	current_type = type_name
 
 	# Initalize global register color map
 	register_color_map = register_colors
@@ -571,4 +600,4 @@ def gen_asm_for_block_list(block_list, register_colors, spilled_registers):
 			gen_asm_for_tac_instr(tac_instr)
 
 	# Add initial setup to the asm instr list
-	add_initial_method_setup(stack_offset)
+	# add_initial_method_setup(stack_offset)

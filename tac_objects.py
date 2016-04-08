@@ -285,3 +285,20 @@ class TACUnbox(TACCustom):
 
 	def __str__(self):
 		return self.assignee + " <- unbox (" + self.exp_type + ") " + self.op1
+
+class TACLoadAttr(TACCustom):
+	def __init__(self, assignee, ident):
+		self.assignee = assignee
+		self.ident = ident
+
+	def __str__(self):
+		return self.assignee + " <- loadAttr " + self.ident + " (attr)"
+
+
+class TACStoreAttr(TACCustom):
+	def __init__(self, ident, op1):
+		self.ident = ident
+		self.op1 = op1
+
+	def __str__(self):
+		return self.ident + "(attr) <- storeAttr " + self.op1

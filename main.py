@@ -6,16 +6,11 @@ from tac_to_asm import *
 from ast_to_tac import *
 from allocate_registers import *
 from deserialize_ast import *
+from shared_vars import *
 import copy
 import sys
 
 DIVIDER_STRING = "\t\t\t## ::::::::::::::::::::::::::::::::::::::::\n"
-SELF_REG = "%rbx"
-
-# Map: (class_name, method_name) -> vtable index
-vtable_offset_map = {}
-# Map: type_name -> type_tag int
-type_tag_map = {}
 
 # Formats line with prefix '.quad'
 def format_quad_line(string):
@@ -126,6 +121,8 @@ def get_constructor_string():
 
 # Generates assembly for 'new' constructor
 def gen_asm_for_constructor(type_name):
+	global register_color_map
+
 	asm_instr_list = gen_asm_for_method_start()
 
 	# Push all callee-saved registers
@@ -158,8 +155,12 @@ def gen_asm_for_constructor(type_name):
 		ASMMovQ("%rax", "16("+SELF_REG+")")
 	]
 
-	# Note: Handle RawInt and RawString explicitly
+	# ---- TODO HANDLE SCOPE OF ATTRIBUTES IN SYMBOL TABLE
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	# 1. Store default values for each attribute
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	# Note: Handle RawInt and RawString explicitly
 	asm_instr_list.append(ASMComment("create default attrs"))
 	for i, ast_attr in enumerate(class_map[type_name]):
 		# Add 3 to the list index to handle 3 implicit fields
@@ -178,15 +179,26 @@ def gen_asm_for_constructor(type_name):
 		else: 
 			# Call default constructor for attr and assign to correct spot
 			constructor = ast_attr.feature_type + "..new"
-			asm_instr_list += [
-				ASMPushQ(SELF_REG),
-				ASMCall(constructor),
-				ASMPopQ(SELF_REG),
-				ASMMovQ("%rax", mem_offset)
-			]
 
+			# Push all caller-saved regs
+			for reg in caller_saved_registers:
+				asm_instr_list.append(ASMPushQ(reg))
+			asm_instr_list.append(ASMPushQ(SELF_REG))
 
+			# Call constructor
+			asm_instr_list.append(ASMCall(constructor))
+
+			# Pop all caller-saved regs
+			asm_instr_list.append(ASMPopQ(SELF_REG))
+			for reg in reversed(caller_saved_registers):
+				asm_instr_list.append(ASMPopQ(reg))
+
+			# Move result into attr offset
+			asm_instr_list.append(ASMMovQ("%rax", mem_offset))
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	# 2. Init each attribute based on expression
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	asm_instr_list.append(ASMComment("initialize attrs"))
 	for i, ast_attr in enumerate(class_map[type_name]):
 		idx = i + 3;
@@ -197,7 +209,11 @@ def gen_asm_for_constructor(type_name):
 			continue
 
 		asm_instr_list.append(ASMComment("self[" + str(idx) + "] " + ast_attr.ident + " <- init exp"))
-		asm_instr_list.append(ASMComment("---- TODO: Generate asm for init exp"))
+		# asm_instr_list.append(ASMComment("---- TODO: Generate asm for init exp"))
+		tmp_asm_instr_list = ast_attr_to_asm(ast_attr, type_name)
+		asm_instr_list += tmp_asm_instr_list
+
+	# -- end for loop
 
 	# Move the pointer to self into rax to return it
 	asm_instr_list += [
@@ -248,6 +264,16 @@ def make_global_type_tag_map():
 	for idx, type_name in enumerate(sorted(remaining_types)):
 		type_tag_map[type_name] = idx + offset
 
+def make_global_attr_offset_map():
+	global attr_offset_map
+
+	# Account for type_tag, size, and vtable_ptr in object
+	offset = 3;
+	for type_name in class_map:
+		for idx, ast_attr in enumerate(class_map[type_name]):
+			tup = (type_name, ast_attr.ident)
+			attr_offset_map[tup] = (idx + 3)
+
 def get_program_start_string():
 	result = get_header_comment_string("PROGRAM START")
 	result += "\t\t\t.globl main\n"
@@ -275,6 +301,9 @@ def get_methods_string():
 	result = get_header_comment_string("METHOD IMPLEMENTATIONS")
 
 	for type_name in sorted(implementation_map.keys()):
+
+		# TODO: HANDLE SCOPE OF ATTRIBUTES IN SYMBOL TABLE
+
 		method_list = implementation_map[type_name]
 		for ast_method in method_list:
 			# Only print methods specific to this class
@@ -287,7 +316,8 @@ def get_methods_string():
 					result += "\t\t\tcall exit\n"
 
 				else:
-					tmp_asm_instr_list = ast_exp_to_asm(ast_method, type_name)
+					tmp_asm_instr_list = gen_asm_for_method_start()
+					tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
 
 					for asm_instr in tmp_asm_instr_list:
 						result += str(asm_instr)
@@ -296,7 +326,7 @@ def get_methods_string():
 
 	return result
 
-def ast_exp_to_asm(ast_method, type_name):
+def ast_method_to_asm(ast_method, type_name):
 	# ---- TODO: Handle scope of attributes in the symbol table
 	reset_globals()
 
@@ -318,20 +348,54 @@ def ast_exp_to_asm(ast_method, type_name):
 	# Allocate registers
 	is_done = False
 	while not is_done:
-		computeLiveSets(block_list)		
+		computeLiveSets(block_list)
 		register_graph = build_register_graph(block_list)
 		combined_live_ranges = combine_block_live_ranges(block_list)
 		is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
 	# -- end while loop
 
 	# Generate asm for the block list
-	gen_asm_for_block_list(block_list, register_colors, spilled_registers)
+	gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
 
 	# for asm_instr in asm_instr_list:
 	# 	print asm_instr,
 
-	# Return a copy of the global list
+	# Return a copy of the result since asm_instr_list is global
 	return copy.copy(asm_instr_list)
+
+def ast_attr_to_asm(ast_attr, type_name):
+	# ---- TODO: Handle scope of attributes
+	reset_globals()
+
+	gen_tac_for_exp(ast_attr.exp)
+
+	block_list = buildBasicBlocks(tac_list)
+	computeLiveSets(block_list)
+
+	# Allocate registers
+	is_done = False
+	while not is_done:
+		computeLiveSets(block_list)
+		register_graph = build_register_graph(block_list)
+		combined_live_ranges = combine_block_live_ranges(block_list)
+		is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
+	# -- end while loop
+	gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+
+	# Add final instr to move value to correct offset from self
+	tup = (type_name, ast_attr.ident)
+	attr_idx = attr_offset_map[tup]
+	self_offset = 8 * attr_idx
+	dest = str(self_offset)+"("+SELF_REG+")"
+
+	# Get the last register in the exp since it holds the resulting value
+	final_virtual_reg = tac_list[-1].assignee
+	src = get_asm_register(final_virtual_reg, 64)
+	asm_instr_list.append(ASMMovQ(src, dest))
+
+	# Return a copy of the result since asm_instr_list is global
+	return copy.copy(asm_instr_list)
+
 
 def reset_globals():
 	global tac_list
@@ -353,6 +417,7 @@ if __name__ == "__main__":
 	prog_ast_root = get_input_list_from_annotated_ast(input_filename)
 
 	make_global_type_tag_map()
+	make_global_attr_offset_map()
 
 	print get_vtables_string()
 	print get_constructor_string()

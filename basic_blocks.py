@@ -22,7 +22,10 @@ class TACBasicBlock:
 		self.live_ranges = {}
 
 		# First item in instr_list will always be TACLabel, so get label for the block
-		self.label = instr_list[0].label
+		if hasattr(instr_list[0], "label"):
+			self.label = instr_list[0].label
+		else:
+			self.label = "Block without beginning label"
 
 		# Populate child labels
 		for instr in instr_list:
@@ -156,7 +159,7 @@ def buildBasicBlocks(TAC_instr_list):
 	for TAC_instr in TAC_instr_list:
 		# If the current instr is a label, start a new basic block
 		if isinstance(TAC_instr, TACLabel) and len(block_instr_list) != 0:
-			label = block_instr_list[0].label
+			# label = block_instr_list[0].label
 			block_list.append(TACBasicBlock(block_instr_list))
 			block_instr_list = []
 
@@ -165,7 +168,7 @@ def buildBasicBlocks(TAC_instr_list):
 			block_instr_list.append(TAC_instr)
 
 	# Add the final basic block to the block map
-	label = block_instr_list[0].label
+	# label = block_instr_list[0].label
 	block_list.append(TACBasicBlock(block_instr_list))
 
 	for parent in block_list:

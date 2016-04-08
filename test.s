@@ -38,7 +38,6 @@ Main..vtable:		## vtable for Main
 			.quad Object.copy
 			.quad Object.type_name
 			.quad Main.main
-			.quad Main.some_method
 
 .globl Object..vtable
 Object..vtable:		## vtable for Object
@@ -73,6 +72,7 @@ Bool..new:		## Constructor for Bool
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
+			pushq	%rbx
 			## Allocate space for Bool
 			movq	$8, %rsi
 			movq	$4, %rdi
@@ -92,6 +92,7 @@ Bool..new:		## Constructor for Bool
 			## assign self register to %rax
 			movq	%rbx, %rax
 			## pop callee-saved regs
+			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
@@ -108,6 +109,7 @@ IO..new:		## Constructor for IO
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
+			pushq	%rbx
 			## Allocate space for IO
 			movq	$8, %rsi
 			movq	$3, %rdi
@@ -125,6 +127,7 @@ IO..new:		## Constructor for IO
 			## assign self register to %rax
 			movq	%rbx, %rax
 			## pop callee-saved regs
+			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
@@ -141,6 +144,7 @@ Int..new:		## Constructor for Int
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
+			pushq	%rbx
 			## Allocate space for Int
 			movq	$8, %rsi
 			movq	$4, %rdi
@@ -160,6 +164,7 @@ Int..new:		## Constructor for Int
 			## assign self register to %rax
 			movq	%rbx, %rax
 			## pop callee-saved regs
+			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
@@ -176,123 +181,21 @@ Main..new:		## Constructor for Main
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
+			pushq	%rbx
 			## Allocate space for Main
 			movq	$8, %rsi
-			movq	$3, %rdi
+			movq	$5, %rdi
 			call	calloc
 			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
 			movq	$5, %rax
 			movq	%rax, 0(%rbx)
-			movq	$3, %rax
+			movq	$5, %rax
 			movq	%rax, 8(%rbx)
 			movq	$Main..vtable, %rax
 			movq	%rax, 16(%rbx)
 			## create default attrs
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
-			## pop callee-saved regs
-			popq	%r15
-			popq	%r14
-			popq	%r13
-			popq	%r12
-			leave
-			ret
-
-.globl Object..new
-Object..new:		## Constructor for Object
-			pushq	%rbp
-			movq	%rsp, %rbp
-			## push callee-saved regs
-			pushq	%r12
-			pushq	%r13
-			pushq	%r14
-			pushq	%r15
-			## Allocate space for Object
-			movq	$8, %rsi
-			movq	$3, %rdi
-			call	calloc
-			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
-			movq	$3, %rax
-			movq	%rax, 0(%rbx)
-			movq	$3, %rax
-			movq	%rax, 8(%rbx)
-			movq	$Object..vtable, %rax
-			movq	%rax, 16(%rbx)
-			## create default attrs
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
-			## pop callee-saved regs
-			popq	%r15
-			popq	%r14
-			popq	%r13
-			popq	%r12
-			leave
-			ret
-
-.globl String..new
-String..new:		## Constructor for String
-			pushq	%rbp
-			movq	%rsp, %rbp
-			## push callee-saved regs
-			pushq	%r12
-			pushq	%r13
-			pushq	%r14
-			pushq	%r15
-			## Allocate space for String
-			movq	$8, %rsi
-			movq	$4, %rdi
-			call	calloc
-			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
-			movq	$4, %rax
-			movq	%rax, 0(%rbx)
-			movq	$4, %rax
-			movq	%rax, 8(%rbx)
-			movq	$String..vtable, %rax
-			movq	%rax, 16(%rbx)
-			## create default attrs
-			## self[3] holds val (raw.String)
-			movq	$empty.string, 24(%rbx)
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
-			## pop callee-saved regs
-			popq	%r15
-			popq	%r14
-			popq	%r13
-			popq	%r12
-			leave
-			ret
-
-
-			## ::::::::::::::::::::::::::::::::::::::::
-			##  METHOD IMPLEMENTATIONS
-			## ::::::::::::::::::::::::::::::::::::::::
-
-.globl IO.in_int
-IO.in_int:
-			call exit
-.globl IO.in_string
-IO.in_string:
-			call exit
-.globl IO.out_int
-IO.out_int:
-			call exit
-.globl IO.out_string
-IO.out_string:
-			call exit
-.globl Main.main
-Main.main:
-.Main_main_1:
-			pushq	%rbp
-			movq	%rsp, %rbp
-			subq	$0, %rsp
-			## new const Int: 777
-			## push caller-saved regs
+			## self[3] holds x (Int)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -301,8 +204,9 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			call	Int..new
-			## pop caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -311,10 +215,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$777, 24(%r9)
-			## new const Int: 9001
-			## push caller-saved regs
+			movq	%rax, 24(%rbx)
+			## self[4] holds y (Int)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -323,8 +225,9 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			call	Int..new
-			## pop caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -333,16 +236,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movl	$9001, 24(%r10)
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
-			## plus
-			movl	%r8d, %r10d
-			addl	%r9d, %r10d
-			## box value of %r10 into %r8
+			movq	%rax, 32(%rbx)
+			## initialize attrs
+			## self[3] x <- init exp
+			## Load self[4] (y) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r10
+			## new const Int: 7
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -363,62 +264,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r10, 24(%r8)
-			## return
-			movq	%r8, %rax
-			leave
-			ret
-
-.globl Main.some_method
-Main.some_method:
-.Main_some_method_2:
-			pushq	%rbp
-			movq	%rsp, %rbp
-			subq	$0, %rsp
-			## new const Int: 1
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r10
-			movl	$1, 24(%r10)
-			## new const Int: 2
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$2, 24(%r8)
+			movl	$7, 24(%r8)
 			## unbox value of %r10 into %r9
 			movq	24(%r10), %r9
 			## unbox value of %r8 into %r10
@@ -448,8 +294,136 @@ Main.some_method:
 			popq	%rcx
 			movq	%rax, %r9
 			movq	%r8, 24(%r9)
+			movq	%r9, 24(%rbx)
+			## assign self register to %rax
+			movq	%rbx, %rax
+			## pop callee-saved regs
+			popq	%rbx
+			popq	%r15
+			popq	%r14
+			popq	%r13
+			popq	%r12
+			leave
+			ret
+
+.globl Object..new
+Object..new:		## Constructor for Object
+			pushq	%rbp
+			movq	%rsp, %rbp
+			## push callee-saved regs
+			pushq	%r12
+			pushq	%r13
+			pushq	%r14
+			pushq	%r15
+			pushq	%rbx
+			## Allocate space for Object
+			movq	$8, %rsi
+			movq	$3, %rdi
+			call	calloc
+			movq	%rax, %rbx
+			## Store type_tag, obj_size, vtable
+			movq	$3, %rax
+			movq	%rax, 0(%rbx)
+			movq	$3, %rax
+			movq	%rax, 8(%rbx)
+			movq	$Object..vtable, %rax
+			movq	%rax, 16(%rbx)
+			## create default attrs
+			## initialize attrs
+			## assign self register to %rax
+			movq	%rbx, %rax
+			## pop callee-saved regs
+			popq	%rbx
+			popq	%r15
+			popq	%r14
+			popq	%r13
+			popq	%r12
+			leave
+			ret
+
+.globl String..new
+String..new:		## Constructor for String
+			pushq	%rbp
+			movq	%rsp, %rbp
+			## push callee-saved regs
+			pushq	%r12
+			pushq	%r13
+			pushq	%r14
+			pushq	%r15
+			pushq	%rbx
+			## Allocate space for String
+			movq	$8, %rsi
+			movq	$4, %rdi
+			call	calloc
+			movq	%rax, %rbx
+			## Store type_tag, obj_size, vtable
+			movq	$4, %rax
+			movq	%rax, 0(%rbx)
+			movq	$4, %rax
+			movq	%rax, 8(%rbx)
+			movq	$String..vtable, %rax
+			movq	%rax, 16(%rbx)
+			## create default attrs
+			## self[3] holds val (raw.String)
+			movq	$empty.string, 24(%rbx)
+			## initialize attrs
+			## assign self register to %rax
+			movq	%rbx, %rax
+			## pop callee-saved regs
+			popq	%rbx
+			popq	%r15
+			popq	%r14
+			popq	%r13
+			popq	%r12
+			leave
+			ret
+
+
+			## ::::::::::::::::::::::::::::::::::::::::
+			##  METHOD IMPLEMENTATIONS
+			## ::::::::::::::::::::::::::::::::::::::::
+
+.globl IO.in_int
+IO.in_int:
+			call exit
+.globl IO.in_string
+IO.in_string:
+			call exit
+.globl IO.out_int
+IO.out_int:
+			call exit
+.globl IO.out_string
+IO.out_string:
+			call exit
+.globl Main.main
+Main.main:
+			pushq	%rbp
+			movq	%rsp, %rbp
+.Main_main_1:
+			## new const Int: 0
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movl	$0, 24(%r8)
 			## return
-			movq	%r9, %rax
+			movq	%r8, %rax
 			leave
 			ret
 

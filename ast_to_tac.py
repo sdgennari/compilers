@@ -24,11 +24,6 @@ def new_label_num():
 	label_counter += 1
 	return str(label_counter)
 
-def add_attr_symbol(ident):
-	global symbol_table_list
-	symbol_table_list[-1][ident] = ident
-	return symbol_table_list[-1][ident]
-
 # Separate this into its own method so get_symbol can handle scope
 # Only ever add new symbols to the LAST symbol table (top of stack)
 def add_symbol(ident):
@@ -99,7 +94,14 @@ def gen_tac_for_exp(ast_exp):
 	elif isinstance(ast_exp, ASTExpIdentifier):
 		# ExpIdentifier: (self, line, ident_line, ident)
 		# For an identifier, get appropriate symbol from the symbol table
-		ident_symbol = get_symbol(ast_exp.ident)
+		maybe_symbol = get_symbol(ast_exp.ident)
+
+		# If the symbol table returned None, then the symbol is an attr
+		if maybe_symbol == None:
+			ident_symbol = new_symbol()
+			tac_list.append(TACLoadAttr(ident_symbol, ast_exp.ident))
+		else:
+			ident_symbol = maybe_symbol
 
 		# Assign the ident symbol to the asignee symbol
 		tac_list.append(TACAssign(assignee_symbol, ident_symbol))
@@ -179,9 +181,15 @@ def gen_tac_for_exp(ast_exp):
 
 	elif isinstance(ast_exp, ASTExpAssign):
 		# ExpAssign: (self, line, ident_line, ident, exp)
-		# assignee_symbol MUST be a value from the symbol table, so fetch it
-		assignee_symbol = get_symbol(ast_exp.ident)
+		# MUST be a value from the symbol table or an attr
 		exp_symbol = gen_tac_for_exp(ast_exp.exp)
+
+		maybe_symbol = get_symbol(ast_exp.ident)
+		
+		# If the assignee symbol is None, then the ident is an attr
+		if maybe_symbol == None:
+			tac_list.append(TACStoreAttr(ast_exp.ident, exp_symbol))
+
 		tac_list.append(TACAssign(assignee_symbol, exp_symbol))
 
 	elif isinstance(ast_exp, ASTExpBlock):
@@ -417,51 +425,49 @@ def gen_tac_for_feature(ast_feature, class_name):
 
 	elif isinstance(ast_feature, ASTAttrInit):
 		# AttrInit: (self, ident_line, ident, type_line, feature_type, exp)
-		# attr_symbol = add_attr_symbol(ast_feature.ident)
 		attr_symbol = add_symbol(ast_feature.ident)
 		exp_symbol = gen_tac_for_exp(ast_feature.exp)
 		tac_list.append(TACAssign(attr_symbol, exp_symbol))
 
 	elif isinstance(ast_feature, ASTAttrNoInit):
 		# AttrNoInit: (self, ident_line, ident, type_line, feature_type)
-		# attr_symbol = add_attr_symbol(ast_feature.ident)
 		attr_symbol = add_symbol(ast_feature.ident)
 		tac_list.append(TACDefault(attr_symbol, ast_feature.feature_type))
 
-def gen_tac_for_class(ast_class):
-	# Add symbol table for class since the scope is changing
-	symbol_table_list.append({})
+# def gen_tac_for_class(ast_class):
+# 	# Add symbol table for class since the scope is changing
+# 	symbol_table_list.append({})
 
-	# For now, skip classes other than the main class
-	class_typ = ast_class.typ
-	tac_list.append(TACComment("start class: " + str(class_typ)))
+# 	# For now, skip classes other than the main class
+# 	class_typ = ast_class.typ
+# 	tac_list.append(TACComment("start class: " + str(class_typ)))
 
-	if class_typ != "Main":
-		symbol_table_list.pop()
-		tac_list.append(TACComment("end class: " + str(class_typ)))
-		return
+# 	if class_typ != "Main":
+# 		symbol_table_list.pop()
+# 		tac_list.append(TACComment("end class: " + str(class_typ)))
+# 		return
 
-	# Generate tac for each feature in the list
-	for ast_feature in ast_class.feature_list:
-		gen_tac_for_feature(ast_feature, class_typ)
+# 	# Generate tac for each feature in the list
+# 	for ast_feature in ast_class.feature_list:
+# 		gen_tac_for_feature(ast_feature, class_typ)
 
-	symbol_table_list.pop()
-	tac_list.append(TACComment("end class: " + str(class_typ)))
+# 	symbol_table_list.pop()
+# 	tac_list.append(TACComment("end class: " + str(class_typ)))
 
-def gen_tac_for_ast(ast_root):
-	global symbol_table_list
-	global tac_list
-	tac_list.append(TACComment("start"))
-	for ast_class in ast_root.class_list:
-		gen_tac_for_class(ast_class)
+# def gen_tac_for_ast(ast_root):
+# 	global symbol_table_list
+# 	global tac_list
+# 	tac_list.append(TACComment("start"))
+# 	for ast_class in ast_root.class_list:
+# 		gen_tac_for_class(ast_class)
 
 if __name__ == "__main__":
 	input_filename = sys.argv[1]
 	# prog_ast_root = get_input_list(input_filename)
 	prog_ast_root = get_input_list_from_annotated_ast(input_filename)
 
-	gen_tac_for_ast(prog_ast_root)
+	# gen_tac_for_ast(prog_ast_root)
 
-	for tac_instr in tac_list:
-		print tac_instr
+	# for tac_instr in tac_list:
+		# print tac_instr
 
