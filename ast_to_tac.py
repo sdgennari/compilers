@@ -387,15 +387,19 @@ def gen_tac_for_exp(ast_exp):
 		elif ast_exp.ident == "in_int":
 			tac_list.append(TACInInt(assignee_symbol))
 
+	else:
+		raise NotImplementedError(ast_exp.__class__.__name__ + " not yet implemented")
+
 	# Default return case
 	return assignee_symbol
 
 def gen_tac_for_feature(ast_feature, class_name):
 	global tac_list
+
 	if isinstance(ast_feature, ASTMethod):
 		# For now, skip classes other than the main method
-		if ast_feature.ident != "main":
-			return
+		# if ast_feature.ident != "main":
+		# 	return
 
 		# Add symbol table for method
 		symbol_table_list.append({})

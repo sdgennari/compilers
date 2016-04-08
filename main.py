@@ -248,6 +248,24 @@ def make_global_type_tag_map():
 	for idx, type_name in enumerate(sorted(remaining_types)):
 		type_tag_map[type_name] = idx + offset
 
+def get_program_start_string():
+	result = get_header_comment_string("PROGRAM START")
+	result += "\t\t\t.globl main\n"
+	result += "\t\t\t.type main, @function\n"
+	result += "main:\n"
+
+	tmp_asm_instr_list = [
+		ASMCall("Main..new"),
+		ASMMovQ("%rax", "%rbx"),
+		ASMCall("Main.main"),
+		ASMMovQ("$0", "%rax"),
+		ASMCall("exit")
+	]
+
+	for asm_instr in tmp_asm_instr_list:
+		result += str(asm_instr)
+
+	return result
 
 # ========================================
 #  METHOD IMPLEMENTATIONS
@@ -255,8 +273,76 @@ def make_global_type_tag_map():
 
 def get_methods_string():
 	result = get_header_comment_string("METHOD IMPLEMENTATIONS")
-	# ---- TODO: Generate asm for each method
+
+	for type_name in sorted(implementation_map.keys()):
+		method_list = implementation_map[type_name]
+		for ast_method in method_list:
+			# Only print methods specific to this class
+			if ast_method.containing_class == type_name:
+				result += ".globl " + type_name + "." + ast_method.ident + "\n"
+				result += type_name + "." + ast_method.ident + ":\n"
+
+				if isinstance(ast_method.body_exp, ASTExpInternal):
+				# ---- TODO: Generate asm for the method
+					result += "\t\t\tcall exit\n"
+
+				else:
+					tmp_asm_instr_list = ast_exp_to_asm(ast_method, type_name)
+
+					for asm_instr in tmp_asm_instr_list:
+						result += str(asm_instr)
+
+					result += "\n"
+
 	return result
+
+def ast_exp_to_asm(ast_method, type_name):
+	# ---- TODO: Handle scope of attributes in the symbol table
+	reset_globals()
+
+	# Generate the TAC for the exp
+	gen_tac_for_feature(ast_method, type_name)
+
+	# print ast_method.body_exp
+	# print
+	# print len(tac_list)
+
+	# for tac_instr in tac_list:
+	# 	print tac_instr
+	# print
+
+	# Build basic blocks and compute liveness
+	block_list = buildBasicBlocks(tac_list)
+	computeLiveSets(block_list)
+
+	# Allocate registers
+	is_done = False
+	while not is_done:
+		computeLiveSets(block_list)		
+		register_graph = build_register_graph(block_list)
+		combined_live_ranges = combine_block_live_ranges(block_list)
+		is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
+	# -- end while loop
+
+	# Generate asm for the block list
+	gen_asm_for_block_list(block_list, register_colors, spilled_registers)
+
+	# for asm_instr in asm_instr_list:
+	# 	print asm_instr,
+
+	# Return a copy of the global list
+	return copy.copy(asm_instr_list)
+
+def reset_globals():
+	global tac_list
+	global asm_instr_list
+	global register_colors
+	global spilled_registers
+
+	del tac_list[:]
+	del asm_instr_list[:]
+	# del spilled_registers[:]
+	# register_colors = {}
 
 # ========================================
 #  MAIN
@@ -272,11 +358,13 @@ if __name__ == "__main__":
 	print get_constructor_string()
 	print get_methods_string()
 
-	gen_tac_for_ast(prog_ast_root)
+	# get_methods_string()
 
-	block_list = buildBasicBlocks(tac_list)
+	# gen_tac_for_ast(prog_ast_root)
 
-	computeLiveSets(block_list)
+	# block_list = buildBasicBlocks(tac_list)
+
+	# computeLiveSets(block_list)
 
 	# for block in block_list:
 	# 	print block
@@ -285,24 +373,26 @@ if __name__ == "__main__":
 
 	# print "blocks:",len(block_list)
 
-	is_done = False
-	while not is_done:
-		computeLiveSets(block_list)
+	# is_done = False
+	# while not is_done:
+	# 	computeLiveSets(block_list)
 		
-		register_graph = build_register_graph(block_list)
+	# 	register_graph = build_register_graph(block_list)
 
-		# print "graph",len(register_graph)
+	# 	# print "graph",len(register_graph)
 
-		combined_live_ranges = combine_block_live_ranges(block_list)
+	# 	combined_live_ranges = combine_block_live_ranges(block_list)
 
-		is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
-	# -- end while loop
+	# 	is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
+	# # -- end while loop
 
-	gen_asm_for_block_list(block_list, register_colors, spilled_registers)
+	# gen_asm_for_block_list(block_list, register_colors, spilled_registers)
 
 	# Print output
-	for asm_instr in asm_instr_list:
-		print asm_instr,
+	# for asm_instr in asm_instr_list:
+	# 	print asm_instr,
+
+	print get_program_start_string()
 
 	# Note: This must be called AFTER asm for all expressions has been generated
 	print get_constants_string()

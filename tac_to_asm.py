@@ -559,6 +559,7 @@ def gen_asm_for_block_list(block_list, register_colors, spilled_registers):
 
 	# For now, assume everything has an offset of 4 bytes on the stack
 	# This will change since strings will require 8 bytes
+	spilled_register_location_map = {}
 	stack_offset = 0
 	for idx, register in enumerate(spilled_registers):
 		spilled_register_location_map[register] = (idx+1) * -4
