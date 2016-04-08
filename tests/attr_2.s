@@ -210,7 +210,34 @@ Main..new:              ## constructor for Main
                         movq 0(%rbp), %r14
                         movq %r14, 24(%r13)
                         movq %r13, 24(%r12)
-                        ## self[4] y initializer -- none 
+                        ## self[4] y initializer <- x + 9001
+                        ## x
+                        movq 24(%r12), %r13
+                        movq 24(%r13), %r13
+                        movq %r13, 0(%rbp)
+                        ## new Int
+                        pushq %rbp
+                        pushq %r12
+                        movq $Int..new, %r14
+                        call *%r14
+                        popq %r12
+                        popq %rbp
+                        movq $9001, %r14
+                        movq %r14, 24(%r13)
+                        movq 24(%r13), %r13
+                        movq 0(%rbp), %r14
+                        addq %r14, %r13
+                        movq %r13, 0(%rbp)
+                        ## new Int
+                        pushq %rbp
+                        pushq %r12
+                        movq $Int..new, %r14
+                        call *%r14
+                        popq %r12
+                        popq %rbp
+                        movq 0(%rbp), %r14
+                        movq %r14, 24(%r13)
+                        movq %r13, 32(%r12)
                         movq %r12, %r13
                         ## return address handling
                         movq %rbp, %rsp

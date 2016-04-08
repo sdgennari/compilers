@@ -2,8 +2,6 @@
 	.section	.rodata
 .LC0:
 	.string	"hello c"
-.LC1:
-	.string	"%d\n"
 	.text
 	.globl	main
 	.type	main, @function
@@ -21,11 +19,6 @@ main:
 	movq	%rax, %rdi
 	call	strlen
 	movl	%eax, -12(%rbp)
-	movl	-12(%rbp), %eax
-	movl	%eax, %esi
-	movl	$.LC1, %edi
-	movl	$0, %eax
-	call	printf
 	movl	$0, %eax
 	leave
 	.cfi_def_cfa 7, 8

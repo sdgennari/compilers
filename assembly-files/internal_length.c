@@ -7,7 +7,7 @@ int main() {
 
 	len = strlen(s1);
 
-	printf("%d\n", len);
+	// printf("%d\n", len);
 
 	return 0;
 }

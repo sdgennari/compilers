@@ -446,46 +446,12 @@ Main.main:              ## method definition
                         pushq %rbp
                         movq %rsp, %rbp
                         movq 16(%rbp), %r12
-                        ## stack room for temporaries: 6
-                        movq $48, %r14
+                        ## stack room for temporaries: 5
+                        movq $40, %r14
                         subq %r14, %rsp
                         ## return address handling
                         ## method body begins
-                        ## fp[0] holds local i (Int)
-                        ## new Int
-                        pushq %rbp
-                        pushq %r12
-                        movq $Int..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq %r13, 0(%rbp)
-                        ## fp[-1] holds local b (Bool)
-                        ## new Bool
-                        pushq %rbp
-                        pushq %r12
-                        movq $Bool..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq %r13, -8(%rbp)
-                        ## fp[-2] holds local s (String)
-                        ## new String
-                        pushq %rbp
-                        pushq %r12
-                        movq $String..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq $the.empty.string, %r15
-                        movq %r15, 24(%r13)
-                        movq %r13, -16(%rbp)
-                        ## fp[-3] holds local io (IO)
-                        movq $0, %r13
-                        movq %r13, -24(%rbp)
-                        ## fp[-4] holds local main (Main)
-                        movq $0, %r13
-                        movq %r13, -32(%rbp)
+                        ## fp[0] holds local a (Int)
                         ## new Int
                         pushq %rbp
                         pushq %r12
@@ -496,24 +462,18 @@ Main.main:              ## method definition
                         movq $777, %r14
                         movq %r14, 24(%r13)
                         movq %r13, 0(%rbp)
-                        ## new Bool
+                        ## fp[-1] holds local b (Int)
+                        ## new Int
                         pushq %rbp
                         pushq %r12
-                        movq $Bool..new, %r14
+                        movq $Int..new, %r14
                         call *%r14
                         popq %r12
                         popq %rbp
-                        movq $1, %r14
+                        movq $9001, %r14
                         movq %r14, 24(%r13)
                         movq %r13, -8(%rbp)
-                        ## new Bool
-                        pushq %rbp
-                        pushq %r12
-                        movq $Bool..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq %r13, -8(%rbp)
+                        ## fp[-2] holds local str (String)
                         ## new String
                         pushq %rbp
                         pushq %r12
@@ -525,22 +485,27 @@ Main.main:              ## method definition
                         movq $string8, %r14
                         movq %r14, 24(%r13)
                         movq %r13, -16(%rbp)
-                        ## new IO
-                        pushq %rbp
-                        pushq %r12
-                        movq $IO..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
+                        ## a
+                        movq 0(%rbp), %r13
+                        movq 24(%r13), %r13
                         movq %r13, -24(%rbp)
-                        ## new Main
+                        ## b
+                        movq -8(%rbp), %r13
+                        movq 24(%r13), %r13
+                        movq -24(%rbp), %r14
+                        addq %r14, %r13
+                        movq %r13, -24(%rbp)
+                        ## new Int
                         pushq %rbp
                         pushq %r12
-                        movq $Main..new, %r14
+                        movq $Int..new, %r14
                         call *%r14
                         popq %r12
                         popq %rbp
-                        movq %r13, -32(%rbp)
+                        movq -24(%rbp), %r14
+                        movq %r14, 24(%r13)
+                        ## str
+                        movq -16(%rbp), %r13
 .globl Main.main.end
 Main.main.end:          ## method body ends
                         ## return address handling

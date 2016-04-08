@@ -189,6 +189,8 @@ def gen_tac_for_exp(ast_exp):
 		# If the assignee symbol is None, then the ident is an attr
 		if maybe_symbol == None:
 			tac_list.append(TACStoreAttr(ast_exp.ident, exp_symbol))
+		else:
+			assignee_symbol = maybe_symbol
 
 		tac_list.append(TACAssign(assignee_symbol, exp_symbol))
 
@@ -402,7 +404,7 @@ def gen_tac_for_exp(ast_exp):
 	return assignee_symbol
 
 def gen_tac_for_feature(ast_feature, class_name):
-	global tac_list
+	global tac_list, symbol_table_list
 
 	if isinstance(ast_feature, ASTMethod):
 		# For now, skip classes other than the main method

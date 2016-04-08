@@ -3,7 +3,7 @@ from asm_objects import *
 from shared_vars import *
 
 # Initialize global vars
-asm_instr_list = []
+# asm_instr_list = []
 register_color_map = {}
 spilled_register_location_map = {}
 asm_label_counter = 0
@@ -471,7 +471,7 @@ def gen_asm_for_tac_store_attr(tac_store_attr):
 	self_offset = 8 * attr_idx
 
 	# Move the value into the attr
-	src = get_asm_register(tac_store_attr.op1)
+	src = get_asm_register(tac_store_attr.op1, 64)
 	dest = str(self_offset)+"("+SELF_REG+")"
 	asm_instr_list.append(ASMComment("Store " + src + " in self[" + str(attr_idx) + \
 		"] (" + tac_store_attr.ident + ")"))
@@ -601,3 +601,45 @@ def gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_
 
 	# Add initial setup to the asm instr list
 	# add_initial_method_setup(stack_offset)
+
+# ========================================
+#  INTERNAL FUNCTIONS
+# ========================================
+def gen_asm_for_internal_method(internal_name):
+	if internal_name == "String.length":
+		gen_asm_for_internal_length()
+
+	else:
+		# raise NotImplementedError(internal_name + " has not been implemented")
+		pass
+
+def gen_asm_for_internal_length():
+	global asm_instr_list
+
+	# Push all callee-saved regs
+	for reg in callee_saved_registers:
+		asm_instr_list.append(ASMPushQ(reg))
+
+	# Call strlen and keep result in rax
+	# Note: No need to save caller-saved regs since none are in use
+	asm_instr_list.append(ASMComment("call strlen to compute length"))
+	str_val_src = "24("+SELF_REG+")"
+	asm_instr_list.append(ASMMovQ(str_val_src, "%rdi"))
+	asm_instr_list.append(ASMCall("strlen"))
+	asm_instr_list.append(ASMMovQ("%rax", "%r8"))
+
+	# Move 
+
+	# Make new Int box and put the result inside
+	# Note: r9 is arbitrary here
+	asm_instr_list.append(ASMComment("box final result"))
+	gen_asm_for_new_boxed_type("Int", "%r9")
+	asm_instr_list.append(ASMMovQ("%r8", "24(%r9)"))
+
+	# Move final result into rax to return
+	asm_instr_list.append(ASMComment("move result into rax"))
+	asm_instr_list.append(ASMMovQ("%r9", "%rax"))
+
+	# Pop all callee-saved regs
+	for reg in reversed(callee_saved_registers):
+		asm_instr_list.append(ASMPopQ(reg))

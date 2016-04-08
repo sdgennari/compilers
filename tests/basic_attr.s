@@ -499,15 +499,8 @@ Main.main:              ## method definition
                         movq %r14, 24(%r13)
                         movq 24(%r13), %r13
                         movq %r13, 0(%rbp)
-                        ## new Int
-                        pushq %rbp
-                        pushq %r12
-                        movq $Int..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq $777, %r14
-                        movq %r14, 24(%r13)
+                        ## some_attr
+                        movq 24(%r12), %r13
                         movq 24(%r13), %r13
                         movq 0(%rbp), %r14
                         addq %r14, %r13
@@ -528,34 +521,9 @@ Main.main:              ## method definition
                         call *%r14
                         popq %r12
                         popq %rbp
-                        movq $555, %r14
+                        movq $123, %r14
                         movq %r14, 24(%r13)
-                        movq 24(%r13), %r13
-                        movq %r13, 0(%rbp)
-                        ## new Int
-                        pushq %rbp
-                        pushq %r12
-                        movq $Int..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq $888, %r14
-                        movq %r14, 24(%r13)
-                        movq 24(%r13), %r13
-                        movq 0(%rbp), %r14
-                        movq %r14, %rax
-			subq %r13, %rax
-			movq %rax, %r13
-                        movq %r13, 0(%rbp)
-                        ## new Int
-                        pushq %rbp
-                        pushq %r12
-                        movq $Int..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq 0(%rbp), %r14
-                        movq %r14, 24(%r13)
+                        movq %r13, 24(%r12)
 .globl Main.main.end
 Main.main.end:          ## method body ends
                         ## return address handling

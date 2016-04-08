@@ -9,6 +9,7 @@ class Main {
 		in {
 			i <- 777;
 			b <- true;
+			b <- false;
 			s <- "hello cool\n";
 			io <- new IO;
 			main <- new Main;

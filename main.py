@@ -298,6 +298,7 @@ def get_program_start_string():
 # ========================================
 
 def get_methods_string():
+	global asm_instr_list
 	result = get_header_comment_string("METHOD IMPLEMENTATIONS")
 
 	for type_name in sorted(implementation_map.keys()):
@@ -311,9 +312,20 @@ def get_methods_string():
 				result += ".globl " + type_name + "." + ast_method.ident + "\n"
 				result += type_name + "." + ast_method.ident + ":\n"
 
+				# Reset global vars
+				reset_globals()
+
 				if isinstance(ast_method.body_exp, ASTExpInternal):
 				# ---- TODO: Generate asm for the method
-					result += "\t\t\tcall exit\n"
+					asm_instr_list += gen_asm_for_method_start()
+					gen_asm_for_internal_method(ast_method.body_exp.class_method)
+					asm_instr_list += gen_asm_for_method_end()
+
+					for asm_instr in asm_instr_list:
+						result += str(asm_instr)
+
+					# result += "\t\t\tcall exit\n"
+					result += "\n"
 
 				else:
 					tmp_asm_instr_list = gen_asm_for_method_start()
@@ -345,6 +357,10 @@ def ast_method_to_asm(ast_method, type_name):
 	block_list = buildBasicBlocks(tac_list)
 	computeLiveSets(block_list)
 
+	# for block in block_list:
+	# 	print block
+	# sys.exit(1)
+
 	# Allocate registers
 	is_done = False
 	while not is_done:
@@ -364,7 +380,7 @@ def ast_method_to_asm(ast_method, type_name):
 	return copy.copy(asm_instr_list)
 
 def ast_attr_to_asm(ast_attr, type_name):
-	# ---- TODO: Handle scope of attributes
+	# Reset global variables to avoid conflicts
 	reset_globals()
 
 	gen_tac_for_exp(ast_attr.exp)
