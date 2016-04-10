@@ -341,9 +341,15 @@ def gen_tac_for_exp(ast_exp):
 	elif isinstance(ast_exp, ASTExpSelfDispatch):
 		# ExpSelfDispatch: (self, line, ident_line, ident, exp_list=[])
 
-		exp_symbol_list = []
-		for exp in ast_exp.exp_list:
-			exp_symbol_list.append(gen_tac_for_exp(exp))
+		# Generate tac for all parameters in order
+		param_symbol_list = []
+		for idx, exp in enumerate(ast_exp.exp_list):
+			param_symbol, param_type_from_ast = gen_tac_for_exp(exp)
+			# Store the param for later use
+			# ---- TODO Consider getting type info for each param
+			tac_list.append(TACStoreParam(param_type_from_ast, idx, param_symbol))
+			# Add the param to the list
+			param_symbol_list.append(param_symbol)
 		
 		# For now, only handle 'out_string' and 'out_int'
 		if ast_exp.ident == "out_string":
@@ -359,8 +365,11 @@ def gen_tac_for_exp(ast_exp):
 			tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
 
 		else:
-			raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
+			method_ident = ast_exp.ident
+			params_list = param_symbol_list
 
+			tac_list.append(TACSelfCall(ast_exp.type_from_ast, method_ident, params_list, assignee_symbol))
+			# raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
 
 	elif isinstance(ast_exp, ASTExpDynamicDispatch):
 		# ExpDynamicDispatch: (self, line, caller_exp, ident_line, ident, exp_list=[])

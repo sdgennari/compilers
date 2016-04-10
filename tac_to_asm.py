@@ -518,17 +518,20 @@ def gen_asm_for_tac_call(tac_call):
 		asm_instr_list.append(ASMMovQ(rsp_value_offset, "%rax"))
 		asm_instr_list.append(ASMMovQ("%rax", rsp_param_offset))
 
-	# Set receiver object as self pointer
-	ro_reg = get_asm_register(tac_call.receiver_obj, 64)
-	asm_instr_list.append(ASMComment("set receiver_obj (" + ro_reg + ") as self ptr (" + SELF_REG + ")"))
-	asm_instr_list.append(ASMMovQ(ro_reg, SELF_REG))
+	# Set receiver object as self pointer (unless self dispatch)
+	if hasattr(tac_call, "receiver_obj"):
+		ro_reg = get_asm_register(tac_call.receiver_obj, 64)
+		asm_instr_list.append(ASMComment("set receiver_obj (" + ro_reg + ") as self ptr (" + SELF_REG + ")"))
+		asm_instr_list.append(ASMMovQ(ro_reg, SELF_REG))
 
+	# Get method pointer based on type of call
 	if isinstance(tac_call, TACStaticCall):
 		# Call method label explicitly
 		asm_instr_list.append("static: call method label explicitly")
 		method_label = tac_call.static_type + "." + tac_call.method_ident
 		asm_instr_list.append(ASMCall(method_label))
 	elif isinstance(tac_call, TACDynamicCall):
+		# Find method label via vtable
 		tup = (tac_call.ro_type_from_ast, tac_call.method_ident)
 		method_idx = vtable_offset_map[tup]
 
@@ -550,6 +553,28 @@ def gen_asm_for_tac_call(tac_call):
 		asm_instr_list.append(ASMCall("*%rax"))
 
 		# raise NotImplementedError("Dynamic not yet impl")
+	elif isinstance(tac_call, TACSelfCall):
+		# Find method label via vtable (very similar to dynamic, but with SELF_REG)
+		tup = (current_type, tac_call.method_ident)
+		method_idx = vtable_offset_map[tup]
+
+		asm_instr_list.append(ASMComment("self: lookup method in vtable"))
+
+		# Get pointer to vtable (offset of 16 from self)
+		asm_instr_list.append(ASMComment("get ptr to vtable from self"))
+		vtable_ptr = "16(" + SELF_REG + ")"
+		asm_instr_list.append(ASMMovQ(vtable_ptr, "%rax"))
+
+		# Get pointer to method label from offset in vtable
+		asm_instr_list.append(ASMComment("find method " + tac_call.method_ident + " in vtable[" + str(method_idx) + "]"))
+		vtable_offset = method_idx * 8
+		method_ptr = str(vtable_offset) + "(%rax)"
+		asm_instr_list.append(ASMMovQ(method_ptr, "%rax"))
+
+		# Call method dynamically
+		asm_instr_list.append(ASMComment("call method dynamically"))
+		asm_instr_list.append(ASMCall("*%rax"))		
+
 	else:
 		raise NotImplementedError("No dispatch for " + tac_call.__class__.__name__)
 

@@ -2,15 +2,6 @@
 			##  VTABLES
 			## ::::::::::::::::::::::::::::::::::::::::
 
-.globl A..vtable
-A..vtable:		## vtable for A
-			.quad type_name_A
-			.quad A..new
-			.quad Object.abort
-			.quad Object.copy
-			.quad Object.type_name
-			.quad A.some_method
-
 .globl Bool..vtable
 Bool..vtable:		## vtable for Bool
 			.quad type_name_Bool
@@ -47,6 +38,7 @@ Main..vtable:		## vtable for Main
 			.quad Object.copy
 			.quad Object.type_name
 			.quad Main.main
+			.quad Main.some_method
 
 .globl Object..vtable
 Object..vtable:		## vtable for Object
@@ -71,86 +63,6 @@ String..vtable:		## vtable for String
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  CONSTRUCTORS
 			## ::::::::::::::::::::::::::::::::::::::::
-
-.globl A..new
-A..new:		## Constructor for A
-			pushq	%rbp
-			movq	%rsp, %rbp
-			## push callee-saved regs
-			pushq	%r12
-			pushq	%r13
-			pushq	%r14
-			pushq	%r15
-			pushq	%rbx
-			## Allocate space for A
-			movq	$8, %rsi
-			movq	$4, %rdi
-			call	calloc
-			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
-			movq	$6, %rax
-			movq	%rax, 0(%rbx)
-			movq	$4, %rax
-			movq	%rax, 8(%rbx)
-			movq	$A..vtable, %rax
-			movq	%rax, 16(%rbx)
-			## create default attrs
-			## self[3] holds x (Int)
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			pushq	%rbx
-			call	Int..new
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, 24(%rbx)
-			## initialize attrs
-			## self[3] x <- init exp
-			## new const Int: 777
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$777, 24(%r8)
-			movq	%r8, 24(%rbx)
-			## assign self register to %rax
-			movq	%rbx, %rax
-			## pop callee-saved regs
-			popq	%rbx
-			popq	%r15
-			popq	%r14
-			popq	%r13
-			popq	%r12
-			leave
-			ret
 
 .globl Bool..new
 Bool..new:		## Constructor for Bool
@@ -373,42 +285,6 @@ String..new:		## Constructor for String
 			##  METHOD IMPLEMENTATIONS
 			## ::::::::::::::::::::::::::::::::::::::::
 
-.globl A.some_method
-A.some_method:
-			pushq	%rbp
-			movq	%rsp, %rbp
-.A_some_method_1:
-			## new const Int: 123
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$123, 24(%r8)
-			## load self[3] (x) into %r9
-			movq	24(%rbx), %r9
-			## assign
-			movq	%r9, %r8
-			## return
-			movq	%r8, %rax
-			leave
-			ret
-
 .globl IO.in_int
 IO.in_int:
 			pushq	%rbp
@@ -441,7 +317,7 @@ IO.out_string:
 Main.main:
 			pushq	%rbp
 			movq	%rsp, %rbp
-.Main_main_2:
+.Main_main_1:
 			## new const Int: 777
 			## push caller-saved regs
 			pushq	%rcx
@@ -466,27 +342,6 @@ Main.main:
 			movl	$777, 24(%r8)
 			## storing param [0]
 			pushq	%r8
-			## new A
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	A..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -502,13 +357,11 @@ Main.main:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
-			## dynamic: lookup method in vtable
-			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
-			## find method some_method in vtable[5]
-			movq	40(%rax), %rax
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method some_method in vtable[6]
+			movq	48(%rax), %rax
 			## call method dynamically
 			call	*%rax
 			## removing 1 params from stack with subq
@@ -527,6 +380,38 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## return
+			movq	%r8, %rax
+			leave
+			ret
+
+.globl Main.some_method
+Main.some_method:
+			pushq	%rbp
+			movq	%rsp, %rbp
+.Main_some_method_2:
+			## new const Int: 123
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movl	$123, 24(%r8)
 			## return
 			movq	%r8, %rax
 			leave
@@ -629,10 +514,6 @@ main:
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  CONSTANT STRINGS
 			## ::::::::::::::::::::::::::::::::::::::::
-
-.globl type_name_A 
-type_name_A:			## type_name string for A
-			.asciz "A"
 
 .globl type_name_Bool 
 type_name_Bool:			## type_name string for Bool

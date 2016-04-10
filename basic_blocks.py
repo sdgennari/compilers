@@ -198,23 +198,9 @@ def computeLiveSets(block_list):
 			for TAC_instr in reversed(block.instr_list):
 
 				# Handle TACCall explicitly
-				if isinstance(TAC_instr, TACCall):
-					if isinstance(TAC_instr, TACStaticCall):
-						# Add params to live set
-						# for param in TAC_instr.params_list:
-						# 	cur_live_in.add(param)
-
-						# Add receiver object to live set
-						cur_live_in.add(TAC_instr.receiver_obj)
-
-					elif isinstance(TAC_instr, TACDynamicCall):
-						
-						# Add receiver object to live set
-						cur_live_in.add(TAC_instr.receiver_obj)
-
-					else:
-						raise NotImplementedError(TAC_instr.__class__.__name__ + " not yet implemented")
-
+				if isinstance(TAC_instr, TACStaticCall) or isinstance(TAC_instr, TACDynamicCall):
+					# Add receiver object to live set
+					cur_live_in.add(TAC_instr.receiver_obj)
 
 				# Remove assignee from live_in
 				if hasattr(TAC_instr, 'assignee'):

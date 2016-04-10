@@ -6,9 +6,6 @@
 
 ### Expressions
 
-- dynamic_dispatch
-- static_dispatch
-- self_dispatch
 - if
 - while
 - isvoid
@@ -16,6 +13,9 @@
 - le
 - eq
 - case
+- ~~dynamic_dispatch~~
+- ~~static_dispatch~~
+- ~~self_dispatch~~
 - ~~assign~~
 	- ~~assign to let var~~
 	- ~~assign to attr~~

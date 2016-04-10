@@ -376,6 +376,20 @@ class TACDynamicCall(TACCall):
 		result += " (ro: " + self.receiver_obj + ", params: " + str(self.params_list) + ")"
 		return result
 
+class TACSelfCall(TACCall):
+	def __init__(self, type_from_ast, method_ident, params_list, assignee):
+		self.type_from_ast = type_from_ast
+		self.method_ident = method_ident
+		self.params_list = params_list
+		self.assignee = assignee
+
+	def __str__(self):
+		result = self.assignee
+		result += " <- self_call "
+		result += self.method_ident
+		result += " (ro: self, params: " + str(self.params_list) + ")"
+		return result
+
 # class TACMakeParamSpace(TACCustom):
 # 	def __init__(self, num_params):
 # 		self.num_params = num_params
