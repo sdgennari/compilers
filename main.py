@@ -345,9 +345,6 @@ def ast_method_to_asm(ast_method, type_name):
 	# Generate the TAC for the exp
 	gen_tac_for_feature(ast_method, type_name)
 
-	# print ast_method.body_exp
-	# print
-
 	# print len(tac_list)
 	# for tac_instr in tac_list:
 	# 	print tac_instr

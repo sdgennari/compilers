@@ -329,13 +329,13 @@ class TACStaticCall(TACCall):
 		result += " (ro: " + self.receiver_obj + ", params: " + str(self.params_list) + ")"
 		return result
 
-# class TACStoreParam(TACCustom):
-# 	def __init__(self, param_idx, op1):
-# 		self.param_idx = param_idx
-# 		self.op1 = op1
+class TACStoreParam(TACCustom):
+	def __init__(self, param_idx, op1):
+		self.param_idx = param_idx
+		self.op1 = op1
 
-# 	def __str__(self):
-# 		return "param [" + str(self.param_idx) + "] <- " + self.op1
+	def __str__(self):
+		return "param [" + str(self.param_idx) + "] <- " + self.op1
 
 # class TACMakeParamSpace(TACCustom):
 # 	def __init__(self, num_params):

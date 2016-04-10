@@ -419,8 +419,12 @@ def gen_tac_for_exp(ast_exp):
 
 		# Generate tac for all parameters in order
 		param_symbol_list = []
-		for exp in ast_exp.exp_list:
-			param_symbol_list.append(gen_tac_for_exp(exp))
+		for idx, exp in enumerate(ast_exp.exp_list):
+			param_symbol = gen_tac_for_exp(exp)
+			# Store the param for later use
+			tac_list.append(TACStoreParam(idx, param_symbol))
+			# Add the param to the list
+			param_symbol_list.append(param_symbol)
 
 		# Generate tac for receiver object
 		ro_symbol = gen_tac_for_exp(ast_exp.caller_exp)

@@ -358,9 +358,8 @@ A.some_method:          ## method definition
                         movq $8, %r14
                         subq %r14, %rsp
                         ## return address handling
-                        ## fp[5] holds argument a (Int)
-                        ## fp[4] holds argument b (Int)
-                        ## fp[3] holds argument c (String)
+                        ## fp[4] holds argument a (Int)
+                        ## fp[3] holds argument b (Int)
                         ## method body begins
                         ## new Int
                         pushq %rbp
@@ -586,17 +585,6 @@ Main.main:              ## method definition
                         movq 0(%rbp), %r14
                         movq %r14, 24(%r13)
                         pushq %r13
-                        ## new String
-                        pushq %rbp
-                        pushq %r12
-                        movq $String..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        ## string9 holds "hello cool\n"
-                        movq $string9, %r14
-                        movq %r14, 24(%r13)
-                        pushq %r13
                         ## new A
                         pushq %rbp
                         pushq %r12
@@ -606,7 +594,7 @@ Main.main:              ## method definition
                         popq %rbp
                         cmpq $0, %r13
 			jne l3
-                        movq $string10, %r13
+                        movq $string9, %r13
                         movq %r13, %rdi
 			call cooloutstr
                         movl $0, %edi
@@ -618,7 +606,7 @@ l3:                     pushq %r13
                         ## look up some_method() at offset 5 in vtable
                         movq 40(%r14), %r14
                         call *%r14
-                        addq $32, %rsp
+                        addq $24, %rsp
                         popq %rbp
                         popq %r12
 .globl Main.main.end
@@ -727,7 +715,7 @@ String.substr:          ## method definition
 			movq %rax, %r13
                         cmpq $0, %r13
 			jne l4
-                        movq $string11, %r13
+                        movq $string10, %r13
                         movq %r13, %rdi
 			call cooloutstr
                         movl $0, %edi
@@ -828,23 +816,7 @@ string8:                # "abort\\n"
 .byte 0
 
 .globl string9
-string9:                # "hello cool\\n"
-.byte 104 # 'h'
-.byte 101 # 'e'
-.byte 108 # 'l'
-.byte 108 # 'l'
-.byte 111 # 'o'
-.byte  32 # ' '
-.byte  99 # 'c'
-.byte 111 # 'o'
-.byte 111 # 'o'
-.byte 108 # 'l'
-.byte  92 # '\\'
-.byte 110 # 'n'
-.byte 0
-
-.globl string10
-string10:               # "ERROR: 3: Exception: dispatch on void\\n"
+string9:                # "ERROR: 3: Exception: dispatch on void\\n"
 .byte  69 # 'E'
 .byte  82 # 'R'
 .byte  82 # 'R'
@@ -886,8 +858,8 @@ string10:               # "ERROR: 3: Exception: dispatch on void\\n"
 .byte 110 # 'n'
 .byte 0
 
-.globl string11
-string11:               # "ERROR: 0: Exception: String.substr out of range\\n"
+.globl string10
+string10:               # "ERROR: 0: Exception: String.substr out of range\\n"
 .byte  69 # 'E'
 .byte  82 # 'R'
 .byte  82 # 'R'

@@ -40,10 +40,9 @@ String
 internal
 Object.type_name
 some_method
-3
+2
 a
 b
-c
 A
 9
 Int
@@ -186,7 +185,7 @@ A
 A
 3
 some_method
-3
+2
 3
 Int
 integer
@@ -209,10 +208,6 @@ integer
 Int
 integer
 3
-3
-String
-string
-hello cool\n
 Object
 3
 abort
@@ -320,7 +315,7 @@ A
 A
 3
 some_method
-3
+2
 3
 Int
 integer
@@ -343,10 +338,6 @@ integer
 Int
 integer
 3
-3
-String
-string
-hello cool\n
 7
 A
 no_inherits
@@ -354,7 +345,7 @@ no_inherits
 method
 8
 some_method
-3
+2
 8
 a
 8
@@ -363,10 +354,6 @@ Int
 b
 8
 Int
-8
-c
-8
-String
 8
 Object
 9

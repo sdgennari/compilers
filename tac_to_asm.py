@@ -481,15 +481,38 @@ def gen_asm_for_tac_static_call(tac_static_call):
 	# Note: This assumes that all params and the receiver object have already been evaluated
 
 	# Push all caller-saved regs
+	num_regs_saved = 0
 	for reg in caller_saved_registers:
+		num_regs_saved += 1
 		asm_instr_list.append(ASMPushQ(reg))
 
-	# Push all params to the stack in REVERSE order
+	# Move all params from location on stack to new stack location
+	# Note: Take into account offset from above caller-saved regs
 	num_params = len(tac_static_call.params_list)
 	asm_instr_list.append(ASMComment("pushing " + str(num_params) + " params to the stack"))
-	for param in reversed(tac_static_call.params_list):
-		param_reg = get_asm_register(param, 64)
-		asm_instr_list.append(ASMPushQ(param_reg))
+	# for param in reversed(tac_static_call.params_list):
+	# 	param_reg = get_asm_register(param, 64)
+	# 	asm_instr_list.append(ASMPushQ(param_reg))
+
+	# Allocate space for all the params
+	space_required = "$" + str(8 * num_params)
+	asm_instr_list.append(ASMSubQ(space_required, "%rsp"))
+	
+	original_value_stack_offset = 2 * num_params + num_regs_saved - 1
+
+	for i in range(num_params):
+		# Get the original value offset on the stack
+		value_offset = 8 * (original_value_stack_offset - i)
+		rsp_value_offset= str(value_offset) + "(%rsp)"
+
+		# Get destination offset on stack
+		param_offset = 8 * i
+		rsp_param_offset = str(param_offset) + "(%rsp)"
+
+		# Move the saved param value to the spot on the stack
+		asm_instr_list.append(ASMComment("moving rsp[" + str(value_offset) + "] to rsp[" + str(param_offset) + "]"))
+		asm_instr_list.append(ASMMovQ(rsp_value_offset, "%rax"))
+		asm_instr_list.append(ASMMovQ("%rax", rsp_param_offset))
 
 	# Call method label explicitly
 	method_label = tac_static_call.static_type + "." + tac_static_call.method_ident
@@ -499,11 +522,15 @@ def gen_asm_for_tac_static_call(tac_static_call):
 	asm_instr_list.append(ASMComment("removing " + str(num_params) + " params from stack with subq"))
 	offset = 8 * num_params
 	offset_str = "$" + str(offset)
-	asm_instr_list.append(ASMSubQ(offset_str, "%rsp"))
+	asm_instr_list.append(ASMAddQ(offset_str, "%rsp"))
 
 	# Pop all caller-saved regs
 	for reg in reversed(caller_saved_registers):
 		asm_instr_list.append(ASMPopQ(reg))
+
+	# Subtract offset from stack to remove stored params
+	asm_instr_list.append(ASMComment("removing " + str(num_params) + " stored params from stack (2nd time)"))
+	asm_instr_list.append(ASMAddQ(offset_str, "%rsp"))
 
 	# Move result into dest
 	dest = get_asm_register(tac_static_call.assignee, 64)
@@ -524,13 +551,10 @@ def gen_asm_for_tac_static_call(tac_static_call):
 # 	asm_instr_list.append(ASMComment("reset rsp after " + str(tac_instr.num_params) + " params"))
 # 	asm_instr_list.append(ASMAddQ(rsp_offset, "%rsp"))
 
-# def gen_asm_for_tac_store_param(tac_store_param):
-# 	op1_reg = get_asm_register(tac_store_param.op1, 64)
-# 	param_offset = 8 * tac_store_param.param_idx
-# 	rsp_offset = str(param_offset) + "(%rsp)"
-
-# 	asm_instr_list.append(ASMComment("storing param [" + str(tac_store_param.param_idx) + "]"))
-# 	asm_instr_list.append(ASMMovQ(op1_reg, rsp_offset))
+def gen_asm_for_tac_store_param(tac_store_param):
+	op1_reg = get_asm_register(tac_store_param.op1, 64)
+	asm_instr_list.append(ASMComment("storing param [" + str(tac_store_param.param_idx) + "]"))
+	asm_instr_list.append(ASMPushQ(op1_reg))
 
 # def gen_asm_for_tac_call(tac_call):
 # 	# Save caller-saved regs and self
@@ -657,8 +681,8 @@ def gen_asm_for_tac_instr(tac_instr):
 	# elif isinstance(tac_instr, TACRemoveParamSpace):
 	# 	gen_asm_for_tac_remove_param_space(tac_instr)
 
-	# elif isinstance(tac_instr, TACStoreParam):
-	# 	gen_asm_for_tac_store_param(tac_instr)
+	elif isinstance(tac_instr, TACStoreParam):
+		gen_asm_for_tac_store_param(tac_instr)
 
 	# elif isinstance(tac_instr, TACCall):
 	# 	gen_asm_for_tac_call(tac_instr)

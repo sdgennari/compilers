@@ -415,6 +415,8 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r10
 			movl	$777, 24(%r10)
+			## storing param [0]
+			pushq	%r10
 			## new A
 			## push caller-saved regs
 			pushq	%rcx
@@ -445,10 +447,13 @@ Main.main:
 			pushq	%r10
 			pushq	%r11
 			## pushing 1 params to the stack
-			pushq	%r10
+			subq	$8, %rsp
+			## moving rsp[72] to rsp[0]
+			movq	72(%rsp), %rax
+			movq	%rax, 0(%rsp)
 			call	A.some_method
 			## removing 1 params from stack with subq
-			subq	$8, %rsp
+			addq	$8, %rsp
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -457,6 +462,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
 			## storing method result in %r9
 			movq	%rax, %r9
 			## return
