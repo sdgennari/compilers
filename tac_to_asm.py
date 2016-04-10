@@ -184,7 +184,7 @@ def gen_asm_for_tac_bt(tac_bt):
 
 # ---- TODO Update for boxing + unboxing
 def gen_asm_for_tac_store(tac_store):
-	src = get_asm_register(tac_store.op1)
+	src = get_asm_register(tac_store.op1, 64)
 	offset = spilled_register_location_map[tac_store.op1]
 
 	dest = str(offset) + "(%rbp)"
@@ -458,7 +458,7 @@ def gen_asm_for_tac_load_attr(tac_load_attr):
 	# Move the contents of the attr into assignee
 	src = str(self_offset)+"("+SELF_REG+")"
 	dest = get_asm_register(tac_load_attr.assignee, 64)
-	asm_instr_list.append(ASMComment("Load self[" + str(attr_idx) + "] (" + \
+	asm_instr_list.append(ASMComment("load self[" + str(attr_idx) + "] (" + \
 		tac_load_attr.ident + ") into " + dest))
 	asm_instr_list.append(ASMMovQ(src, dest))
 
@@ -473,9 +473,91 @@ def gen_asm_for_tac_store_attr(tac_store_attr):
 	# Move the value into the attr
 	src = get_asm_register(tac_store_attr.op1, 64)
 	dest = str(self_offset)+"("+SELF_REG+")"
-	asm_instr_list.append(ASMComment("Store " + src + " in self[" + str(attr_idx) + \
+	asm_instr_list.append(ASMComment("store " + src + " in self[" + str(attr_idx) + \
 		"] (" + tac_store_attr.ident + ")"))
 	asm_instr_list.append(ASMMovQ(src, dest))
+
+def gen_asm_for_tac_static_call(tac_static_call):
+	# Note: This assumes that all params and the receiver object have already been evaluated
+
+	# Push all caller-saved regs
+	for reg in caller_saved_registers:
+		asm_instr_list.append(ASMPushQ(reg))
+
+	# Push all params to the stack in REVERSE order
+	num_params = len(tac_static_call.params_list)
+	asm_instr_list.append(ASMComment("pushing " + str(num_params) + " params to the stack"))
+	for param in reversed(tac_static_call.params_list):
+		param_reg = get_asm_register(param, 64)
+		asm_instr_list.append(ASMPushQ(param_reg))
+
+	# Call method label explicitly
+	method_label = tac_static_call.static_type + "." + tac_static_call.method_ident
+	asm_instr_list.append(ASMCall(method_label))
+
+	# Subtract offset from stack to remove params
+	asm_instr_list.append(ASMComment("removing " + str(num_params) + " params from stack with subq"))
+	offset = 8 * num_params
+	offset_str = "$" + str(offset)
+	asm_instr_list.append(ASMSubQ(offset_str, "%rsp"))
+
+	# Pop all caller-saved regs
+	for reg in reversed(caller_saved_registers):
+		asm_instr_list.append(ASMPopQ(reg))
+
+	# Move result into dest
+	dest = get_asm_register(tac_static_call.assignee, 64)
+	asm_instr_list.append(ASMComment("storing method result in " + dest))
+	asm_instr_list.append(ASMMovQ("%rax", dest))
+
+# def gen_asm_for_tac_make_param_space(tac_instr):
+# 	rsp_offset = 8 * tac_instr.num_params
+# 	rsp_offset = "$" + str(rsp_offset)
+
+# 	asm_instr_list.append(ASMComment("making room for " + str(tac_instr.num_params) + " params"))
+# 	asm_instr_list.append(ASMSubQ(rsp_offset, "%rsp"))
+
+# def gen_asm_for_tac_remove_param_space(tac_instr):
+# 	rsp_offset = 8 * tac_instr.num_params
+# 	rsp_offset = "$" + str(rsp_offset)
+
+# 	asm_instr_list.append(ASMComment("reset rsp after " + str(tac_instr.num_params) + " params"))
+# 	asm_instr_list.append(ASMAddQ(rsp_offset, "%rsp"))
+
+# def gen_asm_for_tac_store_param(tac_store_param):
+# 	op1_reg = get_asm_register(tac_store_param.op1, 64)
+# 	param_offset = 8 * tac_store_param.param_idx
+# 	rsp_offset = str(param_offset) + "(%rsp)"
+
+# 	asm_instr_list.append(ASMComment("storing param [" + str(tac_store_param.param_idx) + "]"))
+# 	asm_instr_list.append(ASMMovQ(op1_reg, rsp_offset))
+
+# def gen_asm_for_tac_call(tac_call):
+# 	# Save caller-saved regs and self
+# 	for reg in caller_saved_registers:
+# 		asm_instr_list.append(ASMPushQ(reg))
+# 	asm_instr_list.append(ASMPushQ(SELF_REG))
+
+# 	# Get register values
+# 	ro_reg = get_asm_register(tac_call.receiver, 64)
+# 	dest = get_asm_register(tac_call.assignee, 64)
+
+# 	# Move ro into self ptr
+# 	asm_instr_list.append(ASMComment("move ro into self ptr and call function"))
+# 	asm_instr_list.append(ASMMovQ(ro_reg, SELF_REG))
+
+# 	# Call the function
+# 	# TODO Handle different types of dispatch
+# 	asm_instr_list.append(ASMComment("TODO get appropriate label for dispatch"))
+# 	asm_instr_list.append(ASMCall(tac_call.method_ident))
+
+# 	# Restore caller-saved regs and self
+# 	asm_instr_list.append(ASMPopQ(SELF_REG))
+# 	for reg in reversed(caller_saved_registers):
+# 		asm_instr_list.append(ASMPopQ(reg))
+
+# 	# Move result (stored in rax) into dest
+# 	asm_instr_list.append(ASMMovQ("%rax", dest))
 
 def gen_asm_for_tac_instr(tac_instr):
 	# Skip instructions whose assignees do not have colors
@@ -565,6 +647,21 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	elif isinstance(tac_instr, TACStoreAttr):
 		gen_asm_for_tac_store_attr(tac_instr)
+
+	elif isinstance(tac_instr, TACStaticCall):
+		gen_asm_for_tac_static_call(tac_instr)
+
+	# elif isinstance(tac_instr, TACMakeParamSpace):
+	# 	gen_asm_for_tac_make_param_space(tac_instr)
+
+	# elif isinstance(tac_instr, TACRemoveParamSpace):
+	# 	gen_asm_for_tac_remove_param_space(tac_instr)
+
+	# elif isinstance(tac_instr, TACStoreParam):
+	# 	gen_asm_for_tac_store_param(tac_instr)
+
+	# elif isinstance(tac_instr, TACCall):
+	# 	gen_asm_for_tac_call(tac_instr)
 
 	else:
 		raise NotImplementedError(str(tac_instr.__class__.__name__) + " not yet implemented")

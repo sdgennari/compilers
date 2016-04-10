@@ -301,4 +301,68 @@ class TACStoreAttr(TACCustom):
 		self.op1 = op1
 
 	def __str__(self):
-		return self.ident + "(attr) <- storeAttr " + self.op1
+		return self.ident + " (attr) <- storeAttr " + self.op1
+
+class TACLoadParam(TACCustom):
+	def __init__(self, assignee, param_idx):
+		self.assignee = assignee
+		self.param_idx = param_idx
+
+	def __str__(self):
+		return self.assignee + " <- param [" + str(self.param_idx) + "]"
+
+class TACCall(TACCustom):
+	pass
+
+class TACStaticCall(TACCall):
+	def __init__(self, static_type, method_ident, receiver_obj, params_list, assignee):
+		self.static_type = static_type
+		self.method_ident = method_ident
+		self.receiver_obj = receiver_obj
+		self.params_list = params_list
+		self.assignee = assignee
+
+	def __str__(self):
+		result = self.assignee
+		result += " <- static_call "
+		result += self.static_type + "." + self.method_ident
+		result += " (ro: " + self.receiver_obj + ", params: " + str(self.params_list) + ")"
+		return result
+
+# class TACStoreParam(TACCustom):
+# 	def __init__(self, param_idx, op1):
+# 		self.param_idx = param_idx
+# 		self.op1 = op1
+
+# 	def __str__(self):
+# 		return "param [" + str(self.param_idx) + "] <- " + self.op1
+
+# class TACMakeParamSpace(TACCustom):
+# 	def __init__(self, num_params):
+# 		self.num_params = num_params
+
+# 	def __str__(self):
+# 		return "make space for " + str(self.num_params) + " params"
+
+# class TACRemoveParamSpace(TACCustom):
+# 	def __init__(self, num_params):
+# 		self.num_params = num_params
+
+# 	def __str__(self):
+# 		return "reset stack pointer based on " + str(self.num_params) + " params"
+
+# class TACCall(TACCustom):
+# 	def __init__(self, assignee, method_ident, receiver, param_list):
+# 		self.assignee = assignee
+# 		self.method_ident = method_ident
+# 		self.receiver = receiver
+# 		self.param_list = param_list
+
+# 	def __str__(self):
+# 		result = self.assignee
+# 		result += " <- call "
+# 		result += self.method_ident + " "
+# 		result += self.receiver
+# 		for param in self.param_list:
+# 			result += " " + param
+# 		return result

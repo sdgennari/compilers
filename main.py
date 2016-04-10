@@ -347,8 +347,8 @@ def ast_method_to_asm(ast_method, type_name):
 
 	# print ast_method.body_exp
 	# print
-	# print len(tac_list)
 
+	# print len(tac_list)
 	# for tac_instr in tac_list:
 	# 	print tac_instr
 	# print
@@ -403,7 +403,6 @@ def ast_attr_to_asm(ast_attr, type_name):
 	attr_idx = attr_offset_map[tup]
 	self_offset = 8 * attr_idx
 	dest = str(self_offset)+"("+SELF_REG+")"
-
 	# Get the last register in the exp since it holds the resulting value
 	final_virtual_reg = tac_list[-1].assignee
 	src = get_asm_register(final_virtual_reg, 64)
@@ -439,8 +438,7 @@ if __name__ == "__main__":
 	print get_constructor_string()
 	print get_methods_string()
 
-	# get_methods_string()
-
+	'''
 	# gen_tac_for_ast(prog_ast_root)
 
 	# block_list = buildBasicBlocks(tac_list)
@@ -468,10 +466,7 @@ if __name__ == "__main__":
 	# # -- end while loop
 
 	# gen_asm_for_block_list(block_list, register_colors, spilled_registers)
-
-	# Print output
-	# for asm_instr in asm_instr_list:
-	# 	print asm_instr,
+	'''
 
 	print get_program_start_string()
 

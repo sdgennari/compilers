@@ -2,6 +2,15 @@
 			##  VTABLES
 			## ::::::::::::::::::::::::::::::::::::::::
 
+.globl A..vtable
+A..vtable:		## vtable for A
+			.quad type_name_A
+			.quad A..new
+			.quad Object.abort
+			.quad Object.copy
+			.quad Object.type_name
+			.quad A.some_method
+
 .globl Bool..vtable
 Bool..vtable:		## vtable for Bool
 			.quad type_name_Bool
@@ -62,6 +71,41 @@ String..vtable:		## vtable for String
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  CONSTRUCTORS
 			## ::::::::::::::::::::::::::::::::::::::::
+
+.globl A..new
+A..new:		## Constructor for A
+			pushq	%rbp
+			movq	%rsp, %rbp
+			## push callee-saved regs
+			pushq	%r12
+			pushq	%r13
+			pushq	%r14
+			pushq	%r15
+			pushq	%rbx
+			## Allocate space for A
+			movq	$8, %rsi
+			movq	$3, %rdi
+			call	calloc
+			movq	%rax, %rbx
+			## Store type_tag, obj_size, vtable
+			movq	$6, %rax
+			movq	%rax, 0(%rbx)
+			movq	$3, %rax
+			movq	%rax, 8(%rbx)
+			movq	$A..vtable, %rax
+			movq	%rax, 16(%rbx)
+			## create default attrs
+			## initialize attrs
+			## assign self register to %rax
+			movq	%rbx, %rax
+			## pop callee-saved regs
+			popq	%rbx
+			popq	%r15
+			popq	%r14
+			popq	%r13
+			popq	%r12
+			leave
+			ret
 
 .globl Bool..new
 Bool..new:		## Constructor for Bool
@@ -284,6 +328,38 @@ String..new:		## Constructor for String
 			##  METHOD IMPLEMENTATIONS
 			## ::::::::::::::::::::::::::::::::::::::::
 
+.globl A.some_method
+A.some_method:
+			pushq	%rbp
+			movq	%rsp, %rbp
+.A_some_method_1:
+			## new const Int: 123
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movl	$123, 24(%r8)
+			## return
+			movq	%r8, %rax
+			leave
+			ret
+
 .globl IO.in_int
 IO.in_int:
 			pushq	%rbp
@@ -316,7 +392,7 @@ IO.out_string:
 Main.main:
 			pushq	%rbp
 			movq	%rsp, %rbp
-.Main_main_1:
+.Main_main_2:
 			## new const Int: 777
 			## push caller-saved regs
 			pushq	%rcx
@@ -337,11 +413,9 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movl	$777, 24(%r8)
-			## assign
-			movq	%r8, %r9
-			## new const Int: 9001
+			movq	%rax, %r10
+			movl	$777, 24(%r10)
+			## new A
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -351,7 +425,7 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			call	Int..new
+			call	A..new
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -362,11 +436,6 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$9001, 24(%r8)
-			## assign
-			movq	%r8, %r10
-			## const String
-			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -375,43 +444,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			call	String..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	$string_1, 24(%r8)
-			## assign
-			movq	%r8, %r11
-			## assign
-			movq	%r9, %r8
-			## assign
-			movq	%r10, %r9
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
-			## plus
-			movl	%r10d, %r9d
-			addl	%r8d, %r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
+			## pushing 1 params to the stack
 			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
+			call	A.some_method
+			## removing 1 params from stack with subq
+			subq	$8, %rsp
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -420,14 +457,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
-			## assign
-			movq	%r11, %r9
-			## assign
-			movq	%r9, %r8
+			## storing method result in %r9
+			movq	%rax, %r9
 			## return
-			movq	%r8, %rax
+			movq	%r9, %rax
 			leave
 			ret
 
@@ -529,6 +562,10 @@ main:
 			##  CONSTANT STRINGS
 			## ::::::::::::::::::::::::::::::::::::::::
 
+.globl type_name_A 
+type_name_A:			## type_name string for A
+			.asciz "A"
+
 .globl type_name_Bool 
 type_name_Bool:			## type_name string for Bool
 			.asciz "Bool"
@@ -556,9 +593,5 @@ type_name_String:			## type_name string for String
 .globl empty.string
 empty.string:			## empty string for default Strings
 			.asciz ""
-
-.globl string_1
-string_1:
-			.asciz "hello cool\n"
 
 
