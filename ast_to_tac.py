@@ -346,7 +346,6 @@ def gen_tac_for_exp(ast_exp):
 		for idx, exp in enumerate(ast_exp.exp_list):
 			param_symbol, param_type_from_ast = gen_tac_for_exp(exp)
 			# Store the param for later use
-			# ---- TODO Consider getting type info for each param
 			tac_list.append(TACStoreParam(param_type_from_ast, idx, param_symbol))
 			# Add the param to the list
 			param_symbol_list.append(param_symbol)
@@ -466,23 +465,27 @@ def gen_tac_for_feature(ast_feature, class_name):
 		label = str(class_name)+"_"+str(ast_feature.ident)+"_"+new_label_num()
 		tac_list.append(TACLabel(label))
 
-		# For now, leave out formals list since main method cannot have formals
+		# Add params to the symbol table and add the load param TAC instrs
+		for idx, formal in enumerate(ast_feature.formals_list):
+			formal_symbol = add_symbol(formal.ident)
+			tac_list.append(TACLoadParam(formal.typ, formal_symbol, idx))
 
+		# Generate the tac for the method body
 		return_symbol, return_type_from_ast = gen_tac_for_exp(ast_feature.body_exp)
 		tac_list.append(TACReturn(return_symbol))
 
 		symbol_table_list.pop()
 
-	elif isinstance(ast_feature, ASTAttrInit):
-		# AttrInit: (self, ident_line, ident, type_line, feature_type, exp)
-		attr_symbol = add_symbol(ast_feature.ident)
-		exp_symbol, exp_type_from_ast = gen_tac_for_exp(ast_feature.exp)
-		tac_list.append(TACAssign(ast_feature.feature_type, attr_symbol, exp_symbol))
+	# elif isinstance(ast_feature, ASTAttrInit):
+	# 	# AttrInit: (self, ident_line, ident, type_line, feature_type, exp)
+	# 	attr_symbol = add_symbol(ast_feature.ident)
+	# 	exp_symbol, exp_type_from_ast = gen_tac_for_exp(ast_feature.exp)
+	# 	tac_list.append(TACAssign(ast_feature.feature_type, attr_symbol, exp_symbol))
 
-	elif isinstance(ast_feature, ASTAttrNoInit):
-		# AttrNoInit: (self, ident_line, ident, type_line, feature_type)
-		attr_symbol = add_symbol(ast_feature.ident)
-		tac_list.append(TACDefault(ast_feature.feature_type, attr_symbol, ast_feature.feature_type))
+	# elif isinstance(ast_feature, ASTAttrNoInit):
+	# 	# AttrNoInit: (self, ident_line, ident, type_line, feature_type)
+	# 	attr_symbol = add_symbol(ast_feature.ident)
+	# 	tac_list.append(TACDefault(ast_feature.feature_type, attr_symbol, ast_feature.feature_type))
 
 # def gen_tac_for_class(ast_class):
 # 	# Add symbol table for class since the scope is changing

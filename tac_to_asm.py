@@ -620,32 +620,15 @@ def gen_asm_for_tac_store_param(tac_store_param):
 	asm_instr_list.append(ASMComment("storing param [" + str(tac_store_param.param_idx) + "]"))
 	asm_instr_list.append(ASMPushQ(op1_reg))
 
-# def gen_asm_for_tac_call(tac_call):
-# 	# Save caller-saved regs and self
-# 	for reg in caller_saved_registers:
-# 		asm_instr_list.append(ASMPushQ(reg))
-# 	asm_instr_list.append(ASMPushQ(SELF_REG))
+def gen_asm_for_tac_load_param(tac_load_param):
+	dest = get_asm_register(tac_load_param.assignee, 64)
 
-# 	# Get register values
-# 	ro_reg = get_asm_register(tac_call.receiver, 64)
-# 	dest = get_asm_register(tac_call.assignee, 64)
+	# Calculate the offset from rbp, taking into account ret addr and saved rbp (+2)
+	offset = 8 * (tac_load_param.param_idx + 2)
+	rbp_offset = str(offset) + "(%rbp)"
 
-# 	# Move ro into self ptr
-# 	asm_instr_list.append(ASMComment("move ro into self ptr and call function"))
-# 	asm_instr_list.append(ASMMovQ(ro_reg, SELF_REG))
-
-# 	# Call the function
-# 	# TODO Handle different types of dispatch
-# 	asm_instr_list.append(ASMComment("TODO get appropriate label for dispatch"))
-# 	asm_instr_list.append(ASMCall(tac_call.method_ident))
-
-# 	# Restore caller-saved regs and self
-# 	asm_instr_list.append(ASMPopQ(SELF_REG))
-# 	for reg in reversed(caller_saved_registers):
-# 		asm_instr_list.append(ASMPopQ(reg))
-
-# 	# Move result (stored in rax) into dest
-# 	asm_instr_list.append(ASMMovQ("%rax", dest))
+	asm_instr_list.append(ASMComment("loading param [" + str(tac_load_param.param_idx) + "] into " + dest))
+	asm_instr_list.append(ASMMovQ(rbp_offset, dest))
 
 def gen_asm_for_tac_instr(tac_instr):
 	# Skip instructions whose assignees do not have colors
@@ -750,6 +733,9 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	elif isinstance(tac_instr, TACStoreParam):
 		gen_asm_for_tac_store_param(tac_instr)
+
+	elif isinstance(tac_instr, TACLoadParam):
+		gen_asm_for_tac_load_param(tac_instr)
 
 	# elif isinstance(tac_instr, TACCall):
 	# 	gen_asm_for_tac_call(tac_instr)

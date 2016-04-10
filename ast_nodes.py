@@ -92,7 +92,7 @@ class ASTFormal(object):
 
 	def __str__(self):
 		result = str(self.ident_line) + "\n" + str(self.ident) + "\n"
-		result += str(self.type_line) + "\n" + str(self.formal_type)
+		result += str(self.type_line) + "\n" + str(self.typ)
 		return result
 
 class ASTExp(object):

@@ -325,7 +325,8 @@ class TACStoreAttr(TACCustom):
 		return self.ident + " (attr) <- storeAttr " + self.op1
 
 class TACLoadParam(TACCustom):
-	def __init__(self, assignee, param_idx):
+	def __init__(self, type_from_ast, assignee, param_idx):
+		self.type_from_ast = type_from_ast
 		self.assignee = assignee
 		self.param_idx = param_idx
 

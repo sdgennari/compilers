@@ -386,12 +386,37 @@ def make_global_implementation_map(input_lines):
 			method_body = exp_from_input(input_lines)
 
 			# Make a new method and set its containing class
-			method = ASTMethod(0, method_name, formals_name_list, 0, None, method_body)
+			method = ASTMethod(0, method_name, formals_name_list, 0, method_body.type_from_ast, method_body)
 			method.containing_class = containing_class
 
 			implementation_map[cur_class].append(method)
 		# -- end method loop
 	# -- end class looop
+
+def update_global_implementation_map(ast_root):
+	global implementation_map
+
+	# Iterate through each class
+	for ast_class in ast_root.class_list:
+
+		new_method_list = []
+		impl_map_method_list = implementation_map[ast_class.typ]
+
+		# Iterate through each ast_feature
+		for ast_feature in ast_class.feature_list:
+			# Skip attributes
+			if not isinstance(ast_feature, ASTMethod):
+				continue
+
+			# Find the appropriate feature in the impl map and set its containing class
+			for method in impl_map_method_list:
+				if ast_feature.ident == method.ident:
+					ast_feature.containing_class = method.containing_class
+					new_method_list.append(ast_feature)
+					break
+
+		# Set the updated list in the implementation map
+		implementation_map[ast_class.typ] = new_method_list
 
 def make_global_parent_map(input_lines):
 	global parent_map
@@ -423,4 +448,9 @@ def get_input_list_from_annotated_ast(filename):
 	assert (line == "parent_map"),"Error: Expecting parent_map"
 	make_global_parent_map(input_lines)
 
-	return ast_from_input(input_lines)
+	ast_root = ast_from_input(input_lines)
+
+	# Update implementation map with values from AST to get type info for formals
+	update_global_implementation_map(ast_root)
+
+	return ast_root

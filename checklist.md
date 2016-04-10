@@ -1,4 +1,4 @@
-### Attributes
+### Features
 
 - method
 - ~~attribute_no_init~~
@@ -34,10 +34,3 @@
 - ~~false~~
 - ~~let_binding_no_init~~
 - ~~let_binding_init~~
-
-### Test Files Passing
-- basic_arith.cl
-- attr_2.cl
-- basic_attr.cl
-- basic_types.cl
-- basic_let_init.cl
