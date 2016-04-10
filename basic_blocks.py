@@ -207,6 +207,11 @@ def computeLiveSets(block_list):
 						# Add receiver object to live set
 						cur_live_in.add(TAC_instr.receiver_obj)
 
+					elif isinstance(TAC_instr, TACDynamicCall):
+						
+						# Add receiver object to live set
+						cur_live_in.add(TAC_instr.receiver_obj)
+
 					else:
 						raise NotImplementedError(TAC_instr.__class__.__name__ + " not yet implemented")
 

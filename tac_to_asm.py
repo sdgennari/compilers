@@ -477,8 +477,10 @@ def gen_asm_for_tac_store_attr(tac_store_attr):
 		"] (" + tac_store_attr.ident + ")"))
 	asm_instr_list.append(ASMMovQ(src, dest))
 
-def gen_asm_for_tac_static_call(tac_static_call):
-	# Note: This assumes that all params and the receiver object have already been evaluated
+def gen_asm_for_tac_call(tac_call):
+	# Note: This function assumes that all params and the receiver object
+	# 	have already been evaluated and stored (done via TAC instructions)
+	global vtable_offset_map
 
 	# Push all caller-saved regs
 	num_regs_saved = 0
@@ -486,14 +488,16 @@ def gen_asm_for_tac_static_call(tac_static_call):
 		num_regs_saved += 1
 		asm_instr_list.append(ASMPushQ(reg))
 
+	# Store self ptr and INC NUM_REGS_SAVED (very important)
+	asm_instr_list.append(ASMComment("save self ptr (" + SELF_REG + ")"))
+	asm_instr_list.append(ASMPushQ(SELF_REG))
+	num_regs_saved += 1
+
 	# Move all params from location on stack to new stack location
 	# Note: Take into account offset from above caller-saved regs
-	num_params = len(tac_static_call.params_list)
+	num_params = len(tac_call.params_list)
 	asm_instr_list.append(ASMComment("pushing " + str(num_params) + " params to the stack"))
-	# for param in reversed(tac_static_call.params_list):
-	# 	param_reg = get_asm_register(param, 64)
-	# 	asm_instr_list.append(ASMPushQ(param_reg))
-
+	
 	# Allocate space for all the params
 	space_required = "$" + str(8 * num_params)
 	asm_instr_list.append(ASMSubQ(space_required, "%rsp"))
@@ -514,15 +518,50 @@ def gen_asm_for_tac_static_call(tac_static_call):
 		asm_instr_list.append(ASMMovQ(rsp_value_offset, "%rax"))
 		asm_instr_list.append(ASMMovQ("%rax", rsp_param_offset))
 
-	# Call method label explicitly
-	method_label = tac_static_call.static_type + "." + tac_static_call.method_ident
-	asm_instr_list.append(ASMCall(method_label))
+	# Set receiver object as self pointer
+	ro_reg = get_asm_register(tac_call.receiver_obj, 64)
+	asm_instr_list.append(ASMComment("set receiver_obj (" + ro_reg + ") as self ptr (" + SELF_REG + ")"))
+	asm_instr_list.append(ASMMovQ(ro_reg, SELF_REG))
+
+	if isinstance(tac_call, TACStaticCall):
+		# Call method label explicitly
+		asm_instr_list.append("static: call method label explicitly")
+		method_label = tac_call.static_type + "." + tac_call.method_ident
+		asm_instr_list.append(ASMCall(method_label))
+	elif isinstance(tac_call, TACDynamicCall):
+		tup = (tac_call.ro_type_from_ast, tac_call.method_ident)
+		method_idx = vtable_offset_map[tup]
+
+		asm_instr_list.append(ASMComment("dynamic: lookup method in vtable"))
+
+		# Get pointer to vtable (offset of 16 from receiver object)
+		asm_instr_list.append(ASMComment("get ptr to vtable from receiver obj"))
+		vtable_ptr = "16(" + ro_reg + ")"
+		asm_instr_list.append(ASMMovQ(vtable_ptr, "%rax"))
+
+		# Get pointer to method label from offset in vtable
+		asm_instr_list.append(ASMComment("find method " + tac_call.method_ident + " in vtable[" + str(method_idx) + "]"))
+		vtable_offset = method_idx * 8
+		method_ptr = str(vtable_offset) + "(%rax)"
+		asm_instr_list.append(ASMMovQ(method_ptr, "%rax"))
+
+		# Call method dynamically
+		asm_instr_list.append(ASMComment("call method dynamically"))
+		asm_instr_list.append(ASMCall("*%rax"))
+
+		# raise NotImplementedError("Dynamic not yet impl")
+	else:
+		raise NotImplementedError("No dispatch for " + tac_call.__class__.__name__)
 
 	# Subtract offset from stack to remove params
 	asm_instr_list.append(ASMComment("removing " + str(num_params) + " params from stack with subq"))
 	offset = 8 * num_params
 	offset_str = "$" + str(offset)
 	asm_instr_list.append(ASMAddQ(offset_str, "%rsp"))
+
+	# Store self ptr
+	asm_instr_list.append(ASMComment("restore self ptr (" + SELF_REG + ")"))
+	asm_instr_list.append(ASMPopQ(SELF_REG))
 
 	# Pop all caller-saved regs
 	for reg in reversed(caller_saved_registers):
@@ -533,7 +572,7 @@ def gen_asm_for_tac_static_call(tac_static_call):
 	asm_instr_list.append(ASMAddQ(offset_str, "%rsp"))
 
 	# Move result into dest
-	dest = get_asm_register(tac_static_call.assignee, 64)
+	dest = get_asm_register(tac_call.assignee, 64)
 	asm_instr_list.append(ASMComment("storing method result in " + dest))
 	asm_instr_list.append(ASMMovQ("%rax", dest))
 
@@ -672,8 +711,11 @@ def gen_asm_for_tac_instr(tac_instr):
 	elif isinstance(tac_instr, TACStoreAttr):
 		gen_asm_for_tac_store_attr(tac_instr)
 
-	elif isinstance(tac_instr, TACStaticCall):
-		gen_asm_for_tac_static_call(tac_instr)
+	# ========================================
+	# 				DISPATCH
+	# ========================================
+	elif isinstance(tac_instr, TACCall):
+		gen_asm_for_tac_call(tac_instr)
 
 	# elif isinstance(tac_instr, TACMakeParamSpace):
 	# 	gen_asm_for_tac_make_param_space(tac_instr)

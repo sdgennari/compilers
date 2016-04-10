@@ -47,7 +47,7 @@ def exp_from_input(input_lines):
 	if exp_type == "internal":
 		# ExpInternal: (self, class_method, body_type)
 		class_method = next_string(input_lines)
-		return ASTExpInternal(class_method, typ)
+		return ASTExpInternal(typ, class_method, typ)
 
 	elif exp_type == "self_dispatch":
 		# ExpSelfDispatch: (self, line, ident_line, ident, exp_list=[])
@@ -59,7 +59,7 @@ def exp_from_input(input_lines):
 		for i in range(num_exp):
 			exp_list.append(exp_from_input(input_lines))
 
-		return ASTExpSelfDispatch(line, ident_line, ident, exp_list)
+		return ASTExpSelfDispatch(typ, line, ident_line, ident, exp_list)
 
 	elif exp_type == "dynamic_dispatch":
 		# ExpDynamicDispatch: (self, line, caller_exp, ident_line, ident, exp_list=[])
@@ -72,7 +72,9 @@ def exp_from_input(input_lines):
 		for i in range(num_exp):
 			exp_list.append(exp_from_input(input_lines))
 
-		return ASTExpDynamicDispatch(line, caller_exp, ident_line, ident, exp_list)
+		# print caller_exp.type_from_ast
+
+		return ASTExpDynamicDispatch(typ, line, caller_exp, ident_line, ident, exp_list)
 
 	elif exp_type == "static_dispatch":
 		# ExpStaticDispatch: (self, line, caller_exp, type_line, static_type, ident_line, ident, exp_list=[])
@@ -87,7 +89,7 @@ def exp_from_input(input_lines):
 		for i in range(num_exp):
 			exp_list.append(exp_from_input(input_lines))
 
-		return ASTExpStaticDispatch(line, caller_exp, type_line, static_type, ident_line, ident, exp_list)
+		return ASTExpStaticDispatch(typ, line, caller_exp, type_line, static_type, ident_line, ident, exp_list)
 
 	elif exp_type == "block":
 		# ExpBlock: (self, line, exp_list)
@@ -96,7 +98,7 @@ def exp_from_input(input_lines):
 		for i in range(num_exp):
 			exp_list.append(exp_from_input(input_lines))
 
-		return ASTExpBlock(line, exp_list)
+		return ASTExpBlock(typ, line, exp_list)
 
 	### Let Expressions ###
 	elif exp_type == "let":
@@ -108,7 +110,7 @@ def exp_from_input(input_lines):
 
 		exp = exp_from_input(input_lines)
 
-		return ASTExpLet(line, binding_list, exp)
+		return ASTExpLet(typ, line, binding_list, exp)
 
 	### Case Expressions ###
 	elif exp_type == "case":
@@ -120,7 +122,7 @@ def exp_from_input(input_lines):
 		for i in range(num_case_exp):
 			case_exp_list.append(case_elem_from_input(input_lines))
 
-		return ASTExpCase(line, exp, case_exp_list)
+		return ASTExpCase(typ, line, exp, case_exp_list)
 
 	### If ###
 	elif exp_type == "if":
@@ -128,19 +130,19 @@ def exp_from_input(input_lines):
 		cond_exp = exp_from_input(input_lines)
 		then_exp = exp_from_input(input_lines)
 		else_exp = exp_from_input(input_lines)
-		return ASTExpIfThenElse(line, cond_exp, then_exp, else_exp)
+		return ASTExpIfThenElse(typ, line, cond_exp, then_exp, else_exp)
 
 	### While ###
 	elif exp_type == "while":
 		cond_exp = exp_from_input(input_lines)
 		loop_exp = exp_from_input(input_lines)
-		return ASTExpWhileLoopPool(line, cond_exp, loop_exp)
+		return ASTExpWhileLoopPool(typ, line, cond_exp, loop_exp)
 
 	### New ###
 	elif exp_type == "new":
 		type_line = next_int(input_lines)
 		exp_type = next_string(input_lines)
-		return ASTExpNew(line, type_line, exp_type)
+		return ASTExpNew(typ, line, type_line, exp_type)
 
 	### Assign ###
 	elif exp_type == "assign":
@@ -148,91 +150,91 @@ def exp_from_input(input_lines):
 		ident_line = next_int(input_lines)
 		ident = next_string(input_lines)
 		exp = exp_from_input(input_lines)
-		return ASTExpAssign(line, ident_line, ident, exp)
+		return ASTExpAssign(typ, line, ident_line, ident, exp)
 
 	### Binary Expressions ###
 	elif exp_type == "plus":
 		# ExpPlus: (line, left_exp, right_exp)
 		left_exp = exp_from_input(input_lines)
 		right_exp = exp_from_input(input_lines)
-		return ASTExpPlus(line, left_exp, right_exp)
+		return ASTExpPlus(typ, line, left_exp, right_exp)
 
 	elif exp_type == "minus":
 		# ExpMinus: (line, left_exp, right_exp)
 		left_exp = exp_from_input(input_lines)
 		right_exp = exp_from_input(input_lines)
-		return ASTExpMinus(line, left_exp, right_exp)
+		return ASTExpMinus(typ, line, left_exp, right_exp)
 
 	elif exp_type == "times":
 		# ExpTimes: (line, left_exp, right_exp)
 		left_exp = exp_from_input(input_lines)
 		right_exp = exp_from_input(input_lines)
-		return ASTExpTimes(line, left_exp, right_exp)
+		return ASTExpTimes(typ, line, left_exp, right_exp)
 
 	elif exp_type == "divide":
 		# ExpDivide: (line, left_exp, right_exp)
 		left_exp = exp_from_input(input_lines)
 		right_exp = exp_from_input(input_lines)
-		return ASTExpDivide(line, left_exp, right_exp)
+		return ASTExpDivide(typ, line, left_exp, right_exp)
 
 	elif exp_type == "lt":
 		# ExpLt: (line, left_exp, right_exp)
 		left_exp = exp_from_input(input_lines)
 		right_exp = exp_from_input(input_lines)
-		return ASTExpLt(line, left_exp, right_exp)
+		return ASTExpLt(typ, line, left_exp, right_exp)
 
 	elif exp_type == "le":
 		# ExpLe: (line, left_exp, right_exp)
 		left_exp = exp_from_input(input_lines)
 		right_exp = exp_from_input(input_lines)
-		return ASTExpLe(line, left_exp, right_exp)
+		return ASTExpLe(typ, line, left_exp, right_exp)
 
 	elif exp_type == "eq":
 		# ExpEq: (line, left_exp, right_exp)
 		left_exp = exp_from_input(input_lines)
 		right_exp = exp_from_input(input_lines)
-		return ASTExpEq(line, left_exp, right_exp)
+		return ASTExpEq(typ, line, left_exp, right_exp)
 
 	### Unary Expressions ###
 	elif exp_type == "isvoid":
 		# ExpIsVoid: (self, line, exp)
 		exp = exp_from_input(input_lines)
-		return ASTExpIsVoid(line, exp)
+		return ASTExpIsVoid(typ, line, exp)
 
 	elif exp_type == "negate":
 		# ExpTilde: (self, line, exp)
 		exp = exp_from_input(input_lines)
-		return ASTExpTilde(line, exp)
+		return ASTExpTilde(typ, line, exp)
 
 	elif exp_type == "not":
 		# ExpNot: (self, line, exp)
 		exp = exp_from_input(input_lines)
-		return ASTExpNot(line, exp)
+		return ASTExpNot(typ, line, exp)
 
 	### Terminals ###
 	elif exp_type == "string":
 		# ExpString: (self, line, string)
 		string = next_string(input_lines)
-		return ASTExpString(line, string)
+		return ASTExpString(typ, line, string)
 
 	elif exp_type == "integer":
 		# ExpInteger: (self, line, integer)
 		integer = next_int(input_lines)
-		return ASTExpInteger(line, integer)
+		return ASTExpInteger(typ, line, integer)
 
 	elif exp_type == "identifier":
 		# ExpIdentifier: (self, line, ident_line, ident)
 		ident_line = next_int(input_lines)
 		ident = next_string(input_lines)
-		return ASTExpIdentifier(line, ident_line, ident)
+		return ASTExpIdentifier(typ, line, ident_line, ident)
 
 	elif exp_type == "true":
 		# ExpTrue: (self, line)
-		return ASTExpTrue(line)
+		return ASTExpTrue(typ, line)
 
 	elif exp_type == "false":
 		# ExpFalse: (self, line)
-		return ASTExpFalse(line)
+		return ASTExpFalse(typ, line)
 
 def formal_from_input(input_lines):
 	# Formal: (self, ident_line, ident, type_line, typ)

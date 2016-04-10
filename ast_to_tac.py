@@ -51,11 +51,11 @@ def gen_tac_for_binding(ast_binding):
 
 	if ast_binding.exp == None:
 		# let_binding_no_init
-		tac_list.append(TACDefault(assignee_symbol, ast_binding.binding_type))
+		tac_list.append(TACDefault(ast_binding.binding_type, assignee_symbol, ast_binding.binding_type))
 	else:
 		# let_binding_init
-		exp_symbol = gen_tac_for_exp(ast_binding.exp)
-		tac_list.append(TACAssign(assignee_symbol, exp_symbol))
+		exp_symbol, exp_type_from_ast = gen_tac_for_exp(ast_binding.exp)
+		tac_list.append(TACAssign(exp_type_from_ast, assignee_symbol, exp_symbol))
 
 	# NOTE: No need to return a symbol since all items are added to symbol table
 
@@ -69,34 +69,6 @@ def gen_tac_for_unbox(boxed_symbol, exp_type):
 	tac_list.append(TACUnbox(unboxed_symbol, boxed_symbol, exp_type))
 	return unboxed_symbol
 
-# def gen_tac_for_exp_dynamic_dispatch(ast_exp):
-
-# 	num_params = len(ast_exp.exp_list)
-
-# 	# Make a new assignee_symbol for the result
-# 	assignee_symbol = new_symbol()
-
-# 	# Allocate space for params
-# 	tac_list.append(TACMakeParamSpace(num_params))
-
-# 	# Evaluate all params
-# 	param_symbol_list = []
-# 	for idx, param_exp in enumerate(ast_exp.exp_list):
-# 		param_symbol = gen_tac_for_exp(param_exp)
-# 		param_symbol_list.append(param_symbol)
-# 		tac_list.append(TACStoreParam(idx, param_symbol))
-
-# 	# Evaluate receiver object
-# 	ro_symbol = gen_tac_for_exp(ast_exp.caller_exp)
-
-# 	# Call function
-# 	tac_list.append(TACCall(assignee_symbol, ast_exp.ident, ro_symbol, param_symbol_list))
-
-# 	# Remove space for params
-# 	tac_list.append(TACRemoveParamSpace(num_params))
-
-# 	return assignee_symbol
-
 def gen_tac_for_exp(ast_exp):
 	global tac_list
 
@@ -107,19 +79,19 @@ def gen_tac_for_exp(ast_exp):
 
 	if isinstance(ast_exp, ASTExpString):
 		# ExpString: (self, line, string)
-		tac_list.append(TACConstString(assignee_symbol, ast_exp.string))
+		tac_list.append(TACConstString(ast_exp.type_from_ast, assignee_symbol, ast_exp.string))
 
 	elif isinstance(ast_exp, ASTExpInteger):
 		# ExpInteger: (self, line, integer)
-		tac_list.append(TACConstInt(assignee_symbol, str(ast_exp.integer)))
+		tac_list.append(TACConstInt(ast_exp.type_from_ast, assignee_symbol, str(ast_exp.integer)))
 
 	elif isinstance(ast_exp, ASTExpTrue):
 		# ExpTrue: (self, line)
-		tac_list.append(TACConstBool(assignee_symbol, "true"))
+		tac_list.append(TACConstBool(ast_exp.type_from_ast, assignee_symbol, "true"))
 
 	elif isinstance(ast_exp, ASTExpFalse):
 		# ExpFalse: (self, line)
-		tac_list.append(TACConstBool(assignee_symbol, "false"))
+		tac_list.append(TACConstBool(ast_exp.type_from_ast, assignee_symbol, "false"))
 
 	elif isinstance(ast_exp, ASTExpIdentifier):
 		# ExpIdentifier: (self, line, ident_line, ident)
@@ -134,7 +106,7 @@ def gen_tac_for_exp(ast_exp):
 			ident_symbol = maybe_symbol
 
 		# Assign the ident symbol to the asignee symbol
-		tac_list.append(TACAssign(assignee_symbol, ident_symbol))
+		tac_list.append(TACAssign(ast_exp.type_from_ast, assignee_symbol, ident_symbol))
 
 	elif isinstance(ast_exp, ASTExpIfThenElse):
 		# ExpIfThenElse: (self, line, cond_exp, then_exp, else_exp)
@@ -144,9 +116,9 @@ def gen_tac_for_exp(ast_exp):
 		exit_label = "if_exit_" + str(label_num)
 
 		# Get condition and negate it
-		cond_symbol = gen_tac_for_exp(ast_exp.cond_exp)
+		cond_symbol, cond_type_from_ast = gen_tac_for_exp(ast_exp.cond_exp)
 		not_cond_symbol = new_symbol()
-		tac_list.append(TACNegBool(not_cond_symbol, cond_symbol))
+		tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol, cond_symbol))
 
 		# Branch to 'then' if condition is true
 		# Branch to 'else' if condition is not true
@@ -156,16 +128,16 @@ def gen_tac_for_exp(ast_exp):
 		# 'then' exp
 		tac_list.append(TACComment("then branch"))
 		tac_list.append(TACLabel(then_label))
-		then_symbol = gen_tac_for_exp(ast_exp.then_exp)
-		tac_list.append(TACAssign(assignee_symbol, then_symbol))
+		then_symbol, then_type_from_ast = gen_tac_for_exp(ast_exp.then_exp)
+		tac_list.append(TACAssign(then_type_from_ast, assignee_symbol, then_symbol))
 		# Jump over 'else' exp
 		tac_list.append(TACJmp(exit_label))
 
 		# Label for 'else' exp
 		tac_list.append(TACComment("else branch"))
 		tac_list.append(TACLabel(else_label))
-		else_symbol = gen_tac_for_exp(ast_exp.else_exp)
-		tac_list.append(TACAssign(assignee_symbol, else_symbol))
+		else_symbol, else_type_from_ast = gen_tac_for_exp(ast_exp.else_exp)
+		tac_list.append(TACAssign(else_type_from_ast, assignee_symbol, else_symbol))
 		# Jump to exit label to preserve child info in basic blocks
 		tac_list.append(TACJmp(exit_label))
 
@@ -186,9 +158,9 @@ def gen_tac_for_exp(ast_exp):
 		tac_list.append(TACLabel(start_label))
 
 		# Get condition and negate it
-		cond_symbol = gen_tac_for_exp(ast_exp.cond_exp)
+		cond_symbol, cond_type_from_ast = gen_tac_for_exp(ast_exp.cond_exp)
 		not_cond_symbol = new_symbol()
-		tac_list.append(TACNegBool(not_cond_symbol, cond_symbol))
+		tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol, cond_symbol))
 
 		# Branch to exit loop if condition is not true
 		tac_list.append(TACBt(cond_symbol, body_label))
@@ -197,7 +169,7 @@ def gen_tac_for_exp(ast_exp):
 		# Add loop body label
 		tac_list.append(TACComment("loop body"))
 		tac_list.append(TACLabel(body_label))
-		body_symbol = gen_tac_for_exp(ast_exp.loop_exp)
+		body_symbol, body_type_from_ast = gen_tac_for_exp(ast_exp.loop_exp)
 
 		# Jmp to start of loop to repeat
 		tac_list.append(TACJmp(start_label))
@@ -207,22 +179,22 @@ def gen_tac_for_exp(ast_exp):
 		tac_list.append(TACLabel(exit_label))
 
 		# Make a new default Object as the loop's return type
-		tac_list.append(TACDefault(assignee_symbol, "Object"))
+		tac_list.append(TACDefault("Object", assignee_symbol, "Object"))
 
 	elif isinstance(ast_exp, ASTExpAssign):
 		# ExpAssign: (self, line, ident_line, ident, exp)
 		# MUST be a value from the symbol table or an attr
-		exp_symbol = gen_tac_for_exp(ast_exp.exp)
+		exp_symbol, exp_type_from_ast = gen_tac_for_exp(ast_exp.exp)
 
 		maybe_symbol = get_symbol(ast_exp.ident)
 		
 		# If the assignee symbol is None, then the ident is an attr
 		if maybe_symbol == None:
-			tac_list.append(TACStoreAttr(ast_exp.ident, exp_symbol))
+			tac_list.append(TACStoreAttr(exp_type_from_ast, ast_exp.ident, exp_symbol))
 		else:
 			assignee_symbol = maybe_symbol
 
-		tac_list.append(TACAssign(assignee_symbol, exp_symbol))
+		tac_list.append(TACAssign(exp_type_from_ast, assignee_symbol, exp_symbol))
 
 	elif isinstance(ast_exp, ASTExpBlock):
 		# ExpBlock: (self, line, exp_list)
@@ -234,7 +206,7 @@ def gen_tac_for_exp(ast_exp):
 
 	elif isinstance(ast_exp, ASTExpNew):
 		# ExpNew: (self, line, type_line, exp_type)
-		tac_list.append(TACAlloc(assignee_symbol, ast_exp.exp_type))
+		tac_list.append(TACAlloc(ast_exp.type_from_ast, assignee_symbol, ast_exp.exp_type))
 
 	elif isinstance(ast_exp, ASTExpLet):
 		# ExpLet: (self, line, binding_list, exp)
@@ -247,10 +219,10 @@ def gen_tac_for_exp(ast_exp):
 			gen_tac_for_binding(ast_binding)
 
 		# Handle expression after 'in'
-		return_symbol = gen_tac_for_exp(ast_exp.exp)
+		return_symbol, return_type_from_ast = gen_tac_for_exp(ast_exp.exp)
 
 		# Store the 'in' expression in assignee
-		tac_list.append(TACAssign(assignee_symbol, return_symbol))
+		tac_list.append(TACAssign(ast_exp.type_from_ast, assignee_symbol, return_symbol))
 
 		# Remove symbol table from stack
 		symbol_table_list.pop()
@@ -259,8 +231,8 @@ def gen_tac_for_exp(ast_exp):
 	# ExpBinaryArith: (self, line, left_exp, right_exp)
 	elif isinstance(ast_exp, ASTExpPlus):
 		# Generate tac for boxed values
-		lhs_symbol_boxed = gen_tac_for_exp(ast_exp.left_exp)
-		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
+		lhs_symbol_boxed, lhs_symbol_type_from_ast = gen_tac_for_exp(ast_exp.left_exp)
+		rhs_symbol_boxed, rhs_symbol_type_from_ast = gen_tac_for_exp(ast_exp.right_exp)
 
 		# Unbox values
 		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed, "Int")
@@ -268,15 +240,15 @@ def gen_tac_for_exp(ast_exp):
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
-		tac_list.append(TACPlus(unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+		tac_list.append(TACPlus(ast_exp.type_from_ast, unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
 
 		# Box the answer and set assignee to pointer
 		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
 		
 	elif isinstance(ast_exp, ASTExpMinus):
 		# Generate tac for boxed values
-		lhs_symbol_boxed = gen_tac_for_exp(ast_exp.left_exp)
-		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
+		lhs_symbol_boxed, lhs_symbol_type_from_ast = gen_tac_for_exp(ast_exp.left_exp)
+		rhs_symbol_boxed, rhs_symbol_type_from_ast = gen_tac_for_exp(ast_exp.right_exp)
 
 		# Unbox values
 		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed, "Int")
@@ -284,15 +256,15 @@ def gen_tac_for_exp(ast_exp):
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
-		tac_list.append(TACMinus(unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+		tac_list.append(TACMinus(ast_exp.type_from_ast, unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
 
 		# Box the answer and set assignee to pointer
 		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
 
 	elif isinstance(ast_exp, ASTExpTimes):
 		# Generate tac for boxed values
-		lhs_symbol_boxed = gen_tac_for_exp(ast_exp.left_exp)
-		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
+		lhs_symbol_boxed, lhs_symbol_type_from_ast = gen_tac_for_exp(ast_exp.left_exp)
+		rhs_symbol_boxed, rhs_symbol_type_from_ast = gen_tac_for_exp(ast_exp.right_exp)
 
 		# Unbox values
 		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed, "Int")
@@ -300,15 +272,15 @@ def gen_tac_for_exp(ast_exp):
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
-		tac_list.append(TACMult(unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+		tac_list.append(TACMult(ast_exp.type_from_ast, unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
 
 		# Box the answer and set assignee to pointer
 		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
 
 	elif isinstance(ast_exp, ASTExpDivide):
 		# Generate tac for boxed values
-		lhs_symbol_boxed = gen_tac_for_exp(ast_exp.left_exp)
-		rhs_symbol_boxed = gen_tac_for_exp(ast_exp.right_exp)
+		lhs_symbol_boxed, lhs_symbol_type_from_ast = gen_tac_for_exp(ast_exp.left_exp)
+		rhs_symbol_boxed, rhs_symbol_type_from_ast = gen_tac_for_exp(ast_exp.right_exp)
 
 		# Unbox values
 		lhs_symbol_unboxed = gen_tac_for_unbox(lhs_symbol_boxed, "Int")
@@ -316,52 +288,52 @@ def gen_tac_for_exp(ast_exp):
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
-		tac_list.append(TACDiv(unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+		tac_list.append(TACDiv(ast_exp.type_from_ast, unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
 
 		# Box the answer and set assignee to pointer
 		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
 
 	elif isinstance(ast_exp, ASTExpLt):
-		left_symbol = gen_tac_for_exp(ast_exp.left_exp)
-		right_symbol = gen_tac_for_exp(ast_exp.right_exp)
-		tac_list.append(TACCompL(assignee_symbol, left_symbol, right_symbol))
+		left_symbol, left_symbol_type_from_ast = gen_tac_for_exp(ast_exp.left_exp)
+		right_symbol, right_symbol_type_from_ast = gen_tac_for_exp(ast_exp.right_exp)
+		tac_list.append(TACCompL(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 
 	elif isinstance(ast_exp, ASTExpLe):
-		left_symbol = gen_tac_for_exp(ast_exp.left_exp)
-		right_symbol = gen_tac_for_exp(ast_exp.right_exp)
-		tac_list.append(TACCompLE(assignee_symbol, left_symbol, right_symbol))
+		left_symbol, left_symbol_type_from_ast = gen_tac_for_exp(ast_exp.left_exp)
+		right_symbol, right_symbol_type_from_ast = gen_tac_for_exp(ast_exp.right_exp)
+		tac_list.append(TACCompLE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 
 	elif isinstance(ast_exp, ASTExpEq):
-		left_symbol = gen_tac_for_exp(ast_exp.left_exp)
-		right_symbol = gen_tac_for_exp(ast_exp.right_exp)
-		tac_list.append(TACCompE(assignee_symbol, left_symbol, right_symbol))
+		left_symbol, left_symbol_type_from_ast = gen_tac_for_exp(ast_exp.left_exp)
+		right_symbol, right_symbol_type_from_ast = gen_tac_for_exp(ast_exp.right_exp)
+		tac_list.append(TACCompE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 
 	# Handle unary expressions together
 	# ExpUnary: (self, line, exp)
 	elif isinstance(ast_exp, ASTExpIsVoid):
-		exp_symbol = gen_tac_for_exp(ast_exp.exp)
-		tac_list.append(TACIsVoid(assignee_symbol, exp_symbol))
+		exp_symbol, exp_type_from_ast = gen_tac_for_exp(ast_exp.exp)
+		tac_list.append(TACIsVoid(ast_exp.type_from_ast, assignee_symbol, exp_symbol))
 
 	elif isinstance(ast_exp, ASTExpTilde):
 		# Get the boxed value
-		boxed_exp_symbol = gen_tac_for_exp(ast_exp.exp)
+		boxed_exp_symbol, boxed_exp_symbol_type_from_ast = gen_tac_for_exp(ast_exp.exp)
 
 		# Unbox the value and do 'not'
 		unboxed_exp_symbol = gen_tac_for_unbox(boxed_exp_symbol, "Int")
 		unboxed_assignee_symbol = new_symbol()
-		tac_list.append(TACNegArith(unboxed_assignee_symbol, unboxed_exp_symbol))
+		tac_list.append(TACNegArith(ast_exp.type_from_ast, unboxed_assignee_symbol, unboxed_exp_symbol))
 
 		# Box the answer and set assignee to pointer
 		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Int")
 
 	elif isinstance(ast_exp, ASTExpNot):
 		# Get the boxed value
-		boxed_exp_symbol = gen_tac_for_exp(ast_exp.exp)
+		boxed_exp_symbol, boxed_exp_symbol_type_from_ast = gen_tac_for_exp(ast_exp.exp)
 
 		# Unbox the value and do 'not'
 		unboxed_exp_symbol = gen_tac_for_unbox(boxed_exp_symbol, "Bool")
 		unboxed_assignee_symbol = new_symbol()
-		tac_list.append(TACNegBool(unboxed_assignee_symbol, unboxed_exp_symbol))
+		tac_list.append(TACNegBool(ast_exp.type_from_ast, unboxed_assignee_symbol, unboxed_exp_symbol))
 
 		# Box the answer and set assignee to pointer
 		assignee_symbol = gen_tac_for_box(unboxed_assignee_symbol, "Bool")
@@ -375,16 +347,16 @@ def gen_tac_for_exp(ast_exp):
 		
 		# For now, only handle 'out_string' and 'out_int'
 		if ast_exp.ident == "out_string":
-			tac_list.append(TACOutString(assignee_symbol, exp_symbol_list[0]))
+			tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
 		elif ast_exp.ident == "out_int":
-			tac_list.append(TACOutInt(assignee_symbol, exp_symbol_list[0]))
+			tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
 		elif ast_exp.ident == "in_string":
-			tac_list.append(TACInString(assignee_symbol))
+			tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
 
 		elif ast_exp.ident == "in_int":
-			tac_list.append(TACInInt(assignee_symbol))
+			tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
 
 		else:
 			raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
@@ -392,27 +364,41 @@ def gen_tac_for_exp(ast_exp):
 
 	elif isinstance(ast_exp, ASTExpDynamicDispatch):
 		# ExpDynamicDispatch: (self, line, caller_exp, ident_line, ident, exp_list=[])
-		# gen_tac_for_exp(ast_exp.caller_exp)
-		# exp_symbol_list = []
-		# for exp in ast_exp.exp_list:
-		# 	exp_symbol_list.append(gen_tac_for_exp(exp))
+
+		# Generate tac for all parameters in order
+		param_symbol_list = []
+		for idx, exp in enumerate(ast_exp.exp_list):
+			param_symbol, param_type_from_ast = gen_tac_for_exp(exp)
+			# Store the param for later use
+			# ---- TODO Consider getting type info for each param
+			tac_list.append(TACStoreParam(param_type_from_ast, idx, param_symbol))
+			# Add the param to the list
+			param_symbol_list.append(param_symbol)
+
+		# Generate tac for receiver object
+		ro_symbol, ro_type_from_ast = gen_tac_for_exp(ast_exp.caller_exp)
 		
 		# For now, only handle 'out_string' and 'out_int'
 		if ast_exp.ident == "out_string":
-			tac_list.append(TACOutString(assignee_symbol, exp_symbol_list[0]))
+			tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
 		elif ast_exp.ident == "out_int":
-			tac_list.append(TACOutInt(assignee_symbol, exp_symbol_list[0]))
+			tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
 		elif ast_exp.ident == "in_string":
-			tac_list.append(TACInString(assignee_symbol))
+			tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
 
 		elif ast_exp.ident == "in_int":
-			tac_list.append(TACInInt(assignee_symbol))
+			tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
 
 		else:
 			# assignee_symbol = gen_tac_for_exp_dynamic_dispatch(ast_exp)
-			raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
+			method_ident = ast_exp.ident
+			receiver_obj = ro_symbol
+			params_list = param_symbol_list
+
+			tac_list.append(TACDynamicCall(ast_exp.type_from_ast, method_ident, receiver_obj, ro_type_from_ast, params_list, assignee_symbol))
+			# raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
 
 	elif isinstance(ast_exp, ASTExpStaticDispatch):
 		# ExpStaticDispatch: (self, line, caller_exp, type_line, static_type, ident_line, ident, exp_list=[])
@@ -420,27 +406,27 @@ def gen_tac_for_exp(ast_exp):
 		# Generate tac for all parameters in order
 		param_symbol_list = []
 		for idx, exp in enumerate(ast_exp.exp_list):
-			param_symbol = gen_tac_for_exp(exp)
+			param_symbol, param_type_from_ast = gen_tac_for_exp(exp)
 			# Store the param for later use
-			tac_list.append(TACStoreParam(idx, param_symbol))
+			tac_list.append(TACStoreParam(param_type_from_ast, idx, param_symbol))
 			# Add the param to the list
 			param_symbol_list.append(param_symbol)
 
 		# Generate tac for receiver object
-		ro_symbol = gen_tac_for_exp(ast_exp.caller_exp)
+		ro_symbol, ro_type_from_ast = gen_tac_for_exp(ast_exp.caller_exp)
 
 		# For now, only handle 'out_string' and 'out_int'
 		if ast_exp.ident == "out_string":
-			tac_list.append(TACOutString(assignee_symbol, exp_symbol_list[0]))
+			tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
 		if ast_exp.ident == "out_int":
-			tac_list.append(TACOutInt(assignee_symbol, exp_symbol_list[0]))
+			tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
 		elif ast_exp.ident == "in_string":
-			tac_list.append(TACInString(assignee_symbol))
+			tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
 
 		elif ast_exp.ident == "in_int":
-			tac_list.append(TACInInt(assignee_symbol))
+			tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
 
 		else:
 			static_type = ast_exp.static_type
@@ -448,13 +434,13 @@ def gen_tac_for_exp(ast_exp):
 			receiver_obj = ro_symbol
 			params_list = param_symbol_list
 
-			tac_list.append(TACStaticCall(static_type, method_ident, receiver_obj, params_list, assignee_symbol))
+			tac_list.append(TACStaticCall(ast_exp.type_from_ast, static_type, method_ident, receiver_obj, params_list, assignee_symbol))
 
 	else:
 		raise NotImplementedError(ast_exp.__class__.__name__ + " not yet implemented")
 
 	# Default return case
-	return assignee_symbol
+	return (assignee_symbol, ast_exp.type_from_ast)
 
 def gen_tac_for_feature(ast_feature, class_name):
 	global tac_list, symbol_table_list
@@ -473,7 +459,7 @@ def gen_tac_for_feature(ast_feature, class_name):
 
 		# For now, leave out formals list since main method cannot have formals
 
-		return_symbol = gen_tac_for_exp(ast_feature.body_exp)
+		return_symbol, return_type_from_ast = gen_tac_for_exp(ast_feature.body_exp)
 		tac_list.append(TACReturn(return_symbol))
 
 		symbol_table_list.pop()
@@ -481,13 +467,13 @@ def gen_tac_for_feature(ast_feature, class_name):
 	elif isinstance(ast_feature, ASTAttrInit):
 		# AttrInit: (self, ident_line, ident, type_line, feature_type, exp)
 		attr_symbol = add_symbol(ast_feature.ident)
-		exp_symbol = gen_tac_for_exp(ast_feature.exp)
-		tac_list.append(TACAssign(attr_symbol, exp_symbol))
+		exp_symbol, exp_type_from_ast = gen_tac_for_exp(ast_feature.exp)
+		tac_list.append(TACAssign(ast_feature.feature_type, attr_symbol, exp_symbol))
 
 	elif isinstance(ast_feature, ASTAttrNoInit):
 		# AttrNoInit: (self, ident_line, ident, type_line, feature_type)
 		attr_symbol = add_symbol(ast_feature.ident)
-		tac_list.append(TACDefault(attr_symbol, ast_feature.feature_type))
+		tac_list.append(TACDefault(ast_feature.feature_type, attr_symbol, ast_feature.feature_type))
 
 # def gen_tac_for_class(ast_class):
 # 	# Add symbol table for class since the scope is changing

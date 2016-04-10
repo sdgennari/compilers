@@ -5,7 +5,11 @@ class Main {
 };
 
 class A {
+	x : Int <- 777;
 	some_method(a : Int) : Int {
-		123
+		{
+			123;
+			x;
+		}
 	};
 };

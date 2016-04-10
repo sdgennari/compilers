@@ -96,11 +96,14 @@ class ASTFormal(object):
 		return result
 
 class ASTExp(object):
-	'Super class for all expressions'
+	'''Super class for all expressions'''
+	def __init__(self, type_from_ast):
+		self.type_from_ast = type_from_ast
 	pass
 
 class ASTExpAssign(ASTExp):
-	def __init__(self, line, ident_line, ident, exp):
+	def __init__(self, type_from_ast, line, ident_line, ident, exp):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.ident_line = ident_line
 		self.ident= ident
@@ -114,7 +117,8 @@ class ASTExpAssign(ASTExp):
 			str(self.exp)
 
 class ASTExpLet(ASTExp):
-	def __init__(self, line, binding_list, exp):
+	def __init__(self, type_from_ast, line, binding_list, exp):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.binding_list = binding_list
 		self.exp = exp
@@ -151,7 +155,8 @@ class ASTExpLetBinding(object):
 		return result
 
 class ASTExpIfThenElse(ASTExp):
-	def __init__(self, line, cond_exp, then_exp, else_exp):
+	def __init__(self, type_from_ast, line, cond_exp, then_exp, else_exp):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.cond_exp = cond_exp
 		self.then_exp = then_exp
@@ -165,7 +170,8 @@ class ASTExpIfThenElse(ASTExp):
 			str(self.else_exp)
 
 class ASTExpWhileLoopPool(ASTExp):
-	def __init__(self, line, cond_exp, loop_exp):
+	def __init__(self, type_from_ast, line, cond_exp, loop_exp):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.cond_exp = cond_exp
 		self.loop_exp = loop_exp
@@ -177,7 +183,8 @@ class ASTExpWhileLoopPool(ASTExp):
 			str(self.loop_exp)
 
 class ASTExpNew(ASTExp):
-	def __init__(self, line, type_line, exp_type):
+	def __init__(self, type_from_ast, line, type_line, exp_type):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.type_line = type_line
 		self.exp_type = exp_type
@@ -191,7 +198,8 @@ class ASTExpNew(ASTExp):
 ### Binary Expressions ###
 class ASTExpBinaryArith(ASTExp):
 	'Super class for all binary arithmetic expressions'
-	def __init__(self, line, left_exp, right_exp):
+	def __init__(self, type_from_ast, line, left_exp, right_exp):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.left_exp = left_exp
 		self.right_exp = right_exp
@@ -248,7 +256,8 @@ class ASTExpEq(ASTExpBinaryArith):
 ### Unary Expressions ###
 class ASTExpUnary(ASTExp):
 	'Superclass for unary expressions'
-	def __init__(self, line, exp):
+	def __init__(self, type_from_ast, line, exp):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.exp = exp
 
@@ -271,7 +280,8 @@ class ASTExpNot(ASTExpUnary):
 			str(self.exp)
 
 class ASTExpBlock(ASTExp):
-	def __init__(self, line, exp_list):
+	def __init__(self, type_from_ast, line, exp_list):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.exp_list = exp_list
 
@@ -287,7 +297,8 @@ class ASTExpBlock(ASTExp):
 class ASTExpDispatch(ASTExp): pass
 
 class ASTExpDynamicDispatch(ASTExpDispatch):
-	def __init__(self, line, caller_exp, ident_line, ident, exp_list=[]):
+	def __init__(self, type_from_ast, line, caller_exp, ident_line, ident, exp_list=[]):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.caller_exp = caller_exp
 		self.ident_line = ident_line
@@ -307,7 +318,8 @@ class ASTExpDynamicDispatch(ASTExpDispatch):
 		return result
 
 class ASTExpStaticDispatch(ASTExpDispatch):
-	def __init__(self, line, caller_exp, type_line, static_type, ident_line, ident, exp_list=[]):
+	def __init__(self, type_from_ast, line, caller_exp, type_line, static_type, ident_line, ident, exp_list=[]):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.caller_exp = caller_exp
 		self.type_line = type_line
@@ -330,8 +342,9 @@ class ASTExpStaticDispatch(ASTExpDispatch):
 				result += "\n" + str(exp)
 		return result
 
-class ASTExpSelfDispatch(ASTExp):
-	def __init__(self, line, ident_line, ident, exp_list=[]):
+class ASTExpSelfDispatch(ASTExpDispatch):
+	def __init__(self, type_from_ast, line, ident_line, ident, exp_list=[]):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.ident_line = ident_line
 		self.ident = ident
@@ -350,7 +363,8 @@ class ASTExpSelfDispatch(ASTExp):
 
 ### Terminals ###
 class ASTExpIdentifier(ASTExp):
-	def __init__(self, line, ident_line, ident):
+	def __init__(self, type_from_ast, line, ident_line, ident):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.ident_line = ident_line
 		self.ident = ident
@@ -362,7 +376,8 @@ class ASTExpIdentifier(ASTExp):
 			str(self.ident)
 
 class ASTExpString(ASTExp):
-	def __init__(self, line, string):
+	def __init__(self, type_from_ast, line, string):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.string = string
 
@@ -372,7 +387,8 @@ class ASTExpString(ASTExp):
 			str(self.string)
 
 class ASTExpInteger(ASTExp):
-	def __init__(self, line, integer):
+	def __init__(self, type_from_ast, line, integer):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.integer = integer
 
@@ -382,7 +398,8 @@ class ASTExpInteger(ASTExp):
 			str(self.integer)
 
 class ASTExpTrue(ASTExp):
-	def __init__(self, line):
+	def __init__(self, type_from_ast, line):
+		self.type_from_ast = type_from_ast
 		self.line = line
 
 	def __str__(self):
@@ -390,7 +407,8 @@ class ASTExpTrue(ASTExp):
 			"true"
 
 class ASTExpFalse(ASTExp):
-	def __init__(self, line):
+	def __init__(self, type_from_ast, line):
+		self.type_from_ast = type_from_ast
 		self.line = line
 
 	def __str__(self):
@@ -398,7 +416,8 @@ class ASTExpFalse(ASTExp):
 			"false"
 
 class ASTExpCase(ASTExp):
-	def __init__(self, line, exp, case_exp_list):
+	def __init__(self, type_from_ast, line, exp, case_exp_list):
+		self.type_from_ast = type_from_ast
 		self.line = line
 		self.exp = exp
 		self.case_exp_list = case_exp_list
@@ -428,7 +447,8 @@ class ASTExpCaseElem(object):
 
 # Predefined internal expressions
 class ASTExpInternal(ASTExp):
-	def __init__(self, class_method, body_type):
+	def __init__(self, type_from_ast, class_method, body_type):
+		self.type_from_ast = type_from_ast
 		self.class_method = class_method
 		self.body_type = body_type
 

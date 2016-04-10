@@ -358,8 +358,7 @@ A.some_method:          ## method definition
                         movq $8, %r14
                         subq %r14, %rsp
                         ## return address handling
-                        ## fp[4] holds argument a (Int)
-                        ## fp[3] holds argument b (Int)
+                        ## fp[3] holds argument a (Int)
                         ## method body begins
                         ## new Int
                         pushq %rbp
@@ -509,23 +508,12 @@ Main.main:              ## method definition
                         pushq %rbp
                         movq %rsp, %rbp
                         movq 16(%rbp), %r12
-                        ## stack room for temporaries: 3
-                        movq $24, %r14
+                        ## stack room for temporaries: 1
+                        movq $8, %r14
                         subq %r14, %rsp
                         ## return address handling
                         ## method body begins
-                        ## fp[0] holds local a (A)
-                        movq $0, %r13
-                        movq %r13, 0(%rbp)
-                        ## new A
-                        pushq %rbp
-                        pushq %r12
-                        movq $A..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq %r13, 0(%rbp)
-                        ## a.some_method(...)
+                        ## new A.some_method(...)
                         pushq %r12
                         pushq %rbp
                         ## new Int
@@ -538,42 +526,13 @@ Main.main:              ## method definition
                         movq $777, %r14
                         movq %r14, 24(%r13)
                         pushq %r13
-                        ## new Int
+                        ## new A
                         pushq %rbp
                         pushq %r12
-                        movq $Int..new, %r14
+                        movq $A..new, %r14
                         call *%r14
                         popq %r12
                         popq %rbp
-                        movq $7, %r14
-                        movq %r14, 24(%r13)
-                        movq 24(%r13), %r13
-                        movq %r13, -8(%rbp)
-                        ## new Int
-                        pushq %rbp
-                        pushq %r12
-                        movq $Int..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq $9001, %r14
-                        movq %r14, 24(%r13)
-                        movq 24(%r13), %r13
-                        movq -8(%rbp), %r14
-                        addq %r14, %r13
-                        movq %r13, -8(%rbp)
-                        ## new Int
-                        pushq %rbp
-                        pushq %r12
-                        movq $Int..new, %r14
-                        call *%r14
-                        popq %r12
-                        popq %rbp
-                        movq -8(%rbp), %r14
-                        movq %r14, 24(%r13)
-                        pushq %r13
-                        ## a
-                        movq 0(%rbp), %r13
                         cmpq $0, %r13
 			jne l3
                         movq $string9, %r13
@@ -588,7 +547,7 @@ l3:                     pushq %r13
                         ## look up some_method() at offset 5 in vtable
                         movq 40(%r14), %r14
                         call *%r14
-                        addq $24, %rsp
+                        addq $16, %rsp
                         popq %rbp
                         popq %r12
 .globl Main.main.end
@@ -798,7 +757,7 @@ string8:                # "abort\\n"
 .byte 0
 
 .globl string9
-string9:                # "ERROR: 7: Exception: dispatch on void\\n"
+string9:                # "ERROR: 3: Exception: dispatch on void\\n"
 .byte  69 # 'E'
 .byte  82 # 'R'
 .byte  82 # 'R'
@@ -806,7 +765,7 @@ string9:                # "ERROR: 7: Exception: dispatch on void\\n"
 .byte  82 # 'R'
 .byte  58 # ':'
 .byte  32 # ' '
-.byte  55 # '7'
+.byte  51 # '3'
 .byte  58 # ':'
 .byte  32 # ' '
 .byte  69 # 'E'
