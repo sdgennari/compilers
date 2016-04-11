@@ -37,10 +37,6 @@ Main..vtable:		## vtable for Main
 			.quad Object.abort
 			.quad Object.copy
 			.quad Object.type_name
-			.quad IO.in_int
-			.quad IO.in_string
-			.quad IO.out_int
-			.quad IO.out_string
 			.quad Main.main
 
 .globl Object..vtable
@@ -502,96 +498,7 @@ Main.main:
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
 .Main_main_1:
-			## new const Int: 777
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$777, 24(%r8)
-			## storing param [0]
-			pushq	%r8
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method out_int in vtable[7]
-			movq	56(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## new const Int: 1
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$1, 24(%r8)
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
-			## negate
-			movl	%r9d, %r8d
-			negl	%r8d
-			## box value of %r8 into %r9
+			## new const Int: 123
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -612,133 +519,9 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## storing param [0]
-			pushq	%r9
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method out_int in vtable[7]
-			movq	56(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## new const Int: 9001
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$9001, 24(%r8)
-			## storing param [0]
-			pushq	%r8
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method out_int in vtable[7]
-			movq	56(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## new const Int: 3
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$3, 24(%r8)
-			## storing param [0]
-			pushq	%r8
+			movl	$123, 24(%r9)
+			## assign
+			movq	%r9, %r8
 			## new const Int: 2
 			## push caller-saved regs
 			pushq	%rcx
@@ -761,9 +544,9 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			movl	$2, 24(%r8)
-			## storing param [0]
-			pushq	%r8
-			## new const Int: 1
+			## assign
+			movq	%r8, %r12
+			## new const Int: 3
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -784,9 +567,11 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$1, 24(%r8)
-			## storing param [0]
-			pushq	%r8
+			movl	$3, 24(%r8)
+			## assign
+			movq	%r8, %r13
+			## new IO
+			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -795,24 +580,8 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method out_int in vtable[7]
-			movq	56(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
+			call	IO..new
+			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -821,10 +590,13 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r14
+			## default Object
+			movq	$0, %r8
+			## new const Int: 5
+			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -833,26 +605,8 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r8) as self ptr (%rbx)
-			movq	%r8, %rbx
-			## dynamic: lookup method in vtable
-			## get ptr to vtable from receiver obj
-			movq	16(%r8), %rax
-			## find method out_int in vtable[7]
-			movq	56(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
+			call	Int..new
+			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -861,10 +615,56 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r9
+			movq	%rax, %r10
+			movl	$5, 24(%r10)
+			## new const Int: 7
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movl	$7, 24(%r11)
+			## use le_helper to compare %r10 <= %r11
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r11)
+			pushq	%r11
+			pushq	%r10
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r9
 			movq	%rax, %r9
+			## new const Int: 9001
+			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -873,26 +673,8 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
-			## dynamic: lookup method in vtable
-			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
-			## find method out_int in vtable[7]
-			movq	56(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
+			call	Int..new
+			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -901,12 +683,730 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r8
+			movq	%rax, %r10
+			movl	$9001, 24(%r10)
+			## new const Int: 777
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movl	$777, 24(%r11)
+			## use le_helper to compare %r10 <= %r11
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r11)
+			pushq	%r11
+			pushq	%r10
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r9
+			movq	%rax, %r9
+			## new const Int: 444
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r9
+			movl	$444, 24(%r9)
+			## new const Int: 444
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movl	$444, 24(%r11)
+			## use le_helper to compare %r9 <= %r11
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r9) and rhs (%r11)
+			pushq	%r11
+			pushq	%r9
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	String..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movq	$string_1, 24(%r11)
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	String..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movq	$string_2, 24(%r10)
+			## use le_helper to compare %r11 <= %r10
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r11) and rhs (%r10)
+			pushq	%r10
+			pushq	%r11
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r9
+			movq	%rax, %r9
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	String..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r9
+			movq	$string_3, 24(%r9)
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	String..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movq	$string_1, 24(%r11)
+			## use le_helper to compare %r9 <= %r11
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r9) and rhs (%r11)
+			pushq	%r11
+			pushq	%r9
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	String..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movq	$string_4, 24(%r11)
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	String..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movq	$string_4, 24(%r10)
+			## use le_helper to compare %r11 <= %r10
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r11) and rhs (%r10)
+			pushq	%r10
+			pushq	%r11
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r9
+			movq	%rax, %r9
+			## const Bool
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movl	$0, 24(%r11)
+			## const Bool
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r9
+			movl	$1, 24(%r9)
+			## use le_helper to compare %r11 <= %r9
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r11) and rhs (%r9)
+			pushq	%r9
+			pushq	%r11
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## const Bool
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movl	$1, 24(%r10)
+			## const Bool
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movl	$0, 24(%r11)
+			## use le_helper to compare %r10 <= %r11
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r11)
+			pushq	%r11
+			pushq	%r10
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r9
+			movq	%rax, %r9
+			## const Bool
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r11
+			movl	$1, 24(%r11)
+			## const Bool
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movl	$1, 24(%r10)
+			## use le_helper to compare %r11 <= %r10
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r11) and rhs (%r10)
+			pushq	%r10
+			pushq	%r11
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r9
+			movq	%rax, %r9
+			## assign
+			movq	%r12, %r11
+			## assign
+			movq	%r14, %r10
+			## use le_helper to compare %r11 <= %r10
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r11) and rhs (%r10)
+			pushq	%r10
+			pushq	%r11
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r9
+			movq	%rax, %r9
+			## assign
+			movq	%r12, %r10
+			## assign
+			movq	%r13, %r9
+			## use le_helper to compare %r10 <= %r9
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r9)
+			pushq	%r9
+			pushq	%r10
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r11
+			movq	%rax, %r11
+			## assign
+			movq	%r13, %r10
+			## assign
+			movq	%r12, %r9
+			## use le_helper to compare %r10 <= %r9
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r9)
+			pushq	%r9
+			pushq	%r10
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r11
+			movq	%rax, %r11
+			## assign
+			movq	%r12, %r10
+			## assign
+			movq	%r12, %r9
+			## use le_helper to compare %r10 <= %r9
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r9)
+			pushq	%r9
+			pushq	%r10
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r11
+			movq	%rax, %r11
+			## assign
+			movq	%r12, %r10
+			## assign
+			movq	%r8, %r11
+			## use le_helper to compare %r10 <= %r11
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r11)
+			pushq	%r11
+			pushq	%r10
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r9
+			movq	%rax, %r9
+			## assign
+			movq	%r8, %r9
+			## assign
+			movq	%r12, %r10
+			## use le_helper to compare %r9 <= %r10
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r9) and rhs (%r10)
+			pushq	%r10
+			pushq	%r9
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r11
+			movq	%rax, %r11
+			## assign
+			movq	%r8, %r9
+			## assign
+			movq	%r8, %r10
+			## use le_helper to compare %r9 <= %r10
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r9) and rhs (%r10)
+			pushq	%r10
+			pushq	%r9
+			call	le_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
 			## return
-			movq	%r8, %rax
+			movq	%r9, %rax
 			leave
 			ret
 			## remove temporary stack space for 0 spilled regs
@@ -1035,6 +1535,22 @@ type_name_String:			## type_name string for String
 .globl empty.string
 empty.string:			## empty string for default Strings
 			.asciz ""
+
+.globl string_1
+string_1:
+			.asciz "abc"
+
+.globl string_2
+string_2:
+			.asciz "edf"
+
+.globl string_3
+string_3:
+			.asciz "zzz"
+
+.globl string_4
+string_4:
+			.asciz "cool"
 
 .globl in_int_format_str
 in_int_format_str:

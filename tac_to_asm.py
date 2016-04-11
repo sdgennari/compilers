@@ -581,7 +581,7 @@ def gen_asm_for_tac_call(tac_call):
 	# Get method pointer based on type of call
 	if isinstance(tac_call, TACStaticCall):
 		# Call method label explicitly
-		asm_instr_list.append("static: call method label explicitly")
+		asm_instr_list.append(ASMComment("static: call method label explicitly"))
 		method_label = tac_call.static_type + "." + tac_call.method_ident
 		asm_instr_list.append(ASMCall(method_label))
 	elif isinstance(tac_call, TACDynamicCall):
@@ -841,18 +841,36 @@ def gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_
 	# Initalize global register color map
 	register_color_map = register_colors
 
-	# For now, assume everything has an offset of 4 bytes on the stack
-	# This will change since strings will require 8 bytes
+	# For now, assume everything has an offset of 8 bytes on the stack
 	spilled_register_location_map = {}
 	stack_offset = 0
 	for idx, register in enumerate(spilled_registers):
-		spilled_register_location_map[register] = (idx+1) * -4
-		stack_offset += 4
+		spilled_register_location_map[register] = (idx+1) * -8
+		stack_offset += 8
+
+	# ===============================================
+	# TODO: Maybe save rbp here to ensure that offset from rbp is valid
+	# This would effectively make a new stack frame
+	# ===============================================
+
+	# Allocate space on stack for saved regs
+	stack_offset_str = "$" + str(stack_offset)
+	asm_instr_list.append(ASMComment("allocate space to store " + str(len(spilled_registers)) + " spilled regs"))
+	asm_instr_list.append(ASMSubQ(stack_offset_str, "%rsp"))
 
 	# Generate the asm instructions for each tac instr
 	for block in block_list:
 		for tac_instr in block.instr_list:
 			gen_asm_for_tac_instr(tac_instr)
+
+	# Restore stack ptr
+	asm_instr_list.append(ASMComment("remove temporary stack space for " + str(len(spilled_registers)) + " spilled regs"))
+	asm_instr_list.append(ASMAddQ(stack_offset_str, "%rsp"))
+
+	# ===============================================
+	# TODO: Maybe restore rbp here to end stack frame
+	# ===============================================
+
 
 	# Add initial setup to the asm instr list
 	# add_initial_method_setup(stack_offset)

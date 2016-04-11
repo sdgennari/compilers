@@ -499,6 +499,8 @@ IO.out_string:
 Main.main:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
 .Main_main_1:
 			## default Bool
 			## push caller-saved regs
@@ -1687,6 +1689,8 @@ Main.main:
 			movq	%r9, %rax
 			leave
 			ret
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
 
 .globl Object.abort
 Object.abort:

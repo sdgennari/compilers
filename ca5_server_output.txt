@@ -1,0 +1,349 @@
+(/var/pl/my-chroot /var/pl-chroot /test-ca5.sh sdg6vt.zip ) 2>&1
+ZIP file: exists ...
+/bin/rm: cannot remove `sdg6vt.zip-dir': No such file or directory
+ZIP file: extracting ...
+Archive:  ../sdg6vt.zip
+  inflating: allocate_registers.py   
+  inflating: asm_objects.py          
+  inflating: ast_nodes.py            
+  inflating: ast_to_tac.py           
+  inflating: basic_blocks.py         
+  inflating: deserialize_ast.py      
+  inflating: main.py                 
+  inflating: shared_vars.py          
+  inflating: tac_objects.py          
+  inflating: tac_to_asm.py           
+ extracting: team.txt                
+ZIP file: done ...
+Checking for main.{py,rb,ml,js,hs} ...
+main.py: found
+Run command: /usr/local/bin/python2.7 main.py in /home/pl/sdg6vt.zip-dir
+
+
+Compiling Benchmarks
+
+TEST:cells-40-21.cl-type
+Compile    cells-40-21.cl-type                       (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 795, in gen_asm_for_tac_instr
+    gen_asm_for_tac_load_attr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 509, in gen_asm_for_tac_load_attr
+    attr_idx = attr_offset_map[tup]
+KeyError: ('CellularAutomaton', 'self')
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:cje4sw-test1.cl-type
+Compile    cje4sw-test1.cl-type                      (your compiler outputs to stdout/stderr: should be none)
+.
+    return_symbol, return_type_from_ast = gen_tac_for_exp(ast_exp.exp)
+  File "/home/pl/sdg6vt.zip-dir/ast_to_tac.py", line 231, in gen_tac_for_exp
+    return_symbol, return_type_from_ast = gen_tac_for_exp(ast_exp.exp)
+  File "/home/pl/sdg6vt.zip-dir/ast_to_tac.py", line 231, in gen_tac_for_exp
+    return_symbol, return_type_from_ast = gen_tac_for_exp(ast_exp.exp)
+  File "/home/pl/sdg6vt.zip-dir/ast_to_tac.py", line 210, in gen_tac_for_exp
+    last_assignee_symbol, last_type_from_ast = gen_tac_for_exp(block_exp)
+  File "/home/pl/sdg6vt.zip-dir/ast_to_tac.py", line 457, in gen_tac_for_exp
+    raise NotImplementedError(ast_exp.__class__.__name__ + " not yet implemented")
+NotImplementedError: ASTExpCase not yet implemented
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:cje4sw-test2.cl-type
+Compile    cje4sw-test2.cl-type                      (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 795, in gen_asm_for_tac_instr
+    gen_asm_for_tac_load_attr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 509, in gen_asm_for_tac_load_attr
+    attr_idx = attr_offset_map[tup]
+KeyError: ('Cons', 'self')
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:crm2xu-benchmark1.cl-type
+Compile    crm2xu-benchmark1.cl-type                 (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 795, in gen_asm_for_tac_instr
+    gen_asm_for_tac_load_attr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 509, in gen_asm_for_tac_load_attr
+    attr_idx = attr_offset_map[tup]
+KeyError: ('Rational', 'self')
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:crm2xu-benchmark2.cl-type
+Compile    crm2xu-benchmark2.cl-type                 ok-compile
+Assemble   crm2xu-benchmark2.s                       ok-assemble
+Run        crm2xu-benchmark2.s                       ok-run
+Compare    crm2xu-benchmark2 output                  ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:crm2xu-benchmark2,897463,869487,10982,1174,156739,0.000735922
+ 
+TEST:ctj4t-test1.cl-type
+Compile    ctj4t-test1.cl-type                       ok-compile
+Assemble   ctj4t-test1.s                             ok-assemble
+Run        ctj4t-test1.s                             ok-run
+Compare    ctj4t-test1 output                        -- incorrect!
+(cannot compare results)
+ 
+TEST:ctj4t-test2.cl-type
+Compile    ctj4t-test2.cl-type                       (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 365, in ast_method_to_asm
+    gen_tac_for_feature(ast_method, type_name)
+  File "/home/pl/sdg6vt.zip-dir/ast_to_tac.py", line 483, in gen_tac_for_feature
+    return_symbol, return_type_from_ast = gen_tac_for_exp(ast_feature.body_exp)
+  File "/home/pl/sdg6vt.zip-dir/ast_to_tac.py", line 210, in gen_tac_for_exp
+    last_assignee_symbol, last_type_from_ast = gen_tac_for_exp(block_exp)
+  File "/home/pl/sdg6vt.zip-dir/ast_to_tac.py", line 457, in gen_tac_for_exp
+    raise NotImplementedError(ast_exp.__class__.__name__ + " not yet implemented")
+NotImplementedError: ASTExpCase not yet implemented
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:dcb6y-test1.cl-type
+Compile    dcb6y-test1.cl-type                       ok-compile
+Assemble   dcb6y-test1.s                             ok-assemble
+Run        dcb6y-test1.s                             ok-run
+Compare    dcb6y-test1 output                        ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:dcb6y-test1,825755,698314,10110,1660,134502,0.000397117
+ 
+TEST:dcb6y-test2.cl-type
+Compile    dcb6y-test2.cl-type                       ok-compile
+Assemble   dcb6y-test2.s                             ok-assemble
+Run        dcb6y-test2.s                             ok-run
+Compare    dcb6y-test2 output                        ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:dcb6y-test2,822871,761817,9991,1927,144669,0.000579229
+ 
+TEST:hairy-scary-double.cl-type
+Compile    hairy-scary-double.cl-type                (your compiler outputs to stdout/stderr: should be none)
+.
+    result += get_constructor_string()
+  File "main.py", line 131, in get_constructor_string
+    asm_instr_list = gen_asm_for_constructor(type_name)
+  File "main.py", line 232, in gen_asm_for_constructor
+    tmp_asm_instr_list = ast_attr_to_asm(ast_attr, type_name)
+  File "main.py", line 402, in ast_attr_to_asm
+    gen_tac_for_exp(ast_attr.exp)
+  File "/home/pl/sdg6vt.zip-dir/ast_to_tac.py", line 457, in gen_tac_for_exp
+    raise NotImplementedError(ast_exp.__class__.__name__ + " not yet implemented")
+NotImplementedError: ASTExpCase not yet implemented
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:hello-world.cl-type
+Compile    hello-world.cl-type                       ok-compile
+Assemble   hello-world.s                             ok-assemble
+Run        hello-world.s                             ok-run
+Compare    hello-world output                        ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:hello-world,665883,459933,9457,708,89489,0.000659348
+ 
+TEST:if-boolean.cl-type
+Compile    if-boolean.cl-type                        (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 751, in gen_asm_for_tac_instr
+    gen_asm_for_tac_store(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 188, in gen_asm_for_tac_store
+    raise NotImplementedError("tac_store not yet implemented")
+NotImplementedError: tac_store not yet implemented
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:int-basic-block.cl-type
+Compile    int-basic-block.cl-type                   (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 751, in gen_asm_for_tac_instr
+    gen_asm_for_tac_store(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 188, in gen_asm_for_tac_store
+    raise NotImplementedError("tac_store not yet implemented")
+NotImplementedError: tac_store not yet implemented
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:int-temporary.cl-type
+Compile    int-temporary.cl-type                     ok-compile
+Assemble   int-temporary.s                           ok-assemble
+Run        int-temporary.s                           ok-run
+Compare    int-temporary output                      ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:int-temporary,1125608,929502,14206,3125,166816,0.036761876
+ 
+TEST:jwb6mz-test1.cl-type
+Compile    jwb6mz-test1.cl-type                      ok-compile
+Assemble   jwb6mz-test1.s                            ok-assemble
+Run        jwb6mz-test1.s                            ok-run
+Compare    jwb6mz-test1 output                       ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:jwb6mz-test1,795241,650209,9958,1002,120504,0.000504734
+ 
+TEST:jwb6mz-test2.cl-type
+Compile    jwb6mz-test2.cl-type                      ok-compile
+Assemble   jwb6mz-test2.s                            ok-assemble
+Run        jwb6mz-test2.s                            ok-run
+Compare    jwb6mz-test2 output                       ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:jwb6mz-test2,766515,633033,10010,1046,118510,0.000588655
+ 
+TEST:list-20.cl-type
+Compile    list-20.cl-type                           (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 795, in gen_asm_for_tac_instr
+    gen_asm_for_tac_load_attr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 509, in gen_asm_for_tac_load_attr
+    attr_idx = attr_offset_map[tup]
+KeyError: ('Cons', 'self')
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:loop-int.cl-type
+Compile    loop-int.cl-type                         /test-ca5.sh: line 79: 19818 Killed                  $USERCMD "$i" &>output-compiler < /dev/null
+-- caught-signal 137
+ (no .cl-asm or .s file produced)
+ 
+TEST:matrix-multiply-5.cl-type
+Compile    matrix-multiply-5.cl-type                 (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 795, in gen_asm_for_tac_instr
+    gen_asm_for_tac_load_attr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 509, in gen_asm_for_tac_load_attr
+    attr_idx = attr_offset_map[tup]
+KeyError: ('ConsOfInt', 'self')
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:mji7wb-test1.cl-type
+Compile    mji7wb-test1.cl-type                      (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 795, in gen_asm_for_tac_instr
+    gen_asm_for_tac_load_attr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 509, in gen_asm_for_tac_load_attr
+    attr_idx = attr_offset_map[tup]
+KeyError: ('IntCons', 'self')
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:mji7wb-test2.cl-type
+Compile    mji7wb-test2.cl-type                      (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 751, in gen_asm_for_tac_instr
+    gen_asm_for_tac_store(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 188, in gen_asm_for_tac_store
+    raise NotImplementedError("tac_store not yet implemented")
+NotImplementedError: tac_store not yet implemented
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:mkd5m-benchmark1.cl-type
+Compile    mkd5m-benchmark1.cl-type                  ok-compile
+Assemble   mkd5m-benchmark1.s                        ok-assemble
+Run        mkd5m-benchmark1.s                        ok-run
+Compare    mkd5m-benchmark1 output                   ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:mkd5m-benchmark1,842674,880732,10313,1043,157696,0.000455200
+ 
+TEST:mkd5m-benchmark2.cl-type
+Compile    mkd5m-benchmark2.cl-type                  ok-compile
+Assemble   mkd5m-benchmark2.s                        ok-assemble
+Run        mkd5m-benchmark2.s                        ok-run
+Compare    mkd5m-benchmark2 output                   ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:mkd5m-benchmark2,865317,913124,10646,1355,162009,0.000591679
+ 
+TEST:pi-100.cl-type
+Compile    pi-100.cl-type                            (your compiler outputs to stdout/stderr: should be none)
+.
+    tmp_asm_instr_list += ast_method_to_asm(ast_method, type_name)
+  File "main.py", line 390, in ast_method_to_asm
+    gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 855, in gen_asm_for_block_list
+    gen_asm_for_tac_instr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 795, in gen_asm_for_tac_instr
+    gen_asm_for_tac_load_attr(tac_instr)
+  File "/home/pl/sdg6vt.zip-dir/tac_to_asm.py", line 509, in gen_asm_for_tac_load_attr
+    attr_idx = attr_offset_map[tup]
+KeyError: ('ConsOfInt', 'self')
+.
+ (no .cl-asm or .s file produced)
+ 
+TEST:primes-500.cl-type
+Compile    primes-500.cl-type                        ok-compile
+Assemble   primes-500.s                              ok-assemble
+Run        primes-500.s                              ok-run
+Compare    primes-500 output                         -- incorrect!
+(cannot compare results)
+ 
+TEST:zl8pj-benchmark1.cl-type
+Compile    zl8pj-benchmark1.cl-type                  ok-compile
+Assemble   zl8pj-benchmark1.s                        ok-assemble
+Run        zl8pj-benchmark1.s                        ok-run
+Compare    zl8pj-benchmark1 output                   ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:zl8pj-benchmark1,986161,904160,11635,1292,162730,0.000741428
+ 
+TEST:zl8pj-benchmark2.cl-type
+Compile    zl8pj-benchmark2.cl-type                  ok-compile
+Assemble   zl8pj-benchmark2.s                        ok-assemble
+Run        zl8pj-benchmark2.s                        ok-run
+Compare    zl8pj-benchmark2 output                   ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:zl8pj-benchmark2,916560,823322,10722,886,149616,0.000490741
