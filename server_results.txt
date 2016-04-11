@@ -1,4 +1,4 @@
-Start Time:   Mon Apr 11 03:34:15 2016
+Start Time:   Mon Apr 11 04:56:12 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -211,4 +211,4 @@ t7: mjk6zt.zip-bug_maker                  (your compiler outputs to stdout/stder
 t8: mjk6zt.zip-shallow_copy               (your compiler outputs to stdout/stderr: should be none)
  (no .cl-asm or .s file produced)
       FAILED (empty output)
-End Time: Mon Apr 11 03:35:22 2016
+End Time: Mon Apr 11 04:57:20 2016

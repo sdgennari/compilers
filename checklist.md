@@ -9,10 +9,10 @@
 - if
 - while
 - isvoid
-- lt
-- le
-- eq
 - case
+- ~~lt~~
+- ~~le~~
+- ~~eq~~
 - ~~dynamic_dispatch~~
 - ~~static_dispatch~~
 - ~~self_dispatch~~
@@ -37,10 +37,10 @@
 
 ### Internals
 
-- IO.in_int
-- IO.in_string
-- IO.out_int
-- IO.out_string
+- ~~IO.in_int~~
+- ~~IO.in_string~~
+- ~~IO.out_int~~
+- ~~IO.out_string~~
 - Object.abort
 - Object.copy
 - Object.type_name

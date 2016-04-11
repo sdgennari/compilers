@@ -172,36 +172,38 @@ def gen_asm_for_tac_jmp(tac_jmp):
 	asm_instr_list.append(ASMJmp(label))
 
 def gen_asm_for_tac_bt(tac_bt):
-	raise NotImplementedError("Branch not yet implemented")
-	# label = "." + str(tac_bt.label)
-	# reg = get_asm_register(tac_bt.op1)
+	label = "." + str(tac_bt.label)
+	reg = get_asm_register(tac_bt.op1)
 
-	# # asm_instr_list.append(ASMCmpL("$1", reg))
-	# # asm_instr_list.append(ASMJmpEq(label))
+	# asm_instr_list.append(ASMCmpL("$1", reg))
+	# asm_instr_list.append(ASMJmpEq(label))
 
-	# asm_instr_list.append(ASMComment("branch " + label))
-	# asm_instr_list.append(ASMTestL(reg, reg))
-	# asm_instr_list.append(ASMJmpNz(label))
+	asm_instr_list.append(ASMComment("branch " + label))
+	asm_instr_list.append(ASMTestL(reg, reg))
+	asm_instr_list.append(ASMJmpNz(label))
+	# raise NotImplementedError("branch not yet implemented")
 
 # ---- TODO Update for boxing + unboxing
 def gen_asm_for_tac_store(tac_store):
-	src = get_asm_register(tac_store.op1, 64)
-	offset = spilled_register_location_map[tac_store.op1]
+	raise NotImplementedError("tac_store not yet implemented")
+	# src = get_asm_register(tac_store.op1, 64)
+	# offset = spilled_register_location_map[tac_store.op1]
 
-	dest = str(offset) + "(%rbp)"
+	# dest = str(offset) + "(%rbp)"
 
-	asm_instr_list.append(ASMComment("store"))
-	asm_instr_list.append(ASMMovL(src, dest))
+	# asm_instr_list.append(ASMComment("store"))
+	# asm_instr_list.append(ASMMovL(src, dest))
 
 # ---- TODO Update for boxing + unboxing
 def gen_asm_for_tac_load(tac_load):
-	dest = get_asm_register(tac_load.assignee)
+	raise NotImplementedError("tac_load not yet implemented")
+	# dest = get_asm_register(tac_load.assignee)
 
-	offset = spilled_register_location_map[tac_load.location]
-	src = str(offset) + "(%rbp)"
+	# offset = spilled_register_location_map[tac_load.location]
+	# src = str(offset) + "(%rbp)"
 
-	asm_instr_list.append(ASMComment("load"))
-	asm_instr_list.append(ASMMovL(src, dest))
+	# asm_instr_list.append(ASMComment("load"))
+	# asm_instr_list.append(ASMMovL(src, dest))
 
 def gen_asm_for_tac_out_int(tac_out_int):
 	raise NotImplementedError("out_int not yet implemented")

@@ -116,14 +116,20 @@ def gen_tac_for_exp(ast_exp):
 		exit_label = "if_exit_" + str(label_num)
 
 		# Get condition and negate it
-		cond_symbol, cond_type_from_ast = gen_tac_for_exp(ast_exp.cond_exp)
-		not_cond_symbol = new_symbol()
-		tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol, cond_symbol))
+		cond_symbol_boxed, cond_type_from_ast = gen_tac_for_exp(ast_exp.cond_exp)
 
+		# Unbox condition variable
+		cond_symbol_unboxed = gen_tac_for_unbox(cond_symbol_boxed, "Bool")
+
+		# Negate condition
+		not_cond_symbol_unboxed = new_symbol()
+		tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol_unboxed, cond_symbol_unboxed))
+
+		# Branch relies on UNBOXED values
 		# Branch to 'then' if condition is true
 		# Branch to 'else' if condition is not true
-		tac_list.append(TACBt(cond_symbol, then_label))
-		tac_list.append(TACBt(not_cond_symbol, else_label))
+		tac_list.append(TACBt(cond_symbol_unboxed, then_label))
+		tac_list.append(TACBt(not_cond_symbol_unboxed, else_label))
 
 		# 'then' exp
 		tac_list.append(TACComment("then branch"))
