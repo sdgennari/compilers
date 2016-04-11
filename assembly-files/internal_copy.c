@@ -22,3 +22,22 @@ int main() {
 	printf("%s %d\n", person_copy.name, person_copy.age);
 	return 0;
 }
+
+// struct {
+// 	int num;
+// } src_item, dest_item;
+
+// int main() {
+// 	src_item.num = 123;
+// 	dest_item.num = 0;
+
+// 	printf("%d\n", src_item.num);
+// 	printf("%d\n", dest_item.num);
+
+// 	memcpy(&dest_item, &src_item, sizeof(src_item));
+
+// 	printf("%d\n", src_item.num);
+// 	printf("%d\n", dest_item.num);	
+
+// 	return 0;
+// }

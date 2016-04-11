@@ -922,9 +922,33 @@ def gen_asm_for_internal_method(internal_name):
 	elif internal_name == "IO.in_string":
 		gen_asm_for_internal_in_string()
 
+	elif internal_name == "Object.copy":
+		gen_asm_for_internal_copy()
+
 	else:
 		# raise NotImplementedError(internal_name + " has not been implemented")
 		pass
+
+def gen_asm_for_internal_copy():
+	asm_instr_list.append(ASMComment("Make new obj to store result (same as doing SELF_TYPE..new)"))
+	# Get vtable ptr
+	asm_instr_list.append(ASMMovQ("16(%rbx)", "%rax"))
+	# Find constructor dynamically
+	asm_instr_list.append(ASMMovQ("8(%rax)", "%rax"))
+	# Call method
+	asm_instr_list.append(ASMCall("*%rax"))
+
+	# Setup and call memcpy
+	asm_instr_list.append(ASMComment("call memcpy to copy %rbx into %rax"))
+	asm_instr_list.append(ASMComment("use leaq to multiply the size by 8"))
+	asm_instr_list.append(ASMMovQ("8(%rbx)", "%rdx"))
+	asm_instr_list.append(ASMLeaQ("0(,%rdx,8)", "%rdx"))
+	asm_instr_list.append(ASMMovQ("%rbx", "%rsi"))
+	asm_instr_list.append(ASMMovQ("%rax", "%rdi"))
+	asm_instr_list.append(ASMCall("memcpy"))
+
+	# Result of memcpy in %rax
+	asm_instr_list.append(ASMComment("result of mempy in %rax, so good to return"))
 
 def gen_asm_for_internal_in_string():
 	global asm_instr_list
