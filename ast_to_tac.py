@@ -199,10 +199,11 @@ def gen_tac_for_exp(ast_exp):
 	elif isinstance(ast_exp, ASTExpBlock):
 		# ExpBlock: (self, line, exp_list)
 		for block_exp in ast_exp.exp_list:
-			last_assignee_symbol = gen_tac_for_exp(block_exp)
+			last_assignee_symbol, last_type_from_ast = gen_tac_for_exp(block_exp)
 
 		# Special return case for blocks (return assignee_symbol of last exp in block)
-		return last_assignee_symbol
+		# ---- TODO
+		return (last_assignee_symbol, last_type_from_ast)
 
 	elif isinstance(ast_exp, ASTExpNew):
 		# ExpNew: (self, line, type_line, exp_type)

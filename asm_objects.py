@@ -92,23 +92,27 @@ class ASMJmp(object):
 		self.label = label
 
 	def __str__(self):
-		return "\t\t\tjmp\t" + str(self.label) + "\n"
+		return "\t\t\tjmp\t\t" + str(self.label) + "\n"
 
 class ASMJmpL(ASMJmp):
 	def __str__(self):
-		return "\t\t\tjl\t" + str(self.label) + "\n"
+		return "\t\t\tjl\t\t" + str(self.label) + "\n"
 
 class ASMJmpLe(ASMJmp):
 	def __str__(self):
-		return "\t\t\tjle\t" + str(self.label) + "\n"
+		return "\t\t\tjle\t\t" + str(self.label) + "\n"
 
 class ASMJmpEq(ASMJmp):
 	def __str__(self):
-		return "\t\t\tje\t" + str(self.label) + "\n"
+		return "\t\t\tje\t\t" + str(self.label) + "\n"
 
 class ASMJmpNz(ASMJmp):
 	def __str__(self):
-		return "\t\t\tjnz\t" + str(self.label) + "\n"
+		return "\t\t\tjnz\t\t" + str(self.label) + "\n"
+
+class ASMJmpNe(ASMJmp):
+	def __str__(self):
+		return "\t\t\tjne\t\t" + str(self.label) + "\n"
 
 # push src
 class ASMPushQ(object):
@@ -134,10 +138,18 @@ class ASMLabel(object):
 	def __str__(self):
 		return str(self.label) + ":\n"
 
+class ASMCmpBase(ASMSrcDestBase):
+	pass
+
 # cmpl src, dest
-class ASMCmpL(ASMSrcDestBase):
+class ASMCmpL(ASMCmpBase):
 	def __str__(self):
 		return "\t\t\tcmpl\t" + str(self.src) + ", " + str(self.dest) + "\n"
+
+# cmpq src, dest
+class ASMCmpQ(ASMCmpBase):
+	def __str__(self):
+		return "\t\t\tcmpq\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
 # test reg1, reg2
 class ASMTest(ASMSrcDestBase):

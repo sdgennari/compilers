@@ -366,18 +366,35 @@ def gen_asm_for_tac_div(tac_div):
 	asm_instr_list.append(ASMAddQ("$8", "%rsp"))
 
 def gen_asm_for_tac_comp_l(tac_comp_l):
-	# op1_reg = get_asm_register(tac_comp_l.op1)
-	# op2_reg = get_asm_register(tac_comp_l.op2)
-	# dest = get_asm_register(tac_comp_l.assignee)
-	# label = next_asm_label()
+	# Get lhs_reg, rhs_reg, and dest
+	op1_reg = get_asm_register(tac_comp_l.op1, 64)
+	op2_reg = get_asm_register(tac_comp_l.op2, 64)
+	dest = get_asm_register(tac_comp_l.assignee, 64)
 
-	# asm_instr_list.append(ASMComment("comp LT"))
-	# asm_instr_list.append(ASMCmpL(op2_reg, op1_reg))
-	# asm_instr_list.append(ASMMovL("$1", dest))
-	# asm_instr_list.append(ASMJmpL(label))
-	# asm_instr_list.append(ASMMovL("$0", dest))
-	# asm_instr_list.append(ASMLabel(label))
-	raise NotImplementedError("Comp LT not yet implemented")
+	asm_instr_list.append(ASMComment("use lt_helper to compare " + op1_reg + " and " + op2_reg))
+
+	# Save all caller-saved regs
+	for reg in caller_saved_registers:
+		asm_instr_list.append(ASMPushQ(reg))
+
+	# Push lhs and rhs regs
+	asm_instr_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
+	asm_instr_list.append(ASMPushQ(op2_reg))
+	asm_instr_list.append(ASMPushQ(op1_reg))
+
+	# Call lt_helper
+	asm_instr_list.append(ASMCall("lt_helper"))
+
+	# Add 16 to stack to remove pushed lhs and rhs
+	asm_instr_list.append(ASMAddQ("$16", "%rsp"))
+
+	# Restore all caller-saved regs
+	for reg in reversed(caller_saved_registers):
+		asm_instr_list.append(ASMPopQ(reg))
+
+	# Move result into dest
+	asm_instr_list.append(ASMComment("move comparison result into " + dest))
+	asm_instr_list.append(ASMMovQ("%rax", dest))
 
 def gen_asm_for_tac_comp_le(tac_comp_le):
 	# op1_reg = get_asm_register(tac_comp_le.op1)
@@ -800,9 +817,7 @@ def gen_asm_for_internal_length():
 	str_val_src = "24("+SELF_REG+")"
 	asm_instr_list.append(ASMMovQ(str_val_src, "%rdi"))
 	asm_instr_list.append(ASMCall("strlen"))
-	asm_instr_list.append(ASMMovQ("%rax", "%r8"))
-
-	# Move 
+	asm_instr_list.append(ASMMovQ("%rax", "%r8")) 
 
 	# Make new Int box and put the result inside
 	# Note: r9 is arbitrary here
@@ -817,3 +832,153 @@ def gen_asm_for_internal_length():
 	# Pop all callee-saved regs
 	for reg in reversed(callee_saved_registers):
 		asm_instr_list.append(ASMPopQ(reg))
+
+# ========================================
+#  COMPARISON FUNCTIONS
+# ========================================
+
+# Returns a string representation of the asm for cmp lt
+# Note: This uses a string since the asm can be hard-coded
+def get_cmp_lt_helper_string():
+	global type_tag_map
+	tmp_instr_list = []
+
+	# Set regs for lhs and rhs
+	lhs_reg = "%r8"
+	rhs_reg = "%r9"
+	lhs_reg_32 = "%r8d"
+	rhs_reg_32 = "%r9d"
+	lhs_unbox_offset = "24("+lhs_reg+")"
+	rhs_unbox_offset = "24("+rhs_reg+")"
+
+	# Labels
+	true_label = "cmp_lt_true"
+	false_label = "cmp_lt_false"
+	int_label = "cmp_lt_int"
+	bool_label = "cmp_lt_bool"
+	string_label = "cmp_lt_string"
+	end_label = "cmp_lt_end"
+
+	# Set up stack
+	tmp_instr_list.append(ASMLabel("lt_helper"))
+	tmp_instr_list.append(ASMPushQ("%rbp"))
+	tmp_instr_list.append(ASMMovQ("%rsp", "%rbp"))
+
+	# Get ptrs from stack
+	tmp_instr_list.append(ASMComment("get lhs and rhs pointers from stack"))
+	lhs_offset_rbp = "16(%rbp)"
+	rhs_offset_rbp = "24(%rbp)"
+	tmp_instr_list.append(ASMComment("move lhs into " + lhs_reg))
+	tmp_instr_list.append(ASMMovQ(lhs_offset_rbp, lhs_reg))
+	tmp_instr_list.append(ASMComment("move rhs into " + rhs_reg))
+	tmp_instr_list.append(ASMMovQ(rhs_offset_rbp, rhs_reg))
+
+	# 1. Check if lhs_ptr = rhs_ptr
+	# Skip this b/c lt
+
+	# 2. Check if lhs_ptr = 0 || rhs_ptr = 0
+	tmp_instr_list.append(ASMComment("check for void pointers"))
+	tmp_instr_list.append(ASMCmpQ("$0", lhs_reg))
+	tmp_instr_list.append(ASMJmpEq(false_label))
+	tmp_instr_list.append(ASMCmpQ("$0", rhs_reg))
+	tmp_instr_list.append(ASMJmpEq(false_label))
+
+	# 3. Compare type tags
+	tmp_instr_list.append(ASMComment("move type tags into " + lhs_reg + " and " + rhs_reg))
+	lhs_type_tag_offset = "("+lhs_reg+")"
+	rhs_type_tag_offset = "("+rhs_reg+")"
+	tmp_instr_list.append(ASMMovQ(lhs_type_tag_offset, lhs_reg))
+	tmp_instr_list.append(ASMMovQ(rhs_type_tag_offset, rhs_reg))
+
+	# i. Check if different types
+	tmp_instr_list.append(ASMComment("check for different types"))
+	tmp_instr_list.append(ASMCmpQ(rhs_reg, lhs_reg))
+	tmp_instr_list.append(ASMJmpNe(false_label))
+
+	# ii. Check if type_tag = Int
+	int_type_tag = "$" + str(type_tag_map["Int"])
+	tmp_instr_list.append(ASMComment("check if lhs and rhs are Ints"))
+	tmp_instr_list.append(ASMCmpQ(int_type_tag, lhs_reg))
+	tmp_instr_list.append(ASMJmpEq(int_label))
+
+	# iii. Check if type_tag = Bool
+	bool_type_tag = "$" + str(type_tag_map["Bool"])
+	tmp_instr_list.append(ASMComment("check if lhs and rhs are Bools"))
+	tmp_instr_list.append(ASMCmpQ(bool_type_tag, lhs_reg))
+	tmp_instr_list.append(ASMJmpEq(bool_label))
+
+	# iv. Check if type_tag = String
+	string_type_tag = "$" + str(type_tag_map["String"])
+	tmp_instr_list.append(ASMComment("check if lhs and rhs are Strings"))
+	tmp_instr_list.append(ASMCmpQ(string_type_tag, lhs_reg))
+	tmp_instr_list.append(ASMJmpEq(string_label))
+
+	# v. Return false
+	tmp_instr_list.append(ASMJmp(false_label))
+	tmp_instr_list.append("\n")
+
+	# Make labels for Int and Bool
+	tmp_instr_list.append(ASMComment("compare Ints and Bools"))
+	tmp_instr_list.append(ASMLabel(bool_label))
+	tmp_instr_list.append(ASMLabel(int_label))
+	tmp_instr_list.append(ASMMovQ(lhs_offset_rbp, lhs_reg))
+	tmp_instr_list.append(ASMMovQ(rhs_offset_rbp, rhs_reg))
+	tmp_instr_list.append(ASMMovL(lhs_unbox_offset, lhs_reg_32))
+	tmp_instr_list.append(ASMMovL(rhs_unbox_offset, rhs_reg_32))
+	tmp_instr_list.append(ASMCmpL(rhs_reg_32, lhs_reg_32))
+	tmp_instr_list.append(ASMJmpL(true_label))
+	tmp_instr_list.append(ASMJmp(false_label))
+	tmp_instr_list.append("\n")
+
+	# Make label for String
+	tmp_instr_list.append(ASMComment("compare Strings"))
+	tmp_instr_list.append(ASMLabel(string_label))
+	tmp_instr_list.append(ASMMovQ(lhs_offset_rbp, lhs_reg))
+	tmp_instr_list.append(ASMMovQ(rhs_offset_rbp, rhs_reg))
+	tmp_instr_list.append(ASMMovQ(lhs_unbox_offset, "%rdi"))
+	tmp_instr_list.append(ASMMovQ(rhs_unbox_offset, "%rsi"))
+	tmp_instr_list.append(ASMCall("strcmp"))
+	tmp_instr_list.append(ASMCmpL("$0", "%eax"))
+	tmp_instr_list.append(ASMJmpL(true_label))
+	tmp_instr_list.append(ASMJmp(false_label))
+	tmp_instr_list.append("\n")
+
+	# Make true and false labels
+	tmp_instr_list.append(ASMComment("make new true object in %rax"))
+	tmp_instr_list.append(ASMLabel(true_label))
+	for reg in caller_saved_registers:
+		tmp_instr_list.append(ASMPushQ(reg))
+
+	tmp_instr_list.append(ASMCall("Bool..new"))
+
+	for reg in reversed(caller_saved_registers):
+		tmp_instr_list.append(ASMPopQ(reg))
+
+	tmp_instr_list.append(ASMMovQ("$1", "24(%rax)"))
+	tmp_instr_list.append(ASMJmp(end_label))
+	tmp_instr_list.append(("\n"))
+
+	tmp_instr_list.append(ASMComment("make new false object in %rax"))
+	tmp_instr_list.append(ASMLabel(false_label))
+	for reg in caller_saved_registers:
+		tmp_instr_list.append(ASMPushQ(reg))
+
+	tmp_instr_list.append(ASMCall("Bool..new"))
+
+	for reg in reversed(caller_saved_registers):
+		tmp_instr_list.append(ASMPopQ(reg))
+
+	tmp_instr_list.append(ASMJmp(end_label))
+	tmp_instr_list.append(("\n"))
+
+	# Restore stack
+	tmp_instr_list.append(ASMLabel(end_label))
+	tmp_instr_list.append(ASMLeave())
+	tmp_instr_list.append(ASMRet())
+
+	# Make result string
+	result = ""
+	for asm_instr in tmp_instr_list:
+		result += str(asm_instr)
+
+	return result

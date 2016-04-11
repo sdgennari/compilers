@@ -470,6 +470,8 @@ if __name__ == "__main__":
 	# Note: This must be called AFTER asm for all expressions has been generated
 	print get_constants_string()
 
+	print get_cmp_lt_helper_string()
+
 	'''
 	old_file_ext_len = len("cl-type")
 	offset_from_end = -1 * old_file_ext_len

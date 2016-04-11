@@ -34,3 +34,16 @@
 - ~~false~~
 - ~~let_binding_no_init~~
 - ~~let_binding_init~~
+
+### Internals
+
+- IO.in_int
+- IO.in_string
+- IO.out_int
+- IO.out_string
+- Object.abort
+- Object.copy
+- Object.type_name
+- String.concat
+- String.length
+- String.substr
