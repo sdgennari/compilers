@@ -164,13 +164,15 @@ def gen_tac_for_exp(ast_exp):
 		tac_list.append(TACLabel(start_label))
 
 		# Get condition and negate it
-		cond_symbol, cond_type_from_ast = gen_tac_for_exp(ast_exp.cond_exp)
-		not_cond_symbol = new_symbol()
-		tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol, cond_symbol))
+		cond_symbol_boxed, cond_type_from_ast = gen_tac_for_exp(ast_exp.cond_exp)
+		cond_symbol_unboxed = gen_tac_for_unbox(cond_symbol_boxed, "Bool")
+		not_cond_symbol_unboxed = new_symbol()
+		tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol_unboxed, cond_symbol_unboxed))
 
+		# Branch relies on UNBOXED values
 		# Branch to exit loop if condition is not true
-		tac_list.append(TACBt(cond_symbol, body_label))
-		tac_list.append(TACBt(not_cond_symbol, exit_label))
+		tac_list.append(TACBt(cond_symbol_unboxed, body_label))
+		tac_list.append(TACBt(not_cond_symbol_unboxed, exit_label))
 
 		# Add loop body label
 		tac_list.append(TACComment("loop body"))

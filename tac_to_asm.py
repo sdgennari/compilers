@@ -690,6 +690,22 @@ def gen_asm_for_tac_load_param(tac_load_param):
 	asm_instr_list.append(ASMComment("loading param [" + str(tac_load_param.param_idx) + "] into " + dest))
 	asm_instr_list.append(ASMMovQ(rbp_offset, dest))
 
+def gen_asm_for_tac_is_void(tac_instr):
+	op1_reg = get_asm_register(tac_instr.op1, 64)
+	dest = get_asm_register(tac_instr.assignee, 64)
+	false_label = next_asm_label()
+
+	# Make a new Bool to hold the result
+	gen_asm_for_new_boxed_type("Bool", dest)
+
+	# Compare op1_reg to $0 to see if it is void
+	asm_instr_list.append(ASMComment("check if " + op1_reg + " is void and set result accordingly"))
+	asm_instr_list.append(ASMCmpQ("$0", op1_reg))
+	asm_instr_list.append(ASMJmpNz(false_label))
+	dest_reg_offset = "24(" + dest + ")"
+	asm_instr_list.append(ASMMovQ("$1", dest_reg_offset))
+	asm_instr_list.append(ASMLabel(false_label))
+
 def gen_asm_for_tac_instr(tac_instr):
 	# Skip instructions whose assignees do not have colors
 	# This will only skip instructions that are never live (dead code)
@@ -780,6 +796,9 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	elif isinstance(tac_instr, TACStoreAttr):
 		gen_asm_for_tac_store_attr(tac_instr)
+
+	elif isinstance(tac_instr, TACIsVoid):
+		gen_asm_for_tac_is_void(tac_instr)
 
 	# ========================================
 	# 				DISPATCH

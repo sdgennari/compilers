@@ -504,8 +504,6 @@ if __name__ == "__main__":
 
 	result += get_helper_strings()
 
-	# sys.exit(1)
-
 	old_file_ext_len = len("cl-type")
 	offset_from_end = -1 * old_file_ext_len
 	output_filename = input_filename[0:offset_from_end] + "s"

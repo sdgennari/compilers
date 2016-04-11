@@ -1,4 +1,4 @@
-Start Time:   Mon Apr 11 04:56:12 2016
+Start Time:   Mon Apr 11 05:27:18 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -36,9 +36,7 @@ t6: book-list-static-dynamic-dispatch     (your compiler outputs to stdout/stder
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
 t7: bool-assigned-in-let                       FAILED (empty compiled-program output)
-t8: bool-comparison                       (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t8: bool-comparison                              ok  
 t9: calls-with-same-formal-name                  ok  
 t10: case-order                           (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
@@ -81,9 +79,7 @@ t29: lambda-term-cool-code-generator      (your compiler outputs to stdout/stder
 t30: lambda-term-evaluation-simulation    (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
-t31: let-nested                           (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t31: let-nested                                  ok  
 t32: mainio                                      ok  
 t33: newbasic                                  FAILED (empty compiled-program output)
 t34: new                                         ok  
@@ -95,26 +91,16 @@ t37: new-self-type                             FAILED
 t38: nonvoid-comparison                   (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
-t39: not                                  (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
-t40: numcalls                             (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
-t41: old                                  (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t39: not                                         ok  
+t40: numcalls                                    ok  
+t41: old                                       FAILED
 t42: one-nested-exp-with-789-arith-ops    (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
 t43: override-builtin-method              (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
-t44: primes                               (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
-t45: receiver-class-hard-to-determine     (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t44: primes                                    FAILED
+t45: receiver-class-hard-to-determine          FAILED (empty compiled-program output)
 t46: scoping                                   FAILED
 t47: shadow-attr-case                     (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
@@ -132,25 +118,17 @@ t53: shadow-let-case                      (your compiler outputs to stdout/stder
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
 t54: shadow-let-let                              ok  
-t55: stack-overflow-not                   (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
-t56: string-comparison                    (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t55: stack-overflow-not                          ok  
+t56: string-comparison                           ok  
 t57: string-internals                            ok  
 t58: substring-ok                              FAILED (empty compiled-program output)
 t59: typename                             (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
-t60: void-comparison                      (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t60: void-comparison                           FAILED
 t61: amh4bm.zip-copy                           FAILED (empty compiled-program output)
 t62: amh4bm.zip-in_int                         FAILED
-t63: aml3sc.zip-copy                      (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t63: aml3sc.zip-copy                           FAILED (empty compiled-program output)
 t64: as3kc.zip-test104                    (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
@@ -167,13 +145,9 @@ t68: jch3xf.zip-b                         (your compiler outputs to stdout/stder
 t69: jhl4qf.zip-minus                     (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
-t70: ktt3ja.zip-arithmetic                (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t70: ktt3ja.zip-arithmetic                       ok  
 t71: mfm4eb.zip-good10                         FAILED (empty compiled-program output)
-t72: mfm4eb.zip-good9                     (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t72: mfm4eb.zip-good9                          FAILED (empty compiled-program output)
 t73: mgr3yp.zip-test_self                 (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
@@ -186,9 +160,7 @@ t75: rab9nn.zip-deep_copy_vs_shallow_copy  (your compiler outputs to stdout/stde
 t76: rbk2kb.zip-clone_attribute_changes   (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
-t77: rbk2kb.zip-comparison_edge_cases_objects  (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t77: rbk2kb.zip-comparison_edge_cases_objects         ok  
 
 
 Negative Test Cases
@@ -199,9 +171,7 @@ t1: case-none                             (your compiler outputs to stdout/stder
 t2: case-on-void                          (your compiler outputs to stdout/stderr: should be none)
  (no .cl-asm or .s file produced)
       FAILED (empty output)
-t3: dispatch-void-dynamic                 (your compiler outputs to stdout/stderr: should be none)
- (no .cl-asm or .s file produced)
-      FAILED (empty output)
+t3: dispatch-void-dynamic                      FAILED (empty output)
 t4: dispatch-void-static                       FAILED
 t5: div-by-zero                                FAILED (empty output)
 t6: substring-bad                              FAILED (empty output)
@@ -211,4 +181,4 @@ t7: mjk6zt.zip-bug_maker                  (your compiler outputs to stdout/stder
 t8: mjk6zt.zip-shallow_copy               (your compiler outputs to stdout/stderr: should be none)
  (no .cl-asm or .s file produced)
       FAILED (empty output)
-End Time: Mon Apr 11 04:57:20 2016
+End Time: Mon Apr 11 05:32:00 2016

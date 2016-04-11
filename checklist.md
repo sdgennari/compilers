@@ -6,10 +6,10 @@
 
 ### Expressions
 
-- if
-- while
-- isvoid
 - case
+- ~~while~~
+- ~~isvoid~~
+- ~~if~~
 - ~~lt~~
 - ~~le~~
 - ~~eq~~

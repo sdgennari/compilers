@@ -22,7 +22,7 @@ do
 	python main.py $type_file
 
 	# gcc the assembly file
-	gcc $asm_file
+	gcc -g $asm_file
 
 	echo "Cool:"
 	cool $input_file
