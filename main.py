@@ -426,8 +426,9 @@ def get_helper_strings():
 	result += "\n"
 	result += get_cmp_le_helper_string()
 	result += "\n"
+	result += get_cmp_eq_helper_string()
+	result += "\n"
 
-	# TODO cmp_eq
 	return result
 
 # ========================================
