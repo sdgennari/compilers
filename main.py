@@ -89,7 +89,11 @@ def gen_const_strings():
 		label = const_string_label_map[string]
 		result += ".globl " + label + "\n"
 		result += label + ":\n"
-		result += "\t\t\t.asciz \"" + string + "\"\n"
+
+		# Format string since \\ in assembly becomes a single \
+		formatted_string = string.replace("\\", "\\\\")
+
+		result += "\t\t\t.asciz \"" + formatted_string + "\"\n"
 		result += "\n"
 	return result
 
@@ -457,9 +461,11 @@ if __name__ == "__main__":
 	make_global_type_tag_map()
 	make_global_attr_offset_map()
 
-	print get_vtables_string()
-	print get_constructor_string()
-	print get_methods_string()
+	result = ""
+
+	result += get_vtables_string()
+	result += get_constructor_string()
+	result += get_methods_string()
 
 	'''
 	# gen_tac_for_ast(prog_ast_root)
@@ -491,19 +497,20 @@ if __name__ == "__main__":
 	# gen_asm_for_block_list(block_list, register_colors, spilled_registers)
 	'''
 
-	print get_program_start_string()
+	result += get_program_start_string()
 
 	# # Note: This must be called AFTER asm for all expressions has been generated
-	print get_constants_string()
+	result += get_constants_string()
 
-	print get_helper_strings()
+	result += get_helper_strings()
 
-	'''
 	old_file_ext_len = len("cl-type")
 	offset_from_end = -1 * old_file_ext_len
 	output_filename = input_filename[0:offset_from_end] + "s"
 	output_file = open(output_filename, 'w')
+	output_file.write(result)
 
+	'''
 	output_file.write("\t.section\t.rodata\n")
 	output_file.write(".int_fmt_string:\n\t.string \"%d\"\n")
 	output_file.write("\t.text\n")

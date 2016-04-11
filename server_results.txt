@@ -1,0 +1,214 @@
+Start Time:   Mon Apr 11 01:50:50 2016
+Your UVA ID:  sdg6vt
+
+ZIP file: exists ...
+ZIP file: extracting ...
+Archive:  ../sdg6vt.zip
+  inflating: allocate_registers.py   
+  inflating: asm_objects.py          
+  inflating: ast_nodes.py            
+  inflating: ast_to_tac.py           
+  inflating: basic_blocks.py         
+  inflating: deserialize_ast.py      
+  inflating: main.py                 
+  inflating: shared_vars.py          
+  inflating: tac_objects.py          
+  inflating: tac_to_asm.py           
+ extracting: team.txt                
+ZIP file: done ...
+Checking for main.{py,rb,ml,js,hs} ...
+main.py: found
+Run command: python main.py
+
+
+Positive Test Cases
+
+t1: abort                                      FAILED (empty compiled-program output)
+t2: alias                                 (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t3: assignments                                  ok  
+t4: bigexpr                                    FAILED
+t5: big-prog-with-many-exprs              (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t6: book-list-static-dynamic-dispatch     (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t7: bool-assigned-in-let                       FAILED (empty compiled-program output)
+t8: bool-comparison                       (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t9: calls-with-same-formal-name                FAILED
+t10: case-order                           (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t11: copy-self-dispatch                        FAILED (empty compiled-program output)
+t12: copy-self-init                       (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t13: dispatch-override-dynamic                 FAILED (empty compiled-program output)
+t14: dispatch-override-static                  FAILED
+t15: eval-order-args                      (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t16: eval-order-arith                          FAILED
+t17: eval-order-self                      (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t18: hairyscary                           (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t19: hello                                     FAILED (empty compiled-program output)
+t20: huge-case-in-big-loop                (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t21: in-int-32bit                              FAILED
+t22: in-int                                    FAILED
+t23: in-int-garbage                            FAILED
+t24: init-order-self                      (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t25: init-order-super                     (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t26: in-string                                 FAILED (empty compiled-program output)
+t27: in-string-garbage                         FAILED (empty compiled-program output)
+t28: in-string-huge                            FAILED (empty compiled-program output)
+t29: lambda-term-cool-code-generator      (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t30: lambda-term-evaluation-simulation    (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t31: let-nested                           (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t32: mainio                                    FAILED (empty compiled-program output)
+t33: newbasic                                  FAILED (empty compiled-program output)
+t34: new                                       FAILED (empty compiled-program output)
+t35: new-self-dispatch                         FAILED
+t36: new-self-init                        (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t37: new-self-type                             FAILED
+t38: nonvoid-comparison                   (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t39: not                                  (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t40: numcalls                             (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t41: old                                  (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t42: one-nested-exp-with-789-arith-ops    (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t43: override-builtin-method              (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t44: primes                               (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t45: receiver-class-hard-to-determine     (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t46: scoping                                   FAILED (empty compiled-program output)
+t47: shadow-attr-case                     (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t48: shadow-attr-formal                        FAILED (empty compiled-program output)
+t49: shadow-attr-let                           FAILED (empty compiled-program output)
+t50: shadow-case-let                      (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t51: shadow-formal-case                   (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t52: shadow-formal-let                         FAILED (empty compiled-program output)
+t53: shadow-let-case                      (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t54: shadow-let-let                            FAILED (empty compiled-program output)
+t55: stack-overflow-not                   (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t56: string-comparison                    (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t57: string-internals                          FAILED (empty compiled-program output)
+t58: substring-ok                              FAILED (empty compiled-program output)
+t59: typename                             (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t60: void-comparison                      (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t61: amh4bm.zip-copy                           FAILED (empty compiled-program output)
+t62: amh4bm.zip-in_int                         FAILED
+t63: aml3sc.zip-copy                      (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t64: as3kc.zip-test104                    (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t65: atc8kq.zip-shallowCopy               (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t66: cyh4mw.zip-bound_variables2               FAILED
+t67: jch3xf.zip-a                         (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t68: jch3xf.zip-b                         (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t69: jhl4qf.zip-minus                     (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t70: ktt3ja.zip-arithmetic                (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t71: mfm4eb.zip-good10                         FAILED (empty compiled-program output)
+t72: mfm4eb.zip-good9                     (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t73: mgr3yp.zip-test_self                 (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t74: mjp2ff.zip-shallow_copy_self_good    (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t75: rab9nn.zip-deep_copy_vs_shallow_copy  (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t76: rbk2kb.zip-clone_attribute_changes   (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+t77: rbk2kb.zip-comparison_edge_cases_objects  (your compiler outputs to stdout/stderr: should be none)
+ (no non-empty .cl-asm or .s file produced)
+      FAILED (empty compiled-program output)
+
+
+Negative Test Cases
+
+t1: case-none                             (your compiler outputs to stdout/stderr: should be none)
+ (no .cl-asm or .s file produced)
+      FAILED (empty output)
+t2: case-on-void                          (your compiler outputs to stdout/stderr: should be none)
+ (no .cl-asm or .s file produced)
+      FAILED (empty output)
+t3: dispatch-void-dynamic                 (your compiler outputs to stdout/stderr: should be none)
+ (no .cl-asm or .s file produced)
+      FAILED (empty output)
+t4: dispatch-void-static                       FAILED
+t5: div-by-zero                                FAILED (empty output)
+t6: substring-bad                              FAILED (empty output)
+t7: mjk6zt.zip-bug_maker                  (your compiler outputs to stdout/stderr: should be none)
+ (no .cl-asm or .s file produced)
+      FAILED (empty output)
+t8: mjk6zt.zip-shallow_copy               (your compiler outputs to stdout/stderr: should be none)
+ (no .cl-asm or .s file produced)
+      FAILED (empty output)
+End Time: Mon Apr 11 01:51:57 2016

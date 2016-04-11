@@ -1,6 +1,7 @@
 from tac_objects import *
 from asm_objects import *
 from shared_vars import *
+import sys
 
 # Initialize global vars
 # asm_instr_list = []
@@ -848,9 +849,72 @@ def gen_asm_for_internal_method(internal_name):
 	elif internal_name == "IO.out_int":
 		gen_asm_for_internal_out_int()
 
+	elif internal_name == "IO.out_string":
+		gen_asm_for_internal_out_string()
+
 	else:
 		# raise NotImplementedError(internal_name + " has not been implemented")
 		pass
+
+def gen_asm_for_internal_out_string():
+	global asm_instr_list
+
+	# Unbox string to get raw value
+	# Note: string value must be in specific reg (%r8) for raw assembly to work
+	asm_instr_list.append(ASMComment("loading param [0] into %rax"))
+	asm_instr_list.append(ASMMovQ("16(%rbp)", "%rax"))
+	asm_instr_list.append(ASMComment("unboxing param [0] (in %rax) into %r8"))
+	asm_instr_list.append(ASMMovQ("24(%rax)", "%r8"))
+
+	# Add generated assembly
+	custom_asm = ASMCustomString(
+			"\t\t\t## Start method body\n" +
+			"\t\t\tsubq	$16, %rsp\n" +
+			"\t\t\tmovq	%r8, -8(%rbp)\n" +
+			"\t\t\tmovl	$0, -12(%rbp)\n" +
+			"\t\t\tjmp	.L2\n" +
+			".L5:\n" +
+			"\t\t\tcmpb	$92, -14(%rbp)\n" +
+			"\t\t\tjne	.L3\n" +
+			"\t\t\tmovl	-12(%rbp), %eax\n" +
+			"\t\t\tcltq\n" +
+			"\t\t\tleaq	1(%rax), %rdx\n" +
+			"\t\t\tmovq	-8(%rbp), %rax\n" +
+			"\t\t\taddq	%rdx, %rax\n" +
+			"\t\t\tmovzbl	(%rax), %eax\n" +
+			"\t\t\tmovb	%al, -13(%rbp)\n" +
+			"\t\t\tcmpb	$110, -13(%rbp)\n" +
+			"\t\t\tjne	.L4\n" +
+			"\t\t\tmovb	$10, -14(%rbp)\n" +
+			"\t\t\taddl	$1, -12(%rbp)\n" +
+			"\t\t\tjmp	.L3\n" +
+			".L4:\n" +
+			"\t\t\tcmpb	$116, -13(%rbp)\n" +
+			"\t\t\tjne	.L3\n" +
+			"\t\t\tmovb	$9, -14(%rbp)\n" +
+			"\t\t\taddl	$1, -12(%rbp)\n" +
+			".L3:\n" +
+			"\t\t\tmovsbl	-14(%rbp), %eax\n" +
+			"\t\t\tmovl	%eax, %edi\n" +
+			"\t\t\tcall	putchar\n" +
+			"\t\t\taddl	$1, -12(%rbp)\n" +
+			".L2:\n" +
+			"\t\t\tmovl	-12(%rbp), %eax\n" +
+			"\t\t\tmovslq	%eax, %rdx\n" +
+			"\t\t\tmovq	-8(%rbp), %rax\n" +
+			"\t\t\taddq	%rdx, %rax\n" +
+			"\t\t\tmovzbl	(%rax), %eax\n" +
+			"\t\t\tmovb	%al, -14(%rbp)\n" +
+			"\t\t\tcmpb	$0, -14(%rbp)\n" +
+			"\t\t\tjne	.L5\n" +
+			"\t\t\t## Fix the stack pointer\n" +
+			"\t\t\taddq	$16, %rsp\n"
+		)
+	asm_instr_list.append(custom_asm)
+
+	# Move self ptr into %rax for return value
+	asm_instr_list.append(ASMComment("move self ptr into %rax for return"))
+	asm_instr_list.append(ASMMovQ(SELF_REG, "%rax"))
 
 def gen_asm_for_internal_out_int():
 	global asm_instr_list

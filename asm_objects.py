@@ -213,6 +213,15 @@ class ASMComment(object):
 	def __str__(self):
 		return "\t\t\t## " + str(self.comment) + "\n"
 
+# raw assembly to be output in the file
+# Note: The assembly must be formatted by in the custom_string itself
+class ASMCustomString(object):
+	def __init__(self, custom_string):
+		self.custom_string = custom_string
+
+	def __str__(self):
+		return self.custom_string + "\n"
+
 
 if __name__ == "__main__":
 	asm_instr_list = []

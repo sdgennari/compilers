@@ -418,172 +418,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r12
-			movq	$0, 24(%r12)
-			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r13
-			movq	$0, 24(%r13)
-			## default Bool
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Bool..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r11
-			movq	$0, 24(%r11)
-			## new const Int: 111
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$111, 24(%r8)
-			## assign
-			movq	%r8, %r9
-			## new const Int: 222
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$222, 24(%r8)
-			## assign
-			movq	%r8, %r12
-			## new const Int: 333
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$333, 24(%r8)
-			## assign
-			movq	%r8, %r13
-			## assign
-			movq	%r12, %r8
-			## assign
-			movq	%r13, %r9
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
-			## plus
-			movl	%r10d, %r8d
-			addl	%r14d, %r8d
-			## box value of %r8 into %r10
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
 			movq	%rax, %r10
-			movq	%r8, 24(%r10)
-			## assign
-			movq	%r10, %r9
-			## assign
-			movq	%r12, %r10
-			## assign
-			movq	%r13, %r9
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
-			## minus
-			movl	%r8d, %r9d
-			subl	%r10d, %r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
+			movq	$0, 24(%r10)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -592,8 +428,21 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 0 params to the stack
+			subq	$0, %rsp
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method in_int in vtable[5]
+			movq	40(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 0 params from stack with subq
+			addq	$0, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -602,46 +451,79 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
+			## removing 0 stored params from stack (2nd time)
+			addq	$0, %rsp
+			## storing method result in %r8
 			movq	%rax, %r8
-			movq	%r9, 24(%r8)
 			## assign
 			movq	%r8, %r9
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 0 params to the stack
+			subq	$0, %rsp
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method in_int in vtable[5]
+			movq	40(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 0 params from stack with subq
+			addq	$0, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 0 stored params from stack (2nd time)
+			addq	$0, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r12, %r9
+			movq	%r8, %r10
 			## assign
-			movq	%r13, %r8
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
-			## divide
+			movq	%r9, %r8
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
 			subq	$8, %rsp
-			pushq	%rdx
-			pushq	%rax
-			pushq	%rcx
-			movl	%r9d, 24(%rsp)
-			movl	%r10d, %eax
-			cltd
-			movl	24(%rsp), %ecx
-			idivl	%ecx
-			movl	%eax, 28(%rsp)
-			popq	%rcx
-			popq	%rax
-			popq	%rdx
-			movl	4(%rsp), %r14d
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_int in vtable[7]
+			movq	56(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
 			addq	$8, %rsp
-			## box value of %r14 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
+			## restore self ptr (%rbx)
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -650,111 +532,56 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
 			movq	%rax, %r8
-			movq	%r14, 24(%r8)
+			## assign
+			movq	%r10, %r8
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_int in vtable[7]
+			movq	56(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
 			movq	%r8, %r9
-			## assign
-			movq	%r12, %r8
-			## assign
-			movq	%r13, %r9
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
-			## mult
-			movl	%r10d, %r9d
-			imull	%r8d, %r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
-			## assign
-			movq	%r8, %r9
-			## assign
-			movq	%r9, %r10
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
-			## negate
-			movl	%r8d, %r9d
-			negl	%r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
-			## assign
-			movq	%r8, %r9
-			## assign
-			movq	%r11, %r9
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
-			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Bool..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
-			## assign
-			movq	%r8, %r11
-			## assign
-			movq	%r11, %r8
 			## return
-			movq	%r8, %rax
+			movq	%r9, %rax
 			leave
 			ret
 
