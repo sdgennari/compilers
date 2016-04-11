@@ -1,0 +1,51 @@
+"\t\t\tsubq	$32, %rsp\n" +
+"\t\t\tmovl	$20, -16(%rbp)\n" +
+"\t\t\tmovl	$0, -12(%rbp)\n" +
+"\t\t\tmovl	-16(%rbp), %eax\n" +
+"\t\t\tcltq\n" +
+"\t\t\tmovq	%rax, %rdi\n" +
+"\t\t\tcall	malloc\n" +
+"\t\t\tmovq	%rax, -8(%rbp)\n" +
+".in_string_L5:\n" +
+"\t\t\tcall	getchar\n" +
+"\t\t\tmovb	%al, -17(%rbp)\n" +
+"\t\t\tcmpb	$10, -17(%rbp)\n" +
+"\t\t\tje	.in_string_L2\n" +
+"\t\t\tcmpb	$-1, -17(%rbp)\n" +
+"\t\t\tje	.in_string_L2\n" +
+"\t\t\tmovl	-12(%rbp), %eax\n" +
+"\t\t\tmovslq	%eax, %rdx\n" +
+"\t\t\tmovq	-8(%rbp), %rax\n" +
+"\t\t\taddq	%rax, %rdx\n" +
+"\t\t\tmovzbl	-17(%rbp), %eax\n" +
+"\t\t\tmovb	%al, (%rdx)\n" +
+"\t\t\taddl	$1, -12(%rbp)\n" +
+"\t\t\tcmpb	$0, -17(%rbp)\n" +
+"\t\t\tjne	.in_string_L3\n" +
+"\t\t\tmovl	$0, -12(%rbp)\n" +
+"\t\t\tjmp	.in_string_L2\n" +
+".in_string_L3:\n" +
+"\t\t\tmovl	-12(%rbp), %eax\n" +
+"\t\t\tcmpl	-16(%rbp), %eax\n" +
+"\t\t\tjne	.in_string_L4\n" +
+"\t\t\taddl	$20, -16(%rbp)\n" +
+"\t\t\tmovl	-16(%rbp), %eax\n" +
+"\t\t\tmovslq	%eax, %rdx\n" +
+"\t\t\tmovq	-8(%rbp), %rax\n" +
+"\t\t\tmovq	%rdx, %rsi\n" +
+"\t\t\tmovq	%rax, %rdi\n" +
+"\t\t\tcall	realloc\n" +
+"\t\t\tmovq	%rax, -8(%rbp)\n" +
+"\t\t\tjmp	.in_string_L5\n" +
+".in_string_L4:\n" +
+"\t\t\tjmp	.in_string_L5\n" +
+".in_string_L2:\n" +
+"\t\t\tmovl	-12(%rbp), %eax\n" +
+"\t\t\tmovslq	%eax, %rdx\n" +
+"\t\t\tmovq	-8(%rbp), %rax\n" +
+"\t\t\tmovq	%rdx, %rsi\n" +
+"\t\t\tmovq	%rax, %rdi\n" +
+"\t\t\tcall	strndup\n" +
+"\t\t\tmovq	%rax, -8(%rbp)\n" +
+"\t\t\t## reset rsp\n" +
+"\t\t\taddq 	$32, %rsp\n" +

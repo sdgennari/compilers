@@ -852,9 +852,85 @@ def gen_asm_for_internal_method(internal_name):
 	elif internal_name == "IO.out_string":
 		gen_asm_for_internal_out_string()
 
+	elif internal_name == "IO.in_string":
+		gen_asm_for_internal_in_string()
+
 	else:
 		# raise NotImplementedError(internal_name + " has not been implemented")
 		pass
+
+def gen_asm_for_internal_in_string():
+	global asm_instr_list
+
+	asm_instr_list.append(ASMComment("use generated code to get string"))
+
+	custom_asm = ASMCustomString(
+		"\t\t\tsubq	$32, %rsp\n" +
+		"\t\t\tmovl	$20, -16(%rbp)\n" +
+		"\t\t\tmovl	$0, -12(%rbp)\n" +
+		"\t\t\tmovl	-16(%rbp), %eax\n" +
+		"\t\t\tcltq\n" +
+		"\t\t\tmovq	%rax, %rdi\n" +
+		"\t\t\tcall	malloc\n" +
+		"\t\t\tmovq	%rax, -8(%rbp)\n" +
+		".in_string_L5:\n" +
+		"\t\t\tcall	getchar\n" +
+		"\t\t\tmovb	%al, -17(%rbp)\n" +
+		"\t\t\tcmpb	$10, -17(%rbp)\n" +
+		"\t\t\tje	.in_string_L2\n" +
+		"\t\t\tcmpb	$-1, -17(%rbp)\n" +
+		"\t\t\tje	.in_string_L2\n" +
+		"\t\t\tmovl	-12(%rbp), %eax\n" +
+		"\t\t\tmovslq	%eax, %rdx\n" +
+		"\t\t\tmovq	-8(%rbp), %rax\n" +
+		"\t\t\taddq	%rax, %rdx\n" +
+		"\t\t\tmovzbl	-17(%rbp), %eax\n" +
+		"\t\t\tmovb	%al, (%rdx)\n" +
+		"\t\t\taddl	$1, -12(%rbp)\n" +
+		"\t\t\tcmpb	$0, -17(%rbp)\n" +
+		"\t\t\tjne	.in_string_L3\n" +
+		"\t\t\tmovl	$0, -12(%rbp)\n" +
+		"\t\t\tjmp	.in_string_L2\n" +
+		".in_string_L3:\n" +
+		"\t\t\tmovl	-12(%rbp), %eax\n" +
+		"\t\t\tcmpl	-16(%rbp), %eax\n" +
+		"\t\t\tjne	.in_string_L4\n" +
+		"\t\t\taddl	$20, -16(%rbp)\n" +
+		"\t\t\tmovl	-16(%rbp), %eax\n" +
+		"\t\t\tmovslq	%eax, %rdx\n" +
+		"\t\t\tmovq	-8(%rbp), %rax\n" +
+		"\t\t\tmovq	%rdx, %rsi\n" +
+		"\t\t\tmovq	%rax, %rdi\n" +
+		"\t\t\tcall	realloc\n" +
+		"\t\t\tmovq	%rax, -8(%rbp)\n" +
+		"\t\t\tjmp	.in_string_L5\n" +
+		".in_string_L4:\n" +
+		"\t\t\tjmp	.in_string_L5\n" +
+		".in_string_L2:\n" +
+		"\t\t\tmovl	-12(%rbp), %eax\n" +
+		"\t\t\tmovslq	%eax, %rdx\n" +
+		"\t\t\tmovq	-8(%rbp), %rax\n" +
+		"\t\t\tmovq	%rdx, %rsi\n" +
+		"\t\t\tmovq	%rax, %rdi\n" +
+		"\t\t\tcall	strndup\n" +
+		"\t\t\tmovq	%rax, -8(%rbp)\n" #+
+		# "\t\t\t## reset rsp\n" +
+		# "\t\t\taddq 	$32, %rsp\n"
+		)
+	asm_instr_list.append(custom_asm)
+	# Note: the string is now at -8(%rbp)
+	asm_instr_list.append(ASMComment("result is now stored at -8(%rbp)"))
+
+	# Create a new boxed string
+	asm_instr_list.append(ASMComment("make new box in %rax to hold the str val"))
+	gen_asm_for_new_boxed_type("String", "%rax")
+
+	# Move the value of the string into the box
+	asm_instr_list.append(ASMComment("use %r8 to move value of str into box"))
+	asm_instr_list.append(ASMPushQ("%r8"))
+	asm_instr_list.append(ASMMovQ("-8(%rbp)", "%r8"))
+	asm_instr_list.append(ASMMovQ("%r8", "24(%rax)"))
+	asm_instr_list.append(ASMPopQ("%r8"))
 
 def gen_asm_for_internal_out_string():
 	global asm_instr_list
@@ -906,9 +982,9 @@ def gen_asm_for_internal_out_string():
 			"\t\t\tmovzbl	(%rax), %eax\n" +
 			"\t\t\tmovb	%al, -14(%rbp)\n" +
 			"\t\t\tcmpb	$0, -14(%rbp)\n" +
-			"\t\t\tjne	.L5\n" +
-			"\t\t\t## Fix the stack pointer\n" +
-			"\t\t\taddq	$16, %rsp\n"
+			"\t\t\tjne	.L5\n" #+
+			# "\t\t\t## Fix the stack pointer\n" +
+			# "\t\t\taddq	$16, %rsp\n"
 		)
 	asm_instr_list.append(custom_asm)
 

@@ -1,0 +1,1 @@
+print "this is a string with " + '\0' + "a null char"
