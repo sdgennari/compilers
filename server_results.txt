@@ -1,4 +1,4 @@
-Start Time:   Mon Apr 11 12:23:31 2016
+Start Time:   Mon Apr 11 13:37:42 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -106,13 +106,13 @@ t57: string-internals                            ok
 t58: substring-ok                              FAILED (empty compiled-program output)
 t59: typename                                  FAILED (empty compiled-program output)
 t60: void-comparison                           FAILED
-t61: amh4bm.zip-copy                           FAILED (empty compiled-program output)
+t61: amh4bm.zip-copy                             ok  
 t62: amh4bm.zip-in_int                         FAILED
-t63: aml3sc.zip-copy                           FAILED (empty compiled-program output)
+t63: aml3sc.zip-copy                             ok  
 t64: as3kc.zip-test104                    (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
-t65: atc8kq.zip-shallowCopy                    FAILED (empty compiled-program output)
+t65: atc8kq.zip-shallowCopy                      ok  
 t66: cyh4mw.zip-bound_variables2               FAILED
 t67: jch3xf.zip-a                              FAILED (empty compiled-program output)
 t68: jch3xf.zip-b                              FAILED (empty compiled-program output)
@@ -120,12 +120,12 @@ t69: jhl4qf.zip-minus                     (your compiler outputs to stdout/stder
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
 t70: ktt3ja.zip-arithmetic                       ok  
-t71: mfm4eb.zip-good10                         FAILED (empty compiled-program output)
+t71: mfm4eb.zip-good10                           ok  
 t72: mfm4eb.zip-good9                          FAILED (empty compiled-program output)
-t73: mgr3yp.zip-test_self                      FAILED (empty compiled-program output)
+t73: mgr3yp.zip-test_self                      FAILED
 t74: mjp2ff.zip-shallow_copy_self_good         FAILED (empty compiled-program output)
 t75: rab9nn.zip-deep_copy_vs_shallow_copy       FAILED (empty compiled-program output)
-t76: rbk2kb.zip-clone_attribute_changes        FAILED
+t76: rbk2kb.zip-clone_attribute_changes          ok  
 t77: rbk2kb.zip-comparison_edge_cases_objects         ok  
 
 
@@ -141,6 +141,6 @@ t3: dispatch-void-dynamic                      FAILED (empty output)
 t4: dispatch-void-static                       FAILED (empty output)
 t5: div-by-zero                                FAILED (empty output)
 t6: substring-bad                              FAILED (empty output)
-t7: mjk6zt.zip-bug_maker                       FAILED (empty output)
-t8: mjk6zt.zip-shallow_copy                    FAILED (empty output)
-End Time: Mon Apr 11 12:25:49 2016
+t7: mjk6zt.zip-bug_maker                       FAILED
+t8: mjk6zt.zip-shallow_copy                    FAILED
+End Time: Mon Apr 11 13:40:00 2016

@@ -925,9 +925,21 @@ def gen_asm_for_internal_method(internal_name):
 	elif internal_name == "Object.copy":
 		gen_asm_for_internal_copy()
 
+	elif internal_name == "Object.abort":
+		gen_asm_for_internal_abort()
+
 	else:
 		# raise NotImplementedError(internal_name + " has not been implemented")
 		pass
+
+def gen_asm_for_internal_abort():
+	custom_asm = ASMCustomString(
+		"\t\t\tmovq $abort.string, %rdi\n" +
+		"\t\t\tcall raw_out_string\n" +
+		"\t\t\tmovq $0, %rdi\n" +
+		"\t\t\tcall exit\n"
+		)
+	asm_instr_list.append(custom_asm)
 
 def gen_asm_for_internal_copy():
 	asm_instr_list.append(ASMComment("Make new obj to store result (same as doing SELF_TYPE..new)"))
@@ -1030,58 +1042,68 @@ def gen_asm_for_internal_out_string():
 	# Note: string value must be in specific reg (%r8) for raw assembly to work
 	asm_instr_list.append(ASMComment("loading param [0] into %rax"))
 	asm_instr_list.append(ASMMovQ("16(%rbp)", "%rax"))
-	asm_instr_list.append(ASMComment("unboxing param [0] (in %rax) into %r8"))
-	asm_instr_list.append(ASMMovQ("24(%rax)", "%r8"))
-
-	# Add generated assembly
-	custom_asm = ASMCustomString(
-			"\t\t\t## Start method body\n" +
-			"\t\t\tsubq	$16, %rsp\n" +
-			"\t\t\tmovq	%r8, -8(%rbp)\n" +
-			"\t\t\tmovl	$0, -12(%rbp)\n" +
-			"\t\t\tjmp	.L2\n" +
-			".L5:\n" +
-			"\t\t\tcmpb	$92, -14(%rbp)\n" +
-			"\t\t\tjne	.L3\n" +
-			"\t\t\tmovl	-12(%rbp), %eax\n" +
-			"\t\t\tcltq\n" +
-			"\t\t\tleaq	1(%rax), %rdx\n" +
-			"\t\t\tmovq	-8(%rbp), %rax\n" +
-			"\t\t\taddq	%rdx, %rax\n" +
-			"\t\t\tmovzbl	(%rax), %eax\n" +
-			"\t\t\tmovb	%al, -13(%rbp)\n" +
-			"\t\t\tcmpb	$110, -13(%rbp)\n" +
-			"\t\t\tjne	.L4\n" +
-			"\t\t\tmovb	$10, -14(%rbp)\n" +
-			"\t\t\taddl	$1, -12(%rbp)\n" +
-			"\t\t\tjmp	.L3\n" +
-			".L4:\n" +
-			"\t\t\tcmpb	$116, -13(%rbp)\n" +
-			"\t\t\tjne	.L3\n" +
-			"\t\t\tmovb	$9, -14(%rbp)\n" +
-			"\t\t\taddl	$1, -12(%rbp)\n" +
-			".L3:\n" +
-			"\t\t\tmovsbl	-14(%rbp), %eax\n" +
-			"\t\t\tmovl	%eax, %edi\n" +
-			"\t\t\tcall	putchar\n" +
-			"\t\t\taddl	$1, -12(%rbp)\n" +
-			".L2:\n" +
-			"\t\t\tmovl	-12(%rbp), %eax\n" +
-			"\t\t\tmovslq	%eax, %rdx\n" +
-			"\t\t\tmovq	-8(%rbp), %rax\n" +
-			"\t\t\taddq	%rdx, %rax\n" +
-			"\t\t\tmovzbl	(%rax), %eax\n" +
-			"\t\t\tmovb	%al, -14(%rbp)\n" +
-			"\t\t\tcmpb	$0, -14(%rbp)\n" +
-			"\t\t\tjne	.L5\n" #+
-			# "\t\t\t## Fix the stack pointer\n" +
-			# "\t\t\taddq	$16, %rsp\n"
-		)
-	asm_instr_list.append(custom_asm)
+	asm_instr_list.append(ASMComment("unboxing param [0] (in %rax) into %rdi for call to raw_out_string"))
+	asm_instr_list.append(ASMMovQ("24(%rax)", "%rdi"))
+	asm_instr_list.append(ASMCall("raw_out_string"))
 
 	# Move self ptr into %rax for return value
 	asm_instr_list.append(ASMComment("move self ptr into %rax for return"))
 	asm_instr_list.append(ASMMovQ(SELF_REG, "%rax"))
+
+def get_raw_out_string_helper():
+	result = "	.globl	raw_out_string\n" + \
+	"	.type	raw_out_string, @function\n" + \
+	"raw_out_string:\n" + \
+	".LFB0:\n" + \
+	"	.cfi_startproc\n" + \
+	"	pushq	%rbp\n" + \
+	"	.cfi_def_cfa_offset 16\n" + \
+	"	.cfi_offset 6, -16\n" + \
+	"	movq	%rsp, %rbp\n" + \
+	"	.cfi_def_cfa_register 6\n" + \
+	"	subq	$32, %rsp\n" + \
+	"	movq	%rdi, -24(%rbp)\n" + \
+	"	movl	$0, -4(%rbp)\n" + \
+	"	jmp	.L2\n" + \
+	".L5:\n" + \
+	"	cmpb	$92, -6(%rbp)\n" + \
+	"	jne	.L3\n" + \
+	"	movl	-4(%rbp), %eax\n" + \
+	"	cltq\n" + \
+	"	leaq	1(%rax), %rdx\n" + \
+	"	movq	-24(%rbp), %rax\n" + \
+	"	addq	%rdx, %rax\n" + \
+	"	movzbl	(%rax), %eax\n" + \
+	"	movb	%al, -5(%rbp)\n" + \
+	"	cmpb	$110, -5(%rbp)\n" + \
+	"	jne	.L4\n" + \
+	"	movb	$10, -6(%rbp)\n" + \
+	"	addl	$1, -4(%rbp)\n" + \
+	"	jmp	.L3\n" + \
+	".L4:\n" + \
+	"	cmpb	$116, -5(%rbp)\n" + \
+	"	jne	.L3\n" + \
+	"	movb	$9, -6(%rbp)\n" + \
+	"	addl	$1, -4(%rbp)\n" + \
+	".L3:\n" + \
+	"	movsbl	-6(%rbp), %eax\n" + \
+	"	movl	%eax, %edi\n" + \
+	"	call	putchar\n" + \
+	"	addl	$1, -4(%rbp)\n" + \
+	".L2:\n" + \
+	"	movl	-4(%rbp), %eax\n" + \
+	"	movslq	%eax, %rdx\n" + \
+	"	movq	-24(%rbp), %rax\n" + \
+	"	addq	%rdx, %rax\n" + \
+	"	movzbl	(%rax), %eax\n" + \
+	"	movb	%al, -6(%rbp)\n" + \
+	"	cmpb	$0, -6(%rbp)\n" + \
+	"	jne	.L5\n" + \
+	"	leave\n" + \
+	"	.cfi_def_cfa 7, 8\n" + \
+	"	ret\n" + \
+	"	.cfi_endproc\n"
+	return result
 
 def gen_asm_for_internal_out_int():
 	global asm_instr_list

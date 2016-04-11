@@ -59,8 +59,10 @@ def get_constants_string():
 	result = get_header_comment_string("CONSTANT STRINGS")
 	result += get_type_name_strings()
 	result += get_empty_string()
+	result += get_abort_string()
 	result += gen_const_strings()
 	result += get_io_format_strings()
+	result += get_raw_out_string_helper()
 	# ---- TODO: Get execption strings
 	return result
 
@@ -80,6 +82,14 @@ def get_empty_string():
 	result = ".globl empty.string\n"
 	result += "empty.string:\t\t\t## empty string for default Strings\n"
 	result += "\t\t\t.string \"\"\n"
+	result += "\n"
+	return result
+
+# Makes string for abort
+def get_abort_string():
+	result = ".globl abort.string\n"
+	result += "abort.string:\t\t\t## abort string for Object.abort\n"
+	result += "\t\t\t.string \"abort\\n\""
 	result += "\n"
 	return result
 

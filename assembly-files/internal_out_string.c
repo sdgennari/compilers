@@ -1,9 +1,6 @@
 #include <stdio.h>
 
-int main() {
-
-	char *str = "hello\t\tc\\n\\";
-
+void raw_out_string(char *str) {
 	// printf("checking: %s\n\n", str);
 
 	int i = 0;
@@ -31,5 +28,13 @@ int main() {
 
 	// printf("\n");
 	// printf("char: %c\n", c);
+}
+
+int main() {
+
+	char *str = "hello\t\tc\\\\n";
+
+	raw_out_string(str);
+
 	return 0;
 }
