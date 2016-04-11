@@ -161,6 +161,14 @@ class TACAlloc:
 	def __str__(self):
 		return self.assignee + " <- new " + self.type
 
+class TACNewSelfType:
+	def __init__(self, type_from_ast, assignee):
+		self.type_from_ast = type_from_ast
+		self.assignee = assignee
+
+	def __str__(self):
+		return self.assignee + " <- new SELF_TYPE"
+
 ''' Default Value '''
 # x <- default <type>
 class TACDefault:

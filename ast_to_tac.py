@@ -215,7 +215,11 @@ def gen_tac_for_exp(ast_exp):
 
 	elif isinstance(ast_exp, ASTExpNew):
 		# ExpNew: (self, line, type_line, exp_type)
-		tac_list.append(TACAlloc(ast_exp.type_from_ast, assignee_symbol, ast_exp.exp_type))
+		# Handle SELF_TYPE explicitly
+		if ast_exp.exp_type == "SELF_TYPE":
+			tac_list.append(TACNewSelfType(ast_exp.type_from_ast, assignee_symbol))
+		else:
+			tac_list.append(TACAlloc(ast_exp.type_from_ast, assignee_symbol, ast_exp.exp_type))
 
 	elif isinstance(ast_exp, ASTExpLet):
 		# ExpLet: (self, line, binding_list, exp)

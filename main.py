@@ -70,7 +70,7 @@ def get_type_name_strings():
 	for class_name in sorted(class_map.keys()):
 		result += ".globl type_name_" + class_name + " \n"
 		result += "type_name_" + class_name + ":\t\t\t## type_name string for " + class_name + "\n"
-		result += "\t\t\t.asciz \"" + class_name + "\"\n"
+		result += "\t\t\t.string \"" + class_name + "\"\n"
 		result += "\n"
 
 	return result
@@ -79,7 +79,7 @@ def get_type_name_strings():
 def get_empty_string():
 	result = ".globl empty.string\n"
 	result += "empty.string:\t\t\t## empty string for default Strings\n"
-	result += "\t\t\t.asciz \"\"\n"
+	result += "\t\t\t.string \"\"\n"
 	result += "\n"
 	return result
 
@@ -93,7 +93,7 @@ def gen_const_strings():
 		# Format string since \\ in assembly becomes a single \
 		formatted_string = string.replace("\\", "\\\\")
 
-		result += "\t\t\t.asciz \"" + formatted_string + "\"\n"
+		result += "\t\t\t.string \"" + formatted_string + "\"\n"
 		result += "\n"
 	return result
 
@@ -368,6 +368,7 @@ def ast_method_to_asm(ast_method, type_name):
 	# for tac_instr in tac_list:
 	# 	print tac_instr
 	# print
+	# sys.exit(1)
 
 	# Build basic blocks and compute liveness
 	block_list = buildBasicBlocks(tac_list)

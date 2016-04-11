@@ -1,6 +1,6 @@
 ### Features
 
-- method
+- ~~method~~
 - ~~attribute_no_init~~
 - ~~attribute_init~~
 
@@ -47,3 +47,15 @@
 - String.concat
 - String.length
 - String.substr
+
+### Priority List
+
+- self
+- abort
+- copy (x2)
+- eval order (x2)
+- case (x5)
+- SELF_TYPE
+- substring
+- type_name
+- exceptions

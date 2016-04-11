@@ -156,6 +156,23 @@ def gen_asm_for_tac_new(tac_new):
 	gen_asm_for_new_boxed_type(tac_new.type, dest)
 
 # BOXED + UNBOXED
+def gen_asm_for_tac_new_self_type(tac_instr):
+	dest = get_asm_register(tac_instr.assignee, 64)
+
+	asm_instr_list.append(ASMComment("Lookup 'new' in vtable for self"))
+	# Get vtable ptr
+	asm_instr_list.append(ASMMovQ("16(%rbx)", "%rax"))
+
+	# Find constructor dynamically
+	asm_instr_list.append(ASMMovQ("8(%rax)", "%rax"))
+
+	# Call method
+	asm_instr_list.append(ASMCall("*%rax"))
+
+	# Move result into dest
+	asm_instr_list.append(ASMMovQ("%rax", dest))
+
+# BOXED + UNBOXED
 def gen_asm_for_tac_return(tac_return):
 	src = get_asm_register(tac_return.op1, 64)
 	dest = "%rax"
@@ -504,17 +521,25 @@ def gen_asm_for_tac_unbox(tac_unbox):
 def gen_asm_for_tac_load_attr(tac_load_attr):
 	global attr_offset_map, current_type
 
-	# Get the offset from the self ptr
-	tup = (current_type, tac_load_attr.ident)
-	attr_idx = attr_offset_map[tup]
-	self_offset = 8 * attr_idx
+	# Handle self explicitly
+	# Note: Up to this point self was treated as an attribute
+	if tac_load_attr.ident == "self":
+		dest = get_asm_register(tac_load_attr.assignee, 64)
+		asm_instr_list.append(ASMComment("move self ptr into " + dest))
+		asm_instr_list.append(ASMMovQ(SELF_REG, dest))
 
-	# Move the contents of the attr into assignee
-	src = str(self_offset)+"("+SELF_REG+")"
-	dest = get_asm_register(tac_load_attr.assignee, 64)
-	asm_instr_list.append(ASMComment("load self[" + str(attr_idx) + "] (" + \
-		tac_load_attr.ident + ") into " + dest))
-	asm_instr_list.append(ASMMovQ(src, dest))
+	else:
+		# Get the offset from the self ptr
+		tup = (current_type, tac_load_attr.ident)
+		attr_idx = attr_offset_map[tup]
+		self_offset = 8 * attr_idx
+
+		# Move the contents of the attr into assignee
+		src = str(self_offset)+"("+SELF_REG+")"
+		dest = get_asm_register(tac_load_attr.assignee, 64)
+		asm_instr_list.append(ASMComment("load self[" + str(attr_idx) + "] (" + \
+			tac_load_attr.ident + ") into " + dest))
+		asm_instr_list.append(ASMMovQ(src, dest))
 
 def gen_asm_for_tac_store_attr(tac_store_attr):
 	global attr_offset_map, current_type
@@ -799,6 +824,9 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	elif isinstance(tac_instr, TACIsVoid):
 		gen_asm_for_tac_is_void(tac_instr)
+
+	elif isinstance(tac_instr, TACNewSelfType):
+		gen_asm_for_tac_new_self_type(tac_instr)
 
 	# ========================================
 	# 				DISPATCH

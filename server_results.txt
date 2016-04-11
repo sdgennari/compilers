@@ -1,4 +1,4 @@
-Start Time:   Mon Apr 11 06:13:34 2016
+Start Time:   Mon Apr 11 07:03:53 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -46,7 +46,7 @@ t12: copy-self-init                       (your compiler outputs to stdout/stder
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
 t13: dispatch-override-dynamic                   ok  
-t14: dispatch-override-static                  FAILED
+t14: dispatch-override-static                    ok  
 t15: eval-order-args                      (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
@@ -172,7 +172,7 @@ t2: case-on-void                          (your compiler outputs to stdout/stder
  (no .cl-asm or .s file produced)
       FAILED (empty output)
 t3: dispatch-void-dynamic                      FAILED (empty output)
-t4: dispatch-void-static                       FAILED
+t4: dispatch-void-static                       FAILED (empty output)
 t5: div-by-zero                                FAILED (empty output)
 t6: substring-bad                              FAILED (empty output)
 t7: mjk6zt.zip-bug_maker                  (your compiler outputs to stdout/stderr: should be none)
@@ -181,4 +181,3 @@ t7: mjk6zt.zip-bug_maker                  (your compiler outputs to stdout/stder
 t8: mjk6zt.zip-shallow_copy               (your compiler outputs to stdout/stderr: should be none)
  (no .cl-asm or .s file produced)
       FAILED (empty output)
-End Time: Mon Apr 11 06:15:51 2016
