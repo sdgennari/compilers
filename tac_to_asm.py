@@ -731,6 +731,27 @@ def gen_asm_for_tac_is_void(tac_instr):
 	asm_instr_list.append(ASMMovQ("$1", dest_reg_offset))
 	asm_instr_list.append(ASMLabel(false_label))
 
+def gen_asm_for_tac_error(tac_instr):
+	pass
+
+def gen_asm_for_tac_case_type_cmp(tac_instr):
+	op1_reg = get_asm_register(tac_instr.op1, 64)
+	# Get type tag from map
+	type_tag_num = "$" + str(type_tag_map[tac_instr.type_name])
+
+	asm_instr_list.append(ASMComment("check for type " + tac_instr.type_name))
+	asm_instr_list.append(ASMMovQ(type_tag_num, "%rax"))
+	asm_instr_list.append(ASMCmpQ("%rax", op1_reg))
+	asm_instr_list.append(ASMJmpEq("." + tac_instr.type_case_label))
+
+def gen_asm_for_tac_get_type_tag(tac_instr):
+	op1_reg = get_asm_register(tac_instr.op1, 64)
+	dest = get_asm_register(tac_instr.assignee, 64)
+
+	op1_reg_offset = "0(" + op1_reg + ")"
+	asm_instr_list.append(ASMComment("move type tag of " + op1_reg + " into " + dest))
+	asm_instr_list.append(ASMMovQ(op1_reg_offset, dest))
+
 def gen_asm_for_tac_instr(tac_instr):
 	# Skip instructions whose assignees do not have colors
 	# This will only skip instructions that are never live (dead code)
@@ -827,6 +848,12 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	elif isinstance(tac_instr, TACNewSelfType):
 		gen_asm_for_tac_new_self_type(tac_instr)
+
+	elif isinstance(tac_instr, TACCaseCmpTypesAndJe):
+		gen_asm_for_tac_case_type_cmp(tac_instr)
+
+	elif isinstance(tac_instr, TACGetTypeTag):
+		gen_asm_for_tac_get_type_tag(tac_instr)
 
 	# ========================================
 	# 				DISPATCH
@@ -1054,7 +1081,7 @@ def get_raw_out_string_helper():
 	result = "	.globl	raw_out_string\n" + \
 	"	.type	raw_out_string, @function\n" + \
 	"raw_out_string:\n" + \
-	".LFB0:\n" + \
+	".raw_out_LFB0:\n" + \
 	"	.cfi_startproc\n" + \
 	"	pushq	%rbp\n" + \
 	"	.cfi_def_cfa_offset 16\n" + \
@@ -1064,10 +1091,10 @@ def get_raw_out_string_helper():
 	"	subq	$32, %rsp\n" + \
 	"	movq	%rdi, -24(%rbp)\n" + \
 	"	movl	$0, -4(%rbp)\n" + \
-	"	jmp	.L2\n" + \
-	".L5:\n" + \
+	"	jmp	.raw_out_string_L2\n" + \
+	".raw_out_string_L5:\n" + \
 	"	cmpb	$92, -6(%rbp)\n" + \
-	"	jne	.L3\n" + \
+	"	jne	.raw_out_string_L3\n" + \
 	"	movl	-4(%rbp), %eax\n" + \
 	"	cltq\n" + \
 	"	leaq	1(%rax), %rdx\n" + \
@@ -1076,21 +1103,21 @@ def get_raw_out_string_helper():
 	"	movzbl	(%rax), %eax\n" + \
 	"	movb	%al, -5(%rbp)\n" + \
 	"	cmpb	$110, -5(%rbp)\n" + \
-	"	jne	.L4\n" + \
+	"	jne	.raw_out_string_L4\n" + \
 	"	movb	$10, -6(%rbp)\n" + \
 	"	addl	$1, -4(%rbp)\n" + \
-	"	jmp	.L3\n" + \
-	".L4:\n" + \
+	"	jmp	.raw_out_string_L3\n" + \
+	".raw_out_string_L4:\n" + \
 	"	cmpb	$116, -5(%rbp)\n" + \
-	"	jne	.L3\n" + \
+	"	jne	.raw_out_string_L3\n" + \
 	"	movb	$9, -6(%rbp)\n" + \
 	"	addl	$1, -4(%rbp)\n" + \
-	".L3:\n" + \
+	".raw_out_string_L3:\n" + \
 	"	movsbl	-6(%rbp), %eax\n" + \
 	"	movl	%eax, %edi\n" + \
 	"	call	putchar\n" + \
 	"	addl	$1, -4(%rbp)\n" + \
-	".L2:\n" + \
+	".raw_out_string_L2:\n" + \
 	"	movl	-4(%rbp), %eax\n" + \
 	"	movslq	%eax, %rdx\n" + \
 	"	movq	-24(%rbp), %rax\n" + \
@@ -1098,7 +1125,7 @@ def get_raw_out_string_helper():
 	"	movzbl	(%rax), %eax\n" + \
 	"	movb	%al, -6(%rbp)\n" + \
 	"	cmpb	$0, -6(%rbp)\n" + \
-	"	jne	.L5\n" + \
+	"	jne	.raw_out_string_L5\n" + \
 	"	leave\n" + \
 	"	.cfi_def_cfa 7, 8\n" + \
 	"	ret\n" + \

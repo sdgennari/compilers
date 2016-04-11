@@ -12,6 +12,11 @@ type_tag_map = {}
 # Define register to hold self ptr
 SELF_REG = "%rbx"
 
+# Info from deserializing tree
+class_map = {}
+parent_map = {}
+implementation_map = {}
+
 # Note: explicitly exclude rax
 caller_saved_registers = [
 	"%rcx", "%rdx", "%rsi",

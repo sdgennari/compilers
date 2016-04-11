@@ -2,10 +2,7 @@ import sys
 import copy
 from ast_nodes import *
 from ast_to_tac import *
-
-class_map = {}
-parent_map = {}
-implementation_map = {}
+from shared_vars import class_map, parent_map, implementation_map
 
 ### FUNCTIONS TO BUILD AST FROM INPUT ###
 def next_int(input_lines):

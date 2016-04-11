@@ -372,16 +372,17 @@ def ast_method_to_asm(ast_method, type_name):
 	reset_globals()
 
 	# Generate the TAC for the exp
-	gen_tac_for_feature(ast_method, type_name)
+	cur_tac_list = []
+	gen_tac_for_feature(cur_tac_list, ast_method, type_name)
 
-	# print len(tac_list)
-	# for tac_instr in tac_list:
+	# print len(cur_tac_list)
+	# for tac_instr in cur_tac_list:
 	# 	print tac_instr
 	# print
 	# sys.exit(1)
 
 	# Build basic blocks and compute liveness
-	block_list = buildBasicBlocks(tac_list)
+	block_list = buildBasicBlocks(cur_tac_list)
 	computeLiveSets(block_list)
 
 	# for block in block_list:
@@ -410,9 +411,10 @@ def ast_attr_to_asm(ast_attr, type_name):
 	# Reset global variables to avoid conflicts
 	reset_globals()
 
-	gen_tac_for_exp(ast_attr.exp)
+	cur_tac_list = []
+	gen_tac_for_exp(cur_tac_list, ast_attr.exp)
 
-	block_list = buildBasicBlocks(tac_list)
+	block_list = buildBasicBlocks(cur_tac_list)
 	computeLiveSets(block_list)
 
 	# Allocate registers
@@ -431,7 +433,7 @@ def ast_attr_to_asm(ast_attr, type_name):
 	self_offset = 8 * attr_idx
 	dest = str(self_offset)+"("+SELF_REG+")"
 	# Get the last register in the exp since it holds the resulting value
-	final_virtual_reg = tac_list[-1].assignee
+	final_virtual_reg = cur_tac_list[-1].assignee
 	src = get_asm_register(final_virtual_reg, 64)
 	asm_instr_list.append(ASMMovQ(src, dest))
 
@@ -440,12 +442,12 @@ def ast_attr_to_asm(ast_attr, type_name):
 
 
 def reset_globals():
-	global tac_list
+	# global tac_list
 	global asm_instr_list
 	global register_colors
 	global spilled_registers
 
-	del tac_list[:]
+	# del tac_list[:]
 	del asm_instr_list[:]
 	# del spilled_registers[:]
 	# register_colors = {}

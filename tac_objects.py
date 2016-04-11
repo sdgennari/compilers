@@ -399,6 +399,33 @@ class TACSelfCall(TACCall):
 		result += " (ro: self, params: " + str(self.params_list) + ")"
 		return result
 
+class TACCaseCmpTypesAndJe(TACCustom):
+	# Store info about the dest label as well to avoid using boxed Bools
+	def __init__(self, op1, type_name, type_case_label):
+		self.op1 = op1
+		self.type_name = type_name
+		self.type_case_label = type_case_label
+
+	def __str__(self):
+		return "compare " + self.op1 + " to " + self.type_name + " and je to " + self.type_case_label
+
+class TACGetTypeTag(TACCustom):
+	def __init__(self, assignee, op1):
+		self.assignee = assignee
+		self.op1 = op1
+
+	def __str__(self):
+		return self.assignee + " <- type_of(" + self.op1 + ")"
+
+class TACError(TACCustom):
+	def __init__(self, line, error_msg):
+		self.line = line
+		self.error_msg = error_msg
+
+	def __str__(self):
+		return "throw error for line " + str(line) + ": " + error_msg
+
+
 # class TACMakeParamSpace(TACCustom):
 # 	def __init__(self, num_params):
 # 		self.num_params = num_params

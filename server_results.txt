@@ -1,4 +1,4 @@
-Start Time:   Mon Apr 11 13:37:42 2016
+Start Time:   Mon Apr 11 15:03:52 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -23,7 +23,7 @@ Run command: python main.py
 
 Positive Test Cases
 
-t1: abort                                      FAILED
+t1: abort                                        ok  
 t2: alias                                        ok  
 t3: assignments                                  ok  
 t4: bigexpr                                    FAILED
@@ -81,7 +81,7 @@ t41: old                                       FAILED
 t42: one-nested-exp-with-789-arith-ops    (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
 t43: override-builtin-method                   FAILED
-t44: primes                                    FAILED
+t44: primes                                      ok  
 t45: receiver-class-hard-to-determine          FAILED (empty compiled-program output)
 t46: scoping                                   FAILED
 t47: shadow-attr-case                     (your compiler outputs to stdout/stderr: should be none)
@@ -143,4 +143,4 @@ t5: div-by-zero                                FAILED (empty output)
 t6: substring-bad                              FAILED (empty output)
 t7: mjk6zt.zip-bug_maker                       FAILED
 t8: mjk6zt.zip-shallow_copy                    FAILED
-End Time: Mon Apr 11 13:40:00 2016
+End Time: Mon Apr 11 15:05:02 2016
