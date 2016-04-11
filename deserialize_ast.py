@@ -1,4 +1,5 @@
 import sys
+import copy
 from ast_nodes import *
 from ast_to_tac import *
 
@@ -399,8 +400,10 @@ def update_global_implementation_map(ast_root):
 	# Iterate through each class
 	for ast_class in ast_root.class_list:
 
-		new_method_list = []
 		impl_map_method_list = implementation_map[ast_class.typ]
+
+		# Use a copy here to include built-in functions
+		new_method_list = copy.copy(impl_map_method_list)
 
 		# Iterate through each ast_feature
 		for ast_feature in ast_class.feature_list:
@@ -412,6 +415,7 @@ def update_global_implementation_map(ast_root):
 			for method in impl_map_method_list:
 				if ast_feature.ident == method.ident:
 					ast_feature.containing_class = method.containing_class
+					new_method_list.remove(method)
 					new_method_list.append(ast_feature)
 					break
 

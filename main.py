@@ -35,7 +35,6 @@ def get_vtables_string():
 		result += get_vtable_str(class_name) + ":\t\t## vtable for " + class_name + "\n"
 
 		# Add type_name and 'new' implicit method
-		# ---- TODO Set this to the correct type name label
 		result += format_quad_line("type_name_" + class_name)
 		result += format_quad_line(class_name + "..new")
 
@@ -61,6 +60,7 @@ def get_constants_string():
 	result += get_type_name_strings()
 	result += get_empty_string()
 	result += gen_const_strings()
+	result += get_io_format_strings()
 	# ---- TODO: Get execption strings
 	return result
 
@@ -91,6 +91,21 @@ def gen_const_strings():
 		result += label + ":\n"
 		result += "\t\t\t.asciz \"" + string + "\"\n"
 		result += "\n"
+	return result
+
+def get_io_format_strings():
+	# in_int format string
+	result = ".globl in_int_format_str\n"
+	result += "in_int_format_str:\n"
+	result += "\t\t\t.string \"%lld\"\n"
+	result += "\n"
+
+	# out_int format string
+	result += ".globl out_int_format_str\n"
+	result += "out_int_format_str:\n"
+	result += "\t\t\t.string \"%d\"\n"
+	result += "\n"
+
 	return result
 
 # ========================================
@@ -421,7 +436,7 @@ def reset_globals():
 	# register_colors = {}
 
 def get_helper_strings():
-	result = ""
+	result = get_header_comment_string("COMPARISONS")
 	result += get_cmp_lt_helper_string()
 	result += "\n"
 	result += get_cmp_le_helper_string()
@@ -478,7 +493,7 @@ if __name__ == "__main__":
 
 	print get_program_start_string()
 
-	# Note: This must be called AFTER asm for all expressions has been generated
+	# # Note: This must be called AFTER asm for all expressions has been generated
 	print get_constants_string()
 
 	print get_helper_strings()

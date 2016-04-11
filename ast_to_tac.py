@@ -351,25 +351,25 @@ def gen_tac_for_exp(ast_exp):
 			# Add the param to the list
 			param_symbol_list.append(param_symbol)
 		
-		# For now, only handle 'out_string' and 'out_int'
-		if ast_exp.ident == "out_string":
-			tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
+		# # For now, only handle 'out_string' and 'out_int'
+		# if ast_exp.ident == "out_string":
+		# 	tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
-		elif ast_exp.ident == "out_int":
-			tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
+		# elif ast_exp.ident == "out_int":
+		# 	tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
-		elif ast_exp.ident == "in_string":
-			tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
+		# elif ast_exp.ident == "in_string":
+		# 	tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
 
-		elif ast_exp.ident == "in_int":
-			tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
+		# elif ast_exp.ident == "in_int":
+		# 	tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
 
-		else:
-			method_ident = ast_exp.ident
-			params_list = param_symbol_list
+		# else:
+		method_ident = ast_exp.ident
+		params_list = param_symbol_list
 
-			tac_list.append(TACSelfCall(ast_exp.type_from_ast, method_ident, params_list, assignee_symbol))
-			# raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
+		tac_list.append(TACSelfCall(ast_exp.type_from_ast, method_ident, params_list, assignee_symbol))
+		# raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
 
 	elif isinstance(ast_exp, ASTExpDynamicDispatch):
 		# ExpDynamicDispatch: (self, line, caller_exp, ident_line, ident, exp_list=[])
@@ -387,27 +387,27 @@ def gen_tac_for_exp(ast_exp):
 		# Generate tac for receiver object
 		ro_symbol, ro_type_from_ast = gen_tac_for_exp(ast_exp.caller_exp)
 		
-		# For now, only handle 'out_string' and 'out_int'
-		if ast_exp.ident == "out_string":
-			tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
+		# # For now, only handle 'out_string' and 'out_int'
+		# if ast_exp.ident == "out_string":
+		# 	tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
-		elif ast_exp.ident == "out_int":
-			tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
+		# elif ast_exp.ident == "out_int":
+		# 	tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
-		elif ast_exp.ident == "in_string":
-			tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
+		# elif ast_exp.ident == "in_string":
+		# 	tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
 
-		elif ast_exp.ident == "in_int":
-			tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
+		# elif ast_exp.ident == "in_int":
+		# 	tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
 
-		else:
-			# assignee_symbol = gen_tac_for_exp_dynamic_dispatch(ast_exp)
-			method_ident = ast_exp.ident
-			receiver_obj = ro_symbol
-			params_list = param_symbol_list
+		# else:
+		# assignee_symbol = gen_tac_for_exp_dynamic_dispatch(ast_exp)
+		method_ident = ast_exp.ident
+		receiver_obj = ro_symbol
+		params_list = param_symbol_list
 
-			tac_list.append(TACDynamicCall(ast_exp.type_from_ast, method_ident, receiver_obj, ro_type_from_ast, params_list, assignee_symbol))
-			# raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
+		tac_list.append(TACDynamicCall(ast_exp.type_from_ast, method_ident, receiver_obj, ro_type_from_ast, params_list, assignee_symbol))
+		# raise NotImplementedError(ast_exp.__class__.__name__ + " for " + ast_exp.ident + " not yet implemented")
 
 	elif isinstance(ast_exp, ASTExpStaticDispatch):
 		# ExpStaticDispatch: (self, line, caller_exp, type_line, static_type, ident_line, ident, exp_list=[])
@@ -425,25 +425,25 @@ def gen_tac_for_exp(ast_exp):
 		ro_symbol, ro_type_from_ast = gen_tac_for_exp(ast_exp.caller_exp)
 
 		# For now, only handle 'out_string' and 'out_int'
-		if ast_exp.ident == "out_string":
-			tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
+		# if ast_exp.ident == "out_string":
+		# 	tac_list.append(TACOutString(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
-		if ast_exp.ident == "out_int":
-			tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
+		# if ast_exp.ident == "out_int":
+		# 	tac_list.append(TACOutInt(ast_exp.type_from_ast, assignee_symbol, exp_symbol_list[0]))
 
-		elif ast_exp.ident == "in_string":
-			tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
+		# elif ast_exp.ident == "in_string":
+		# 	tac_list.append(TACInString(ast_exp.type_from_ast, assignee_symbol))
 
-		elif ast_exp.ident == "in_int":
-			tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
+		# elif ast_exp.ident == "in_int":
+		# 	tac_list.append(TACInInt(ast_exp.type_from_ast, assignee_symbol))
 
-		else:
-			static_type = ast_exp.static_type
-			method_ident = ast_exp.ident
-			receiver_obj = ro_symbol
-			params_list = param_symbol_list
+		# else:
+		static_type = ast_exp.static_type
+		method_ident = ast_exp.ident
+		receiver_obj = ro_symbol
+		params_list = param_symbol_list
 
-			tac_list.append(TACStaticCall(ast_exp.type_from_ast, static_type, method_ident, receiver_obj, params_list, assignee_symbol))
+		tac_list.append(TACStaticCall(ast_exp.type_from_ast, static_type, method_ident, receiver_obj, params_list, assignee_symbol))
 
 	else:
 		raise NotImplementedError(ast_exp.__class__.__name__ + " not yet implemented")

@@ -583,7 +583,12 @@ def gen_asm_for_tac_call(tac_call):
 		asm_instr_list.append(ASMCall(method_label))
 	elif isinstance(tac_call, TACDynamicCall):
 		# Find method label via vtable
-		tup = (tac_call.ro_type_from_ast, tac_call.method_ident)
+		# Handle SELF_TYPE explicitly
+		receiver_obj_type = tac_call.ro_type_from_ast
+		if receiver_obj_type == "SELF_TYPE":
+			receiver_obj_type = current_type
+
+		tup = (receiver_obj_type, tac_call.method_ident)
 		method_idx = vtable_offset_map[tup]
 
 		asm_instr_list.append(ASMComment("dynamic: lookup method in vtable"))
@@ -607,6 +612,7 @@ def gen_asm_for_tac_call(tac_call):
 	elif isinstance(tac_call, TACSelfCall):
 		# Find method label via vtable (very similar to dynamic, but with SELF_REG)
 		tup = (current_type, tac_call.method_ident)
+
 		method_idx = vtable_offset_map[tup]
 
 		asm_instr_list.append(ASMComment("self: lookup method in vtable"))
@@ -729,10 +735,12 @@ def gen_asm_for_tac_instr(tac_instr):
 		gen_asm_for_tac_load(tac_instr)
 
 	elif isinstance(tac_instr, TACOutInt):
-		gen_asm_for_tac_out_int(tac_instr)
+		# gen_asm_for_tac_out_int(tac_instr)
+		raise ValueError("TACOutInt should not exist")
 
 	elif isinstance(tac_instr, TACInInt):
-		gen_asm_for_tac_in_int(tac_instr)
+		# gen_asm_for_tac_in_int(tac_instr)
+		raise ValueError("TACInInt should not exist")
 
 	elif isinstance(tac_instr, TACPlus):
 		gen_asm_for_tac_plus(tac_instr)
@@ -834,9 +842,78 @@ def gen_asm_for_internal_method(internal_name):
 	if internal_name == "String.length":
 		gen_asm_for_internal_length()
 
+	elif internal_name == "IO.in_int":
+		gen_asm_for_internal_in_int()
+
+	elif internal_name == "IO.out_int":
+		gen_asm_for_internal_out_int()
+
 	else:
 		# raise NotImplementedError(internal_name + " has not been implemented")
 		pass
+
+def gen_asm_for_internal_out_int():
+	global asm_instr_list
+
+	# No need to save caller-saved regs because done before calling out_int
+	asm_instr_list.append(ASMComment("loading param [0] into %rax"))
+	asm_instr_list.append(ASMMovQ("16(%rbp)", "%rax"))
+
+	# Setup and call printf
+	asm_instr_list.append(ASMComment("setup and call printf"))
+	asm_instr_list.append(ASMMovL("24(%rax)", "%esi"))
+	asm_instr_list.append(ASMMovQ("$out_int_format_str", "%rdi"))
+	asm_instr_list.append(ASMMovL("$0", "%eax"))
+	asm_instr_list.append(ASMCall("printf"))
+
+	# Set return type to self ptr
+	asm_instr_list.append(ASMComment("set self ptr as return type"))
+	asm_instr_list.append(ASMMovQ(SELF_REG, "%rax"))
+
+def gen_asm_for_internal_in_int():
+	global asm_instr_list
+
+	asm_instr_list.append(ASMComment("make tmp space on stack"))
+	asm_instr_list.append(ASMSubQ("$8", "%rsp"))
+
+	# Push caller-saved regs
+	offset = 0
+	for reg in caller_saved_registers:
+		asm_instr_list.append(ASMPushQ(reg))
+		offset += 1
+	rsp_offset = str(8 * offset) + "(%rsp)"
+
+	# Setup and call scanf
+	asm_instr_list.append(ASMComment("setup and call scanf"))
+	asm_instr_list.append(ASMLeaQ(rsp_offset, "%rsi"))
+	asm_instr_list.append(ASMMovQ("$in_int_format_str", "%rdi"))
+	asm_instr_list.append(ASMMovL("$0", "%eax"))
+	asm_instr_list.append(ASMCall("__isoc99_scanf"))
+
+	# Pop all caller-saved regs
+	for reg in reversed(caller_saved_registers):
+		asm_instr_list.append(ASMPopQ(reg))
+
+	# Make a new Int to store the result
+	asm_instr_list.append(ASMComment("make new Int object in %rax"))
+	for reg in caller_saved_registers:
+		asm_instr_list.append(ASMPushQ(reg))
+
+	asm_instr_list.append(ASMCall("Int..new"))
+
+	for reg in reversed(caller_saved_registers):
+		asm_instr_list.append(ASMPopQ(reg))
+
+	# Box the result in the int
+	asm_instr_list.append(ASMComment("box answer in the new Int (use %r8 as tmp reg)"))
+	asm_instr_list.append(ASMPushQ("%r8"))
+	asm_instr_list.append(ASMMovQ("8(%rsp)", "%r8"))
+	asm_instr_list.append(ASMMovQ("%r8", "24(%rax)"))
+	asm_instr_list.append(ASMPopQ("%r8"))
+
+	# Remove tmp space on stack
+	asm_instr_list.append(ASMComment("remove tmp space on stack"))
+	asm_instr_list.append(ASMAddQ("$8", "%rsp"))
 
 def gen_asm_for_internal_length():
 	global asm_instr_list
