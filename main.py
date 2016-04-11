@@ -420,6 +420,16 @@ def reset_globals():
 	# del spilled_registers[:]
 	# register_colors = {}
 
+def get_helper_strings():
+	result = ""
+	result += get_cmp_lt_helper_string()
+	result += "\n"
+	result += get_cmp_le_helper_string()
+	result += "\n"
+
+	# TODO cmp_eq
+	return result
+
 # ========================================
 #  MAIN
 # ========================================
@@ -470,7 +480,7 @@ if __name__ == "__main__":
 	# Note: This must be called AFTER asm for all expressions has been generated
 	print get_constants_string()
 
-	print get_cmp_lt_helper_string()
+	print get_helper_strings()
 
 	'''
 	old_file_ext_len = len("cl-type")
