@@ -399,6 +399,30 @@ def gen_tac_for_exp(cur_tac_list, ast_exp):
 
 		# Generate tac for receiver object
 		ro_symbol, ro_type_from_ast = gen_tac_for_exp(cur_tac_list, ast_exp.caller_exp)
+
+		# Check if the receiver object is void
+		void_check_boxed = new_symbol()
+		void_label_num = new_label_num()
+		void_label = "dispatch_" + str(void_label_num) + "_void"
+		not_void_label = "dispatch_" + str(void_label_num) + "_not_void"
+		cur_tac_list.append(TACIsVoid(ro_type_from_ast, void_check_boxed, ro_symbol))
+
+		# Unbox result of isvoid and negate it
+		unboxed_is_void = gen_tac_for_unbox(cur_tac_list, void_check_boxed, "Bool")
+		unboxed_is_not_void = new_symbol()
+		# NegBool relies on UNBOXED values
+		cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))		
+
+		# Branch relies on UNBOXED values
+		# Branch to error or rest of dispatch
+		cur_tac_list.append(TACBt(unboxed_is_void, void_label))
+		cur_tac_list.append(TACBt(unboxed_is_not_void, not_void_label))
+		cur_tac_list.append(TACLabel(void_label))
+		cur_tac_list.append(TACError(ast_exp.line, "dispatch on void"))
+		cur_tac_list.append(TACJmp(not_void_label)) 		# include this to end basic block
+
+		# Label for rest of dispatch
+		cur_tac_list.append(TACLabel(not_void_label))
 		
 		# # For now, only handle 'out_string' and 'out_int'
 		# if ast_exp.ident == "out_string":
@@ -436,6 +460,30 @@ def gen_tac_for_exp(cur_tac_list, ast_exp):
 
 		# Generate tac for receiver object
 		ro_symbol, ro_type_from_ast = gen_tac_for_exp(cur_tac_list, ast_exp.caller_exp)
+
+		# Check if the receiver object is void
+		void_check_boxed = new_symbol()
+		void_label_num = new_label_num()
+		void_label = "dispatch_" + str(void_label_num) + "_void"
+		not_void_label = "dispatch_" + str(void_label_num) + "_not_void"
+		cur_tac_list.append(TACIsVoid(ro_type_from_ast, void_check_boxed, ro_symbol))
+
+		# Unbox result of isvoid and negate it
+		unboxed_is_void = gen_tac_for_unbox(cur_tac_list, void_check_boxed, "Bool")
+		unboxed_is_not_void = new_symbol()
+		# NegBool relies on UNBOXED values
+		cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))		
+
+		# Branch relies on UNBOXED values
+		# Branch to error or rest of dispatch
+		cur_tac_list.append(TACBt(unboxed_is_void, void_label))
+		cur_tac_list.append(TACBt(unboxed_is_not_void, not_void_label))
+		cur_tac_list.append(TACLabel(void_label))
+		cur_tac_list.append(TACError(ast_exp.line, "static dispatch on void"))
+		cur_tac_list.append(TACJmp(not_void_label)) 		# include this to end basic block
+
+		# Label for rest of dispatch
+		cur_tac_list.append(TACLabel(not_void_label))
 
 		# For now, only handle 'out_string' and 'out_int'
 		# if ast_exp.ident == "out_string":
@@ -499,6 +547,31 @@ def gen_tac_for_exp(cur_tac_list, ast_exp):
 		# Evaluate case predicate exp
 		pred_symbol, pred_type_from_ast = gen_tac_for_exp(cur_tac_list, ast_exp.exp)
 
+		# Check if the predicate is void
+		void_check_boxed = new_symbol()
+		void_label_num = new_label_num()
+		void_label = "case_" + str(void_label_num) + "_void"
+		not_void_label = "case_" + str(void_label_num) + "_not_void"
+		cur_tac_list.append(TACIsVoid(pred_type_from_ast, void_check_boxed, pred_symbol))
+
+		# Unbox result of isvoid and negate it
+		unboxed_is_void = gen_tac_for_unbox(cur_tac_list, void_check_boxed, "Bool")
+		unboxed_is_not_void = new_symbol()
+		# NegBool relies on UNBOXED values
+		cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))	
+
+		# Branch relies on UNBOXED values
+		# Branch to error or rest of case
+		cur_tac_list.append(TACBt(unboxed_is_void, void_label))
+		cur_tac_list.append(TACBt(unboxed_is_not_void, not_void_label))
+		cur_tac_list.append(TACLabel(void_label))
+		cur_tac_list.append(TACError(ast_exp.line, "case on void"))
+		cur_tac_list.append(TACJmp(not_void_label)) 		# include this to end basic block
+
+		# Label for rest of case
+		cur_tac_list.append(TACLabel(not_void_label))
+
+		# Get the type tag for the predicate
 		type_symbol = new_symbol()
 		cur_tac_list.append(TACGetTypeTag(type_symbol, pred_symbol))
 
@@ -536,8 +609,7 @@ def gen_tac_for_exp(cur_tac_list, ast_exp):
 
 		# Add error expression
 		cur_tac_list.append(TACLabel(error_label))
-		cur_tac_list.append(TACComment("TODO: handle error"))
-		# cur_tac_list.append(TACError(ast_exp.line, "no case branch reached"))
+		cur_tac_list.append(TACError(ast_exp.line, "case without matching branch: " + pred_type_from_ast))
 
 		# Add exit label
 		cur_tac_list.append(TACLabel(exit_label))

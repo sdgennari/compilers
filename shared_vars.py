@@ -17,6 +17,9 @@ class_map = {}
 parent_map = {}
 implementation_map = {}
 
+# Map constant strings to their label
+const_string_label_map = {}
+
 # Note: explicitly exclude rax
 caller_saved_registers = [
 	"%rcx", "%rdx", "%rsi",

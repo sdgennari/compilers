@@ -423,7 +423,7 @@ class TACError(TACCustom):
 		self.error_msg = error_msg
 
 	def __str__(self):
-		return "throw error for line " + str(line) + ": " + error_msg
+		return "throw error for line " + str(self.line) + ": " + self.error_msg
 
 
 # class TACMakeParamSpace(TACCustom):

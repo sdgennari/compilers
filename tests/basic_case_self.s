@@ -346,6 +346,49 @@ A.some_method:
 			movq	%rbx, %r8
 			## assign
 			movq	%r8, %r9
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			## check if %r9 is void and set result accordingly
+			cmpq	$0, %r9
+			jnz		.asm_label_1
+			movq	$1, 24(%r8)
+.asm_label_1:
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## not
+			movl	%r10d, %r8d
+			xorl	$1, %r8d
+			## branch .case_3_void
+			test	%r10d, %r10d
+			jnz		.case_3_void
+			## branch .case_3_not_void
+			test	%r8d, %r8d
+			jnz		.case_3_not_void
+.case_3_void:
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+			jmp		.case_3_not_void
+.case_3_not_void:
 			## move type tag of %r9 into %r8
 			movq	0(%r9), %r8
 			## check for type A
@@ -377,74 +420,6 @@ A.some_method:
 			cmpq	%rax, %r8
 			je		.case_2_Main
 .case_2_A:
-			## assign
-			movq	%r9, %r8
-			## const String
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	String..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	$string_1, 24(%r8)
-			## storing param [0]
-			pushq	%r8
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method out_string in vtable[8]
-			movq	64(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## assign
-			movq	%r8, %r9
-			jmp		.case_2_exit
-.case_2_Main:
 			## assign
 			movq	%r9, %r8
 			## const String
@@ -512,7 +487,79 @@ A.some_method:
 			## assign
 			movq	%r8, %r9
 			jmp		.case_2_exit
+.case_2_Main:
+			## assign
+			movq	%r9, %r8
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	String..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movq	$string_3, 24(%r8)
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_string in vtable[8]
+			movq	64(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
+			jmp		.case_2_exit
 .case_2_error_branch:
+			movq	$string_4, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
 .case_2_exit:
 			## return
 			movq	%r9, %rax
@@ -697,7 +744,7 @@ Main.main:
 			movq	%rsp, %rbp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
-.Main_main_3:
+.Main_main_4:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -888,12 +935,20 @@ empty.string:			## empty string for default Strings
 .globl abort.string
 abort.string:			## abort string for Object.abort
 			.string "abort\n"
-.globl string_2
-string_2:
+.globl string_4
+string_4:
+			.string "ERROR: 10: Exception: case without matching branch: SELF_TYPE"
+
+.globl string_3
+string_3:
 			.string "case Main\\n"
 
 .globl string_1
 string_1:
+			.string "ERROR: 10: Exception: case on void"
+
+.globl string_2
+string_2:
 			.string "case A\\n"
 
 .globl in_int_format_str

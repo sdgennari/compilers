@@ -31,6 +31,8 @@ class TACBasicBlock:
 		for instr in instr_list:
 			if isinstance(instr, TACJmp) or isinstance(instr, TACBt):
 				self.child_labels += [instr.label]
+			if isinstance(instr, TACCaseCmpTypesAndJe):
+				self.child_labels += [instr.type_case_label]
 
 	def __str__(self):
 		s = "Label: " + str(self.label) + "\n"

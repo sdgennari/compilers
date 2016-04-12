@@ -9,8 +9,7 @@ register_color_map = {}
 spilled_register_location_map = {}
 asm_label_counter = 0
 const_string_label_counter = 0
-# Map constant strings to their label
-const_string_label_map = {}
+
 # Keep track of the current type
 current_type = ""
 
@@ -732,7 +731,25 @@ def gen_asm_for_tac_is_void(tac_instr):
 	asm_instr_list.append(ASMLabel(false_label))
 
 def gen_asm_for_tac_error(tac_instr):
-	pass
+	# Call helper function to generate asm
+	gen_asm_for_error(tac_instr.line, tac_instr.error_msg)
+
+def gen_asm_for_error(line, error_msg):
+	# Create a string of the form:
+	# ERROR: 3: Exception: case without matching branch: String()
+	error_string = "ERROR: " + str(line) + ": Exception: "
+	error_string += error_msg
+
+	# Get the string label for the error (and add to global string map)
+	error_string_label = get_const_string_label(error_string)
+
+	# Move the string into rdi and call raw_out_string
+	asm_instr_list.append(ASMMovQ("$" + error_string_label, "%rdi"))
+	asm_instr_list.append(ASMCall("raw_out_string"))
+
+	# Exit the program
+	asm_instr_list.append(ASMMovQ("$0", "%rax"))
+	asm_instr_list.append(ASMCall("exit"))
 
 def gen_asm_for_tac_case_type_cmp(tac_instr):
 	op1_reg = get_asm_register(tac_instr.op1, 64)
@@ -854,6 +871,9 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	elif isinstance(tac_instr, TACGetTypeTag):
 		gen_asm_for_tac_get_type_tag(tac_instr)
+
+	elif isinstance(tac_instr, TACError):
+		gen_asm_for_tac_error(tac_instr)
 
 	# ========================================
 	# 				DISPATCH

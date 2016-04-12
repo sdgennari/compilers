@@ -784,8 +784,51 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r8
+			## storing method result in %r10
+			movq	%rax, %r10
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
 			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
+			jnz		.asm_label_1
+			movq	$1, 24(%r8)
+.asm_label_1:
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .dispatch_2_void
+			test	%r9d, %r9d
+			jnz		.dispatch_2_void
+			## branch .dispatch_2_not_void
+			test	%r8d, %r8d
+			jnz		.dispatch_2_not_void
+.dispatch_2_void:
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+			jmp		.dispatch_2_not_void
+.dispatch_2_not_void:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -801,11 +844,11 @@ Main.main:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r8) as self ptr (%rbx)
-			movq	%r8, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r8), %rax
+			movq	16(%r10), %rax
 			## find method out_int in vtable[7]
 			movq	56(%rax), %rax
 			## call method dynamically
@@ -826,6 +869,49 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r9
 			movq	%rax, %r9
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			## check if %r9 is void and set result accordingly
+			cmpq	$0, %r9
+			jnz		.asm_label_2
+			movq	$1, 24(%r8)
+.asm_label_2:
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## not
+			movl	%r10d, %r8d
+			xorl	$1, %r8d
+			## branch .dispatch_3_void
+			test	%r10d, %r10d
+			jnz		.dispatch_3_void
+			## branch .dispatch_3_not_void
+			test	%r8d, %r8d
+			jnz		.dispatch_3_not_void
+.dispatch_3_void:
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+			jmp		.dispatch_3_not_void
+.dispatch_3_not_void:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -877,6 +963,11 @@ Main.main:
 Object.abort:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			movq $abort.string, %rdi
+			call raw_out_string
+			movq $0, %rdi
+			call exit
+
 			leave
 			ret
 
@@ -1010,7 +1101,12 @@ empty.string:			## empty string for default Strings
 			.string ""
 
 .globl abort.string
-abort.string:			## abort string for Object.abort			.string abort\n
+abort.string:			## abort string for Object.abort
+			.string "abort\n"
+.globl string_1
+string_1:
+			.string "ERROR: 9: Exception: dispatch on void"
+
 .globl in_int_format_str
 in_int_format_str:
 			.string "%lld"
@@ -1022,7 +1118,7 @@ out_int_format_str:
 	.globl	raw_out_string
 	.type	raw_out_string, @function
 raw_out_string:
-.LFB0:
+.raw_out_LFB0:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -1032,10 +1128,10 @@ raw_out_string:
 	subq	$32, %rsp
 	movq	%rdi, -24(%rbp)
 	movl	$0, -4(%rbp)
-	jmp	.L2
-.L5:
+	jmp	.raw_out_string_L2
+.raw_out_string_L5:
 	cmpb	$92, -6(%rbp)
-	jne	.L3
+	jne	.raw_out_string_L3
 	movl	-4(%rbp), %eax
 	cltq
 	leaq	1(%rax), %rdx
@@ -1044,21 +1140,21 @@ raw_out_string:
 	movzbl	(%rax), %eax
 	movb	%al, -5(%rbp)
 	cmpb	$110, -5(%rbp)
-	jne	.L4
+	jne	.raw_out_string_L4
 	movb	$10, -6(%rbp)
 	addl	$1, -4(%rbp)
-	jmp	.L3
-.L4:
+	jmp	.raw_out_string_L3
+.raw_out_string_L4:
 	cmpb	$116, -5(%rbp)
-	jne	.L3
+	jne	.raw_out_string_L3
 	movb	$9, -6(%rbp)
 	addl	$1, -4(%rbp)
-.L3:
+.raw_out_string_L3:
 	movsbl	-6(%rbp), %eax
 	movl	%eax, %edi
 	call	putchar
 	addl	$1, -4(%rbp)
-.L2:
+.raw_out_string_L2:
 	movl	-4(%rbp), %eax
 	movslq	%eax, %rdx
 	movq	-24(%rbp), %rax
@@ -1066,7 +1162,7 @@ raw_out_string:
 	movzbl	(%rax), %eax
 	movb	%al, -6(%rbp)
 	cmpb	$0, -6(%rbp)
-	jne	.L5
+	jne	.raw_out_string_L5
 	leave
 	.cfi_def_cfa 7, 8
 	ret

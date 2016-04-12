@@ -550,48 +550,9 @@ IO.out_string:
 			movq	%rsp, %rbp
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
-			## unboxing param [0] (in %rax) into %r8
-			movq	24(%rax), %r8
-			## Start method body
-			subq	$16, %rsp
-			movq	%r8, -8(%rbp)
-			movl	$0, -12(%rbp)
-			jmp	.L2
-.L5:
-			cmpb	$92, -14(%rbp)
-			jne	.L3
-			movl	-12(%rbp), %eax
-			cltq
-			leaq	1(%rax), %rdx
-			movq	-8(%rbp), %rax
-			addq	%rdx, %rax
-			movzbl	(%rax), %eax
-			movb	%al, -13(%rbp)
-			cmpb	$110, -13(%rbp)
-			jne	.L4
-			movb	$10, -14(%rbp)
-			addl	$1, -12(%rbp)
-			jmp	.L3
-.L4:
-			cmpb	$116, -13(%rbp)
-			jne	.L3
-			movb	$9, -14(%rbp)
-			addl	$1, -12(%rbp)
-.L3:
-			movsbl	-14(%rbp), %eax
-			movl	%eax, %edi
-			call	putchar
-			addl	$1, -12(%rbp)
-.L2:
-			movl	-12(%rbp), %eax
-			movslq	%eax, %rdx
-			movq	-8(%rbp), %rax
-			addq	%rdx, %rax
-			movzbl	(%rax), %eax
-			movb	%al, -14(%rbp)
-			cmpb	$0, -14(%rbp)
-			jne	.L5
-
+			## unboxing param [0] (in %rax) into %rdi for call to raw_out_string
+			movq	24(%rax), %rdi
+			call	raw_out_string
 			## move self ptr into %rax for return
 			movq	%rbx, %rax
 			leave
@@ -937,6 +898,49 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r9
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			## check if %r9 is void and set result accordingly
+			cmpq	$0, %r9
+			jnz		.asm_label_1
+			movq	$1, 24(%r8)
+.asm_label_1:
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## not
+			movl	%r10d, %r8d
+			xorl	$1, %r8d
+			## branch .dispatch_3_void
+			test	%r10d, %r10d
+			jnz		.dispatch_3_void
+			## branch .dispatch_3_not_void
+			test	%r8d, %r8d
+			jnz		.dispatch_3_not_void
+.dispatch_3_void:
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+			jmp		.dispatch_3_not_void
+.dispatch_3_not_void:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1019,6 +1023,11 @@ Main.main:
 Object.abort:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			movq $abort.string, %rdi
+			call raw_out_string
+			movq $0, %rdi
+			call exit
+
 			leave
 			ret
 
@@ -1026,6 +1035,18 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## Make new obj to store result (same as doing SELF_TYPE..new)
+			movq	16(%rbx), %rax
+			movq	8(%rax), %rax
+			call	*%rax
+			## call memcpy to copy %rbx into %rax
+			## use leaq to multiply the size by 8
+			movq	8(%rbx), %rdx
+			leaq	0(,%rdx,8), %rdx
+			movq	%rbx, %rsi
+			movq	%rax, %rdi
+			call	memcpy
+			## result of mempy in %rax, so good to return
 			leave
 			ret
 
@@ -1113,35 +1134,42 @@ main:
 
 .globl type_name_A 
 type_name_A:			## type_name string for A
-			.asciz "A"
+			.string "A"
 
 .globl type_name_Bool 
 type_name_Bool:			## type_name string for Bool
-			.asciz "Bool"
+			.string "Bool"
 
 .globl type_name_IO 
 type_name_IO:			## type_name string for IO
-			.asciz "IO"
+			.string "IO"
 
 .globl type_name_Int 
 type_name_Int:			## type_name string for Int
-			.asciz "Int"
+			.string "Int"
 
 .globl type_name_Main 
 type_name_Main:			## type_name string for Main
-			.asciz "Main"
+			.string "Main"
 
 .globl type_name_Object 
 type_name_Object:			## type_name string for Object
-			.asciz "Object"
+			.string "Object"
 
 .globl type_name_String 
 type_name_String:			## type_name string for String
-			.asciz "String"
+			.string "String"
 
 .globl empty.string
 empty.string:			## empty string for default Strings
-			.asciz ""
+			.string ""
+
+.globl abort.string
+abort.string:			## abort string for Object.abort
+			.string "abort\n"
+.globl string_1
+string_1:
+			.string "ERROR: 3: Exception: static dispatch on void"
 
 .globl in_int_format_str
 in_int_format_str:
@@ -1151,6 +1179,58 @@ in_int_format_str:
 out_int_format_str:
 			.string "%d"
 
+	.globl	raw_out_string
+	.type	raw_out_string, @function
+raw_out_string:
+.raw_out_LFB0:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	subq	$32, %rsp
+	movq	%rdi, -24(%rbp)
+	movl	$0, -4(%rbp)
+	jmp	.raw_out_string_L2
+.raw_out_string_L5:
+	cmpb	$92, -6(%rbp)
+	jne	.raw_out_string_L3
+	movl	-4(%rbp), %eax
+	cltq
+	leaq	1(%rax), %rdx
+	movq	-24(%rbp), %rax
+	addq	%rdx, %rax
+	movzbl	(%rax), %eax
+	movb	%al, -5(%rbp)
+	cmpb	$110, -5(%rbp)
+	jne	.raw_out_string_L4
+	movb	$10, -6(%rbp)
+	addl	$1, -4(%rbp)
+	jmp	.raw_out_string_L3
+.raw_out_string_L4:
+	cmpb	$116, -5(%rbp)
+	jne	.raw_out_string_L3
+	movb	$9, -6(%rbp)
+	addl	$1, -4(%rbp)
+.raw_out_string_L3:
+	movsbl	-6(%rbp), %eax
+	movl	%eax, %edi
+	call	putchar
+	addl	$1, -4(%rbp)
+.raw_out_string_L2:
+	movl	-4(%rbp), %eax
+	movslq	%eax, %rdx
+	movq	-24(%rbp), %rax
+	addq	%rdx, %rax
+	movzbl	(%rax), %eax
+	movb	%al, -6(%rbp)
+	cmpb	$0, -6(%rbp)
+	jne	.raw_out_string_L5
+	leave
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

@@ -660,7 +660,7 @@ out_int_format_str:
 	.globl	raw_out_string
 	.type	raw_out_string, @function
 raw_out_string:
-.LFB0:
+.raw_out_LFB0:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -670,10 +670,10 @@ raw_out_string:
 	subq	$32, %rsp
 	movq	%rdi, -24(%rbp)
 	movl	$0, -4(%rbp)
-	jmp	.L2
-.L5:
+	jmp	.raw_out_string_L2
+.raw_out_string_L5:
 	cmpb	$92, -6(%rbp)
-	jne	.L3
+	jne	.raw_out_string_L3
 	movl	-4(%rbp), %eax
 	cltq
 	leaq	1(%rax), %rdx
@@ -682,21 +682,21 @@ raw_out_string:
 	movzbl	(%rax), %eax
 	movb	%al, -5(%rbp)
 	cmpb	$110, -5(%rbp)
-	jne	.L4
+	jne	.raw_out_string_L4
 	movb	$10, -6(%rbp)
 	addl	$1, -4(%rbp)
-	jmp	.L3
-.L4:
+	jmp	.raw_out_string_L3
+.raw_out_string_L4:
 	cmpb	$116, -5(%rbp)
-	jne	.L3
+	jne	.raw_out_string_L3
 	movb	$9, -6(%rbp)
 	addl	$1, -4(%rbp)
-.L3:
+.raw_out_string_L3:
 	movsbl	-6(%rbp), %eax
 	movl	%eax, %edi
 	call	putchar
 	addl	$1, -4(%rbp)
-.L2:
+.raw_out_string_L2:
 	movl	-4(%rbp), %eax
 	movslq	%eax, %rdx
 	movq	-24(%rbp), %rax
@@ -704,7 +704,7 @@ raw_out_string:
 	movzbl	(%rax), %eax
 	movb	%al, -6(%rbp)
 	cmpb	$0, -6(%rbp)
-	jne	.L5
+	jne	.raw_out_string_L5
 	leave
 	.cfi_def_cfa 7, 8
 	ret

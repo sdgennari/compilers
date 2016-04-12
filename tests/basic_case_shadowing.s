@@ -512,9 +512,52 @@ Main.main:
 			## assign
 			movq	%r9, %r8
 			## assign
-			movq	%r8, %r9
-			## move type tag of %r9 into %r8
-			movq	0(%r9), %r8
+			movq	%r8, %r11
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bool..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r9
+			## check if %r11 is void and set result accordingly
+			cmpq	$0, %r11
+			jnz		.asm_label_1
+			movq	$1, 24(%r9)
+.asm_label_1:
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
+			## not
+			movl	%r8d, %r9d
+			xorl	$1, %r9d
+			## branch .case_3_void
+			test	%r8d, %r8d
+			jnz		.case_3_void
+			## branch .case_3_not_void
+			test	%r9d, %r9d
+			jnz		.case_3_not_void
+.case_3_void:
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+			jmp		.case_3_not_void
+.case_3_not_void:
+			## move type tag of %r11 into %r8
+			movq	0(%r11), %r8
 			## check for type String
 			movq	$4, %rax
 			cmpq	%rax, %r8
@@ -541,7 +584,7 @@ Main.main:
 			je		.case_2_error_branch
 .case_2_Int:
 			## assign
-			movq	%r9, %r8
+			movq	%r11, %r8
 			## assign
 			movq	%r8, %r9
 			## storing param [0]
@@ -605,7 +648,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	$string_1, 24(%r8)
+			movq	$string_2, 24(%r8)
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -674,6 +717,10 @@ Main.main:
 			movq	%r8, %r9
 			jmp		.case_2_exit
 .case_2_error_branch:
+			movq	$string_3, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
 .case_2_exit:
 			## assign
 			movq	%r10, %r8
@@ -738,7 +785,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	$string_1, 24(%r8)
+			movq	$string_2, 24(%r8)
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -932,9 +979,17 @@ empty.string:			## empty string for default Strings
 .globl abort.string
 abort.string:			## abort string for Object.abort
 			.string "abort\n"
+.globl string_2
+string_2:
+			.string "\\n"
+
+.globl string_3
+string_3:
+			.string "ERROR: 8: Exception: case without matching branch: Object"
+
 .globl string_1
 string_1:
-			.string "\\n"
+			.string "ERROR: 8: Exception: case on void"
 
 .globl in_int_format_str
 in_int_format_str:

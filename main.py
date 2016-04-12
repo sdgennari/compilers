@@ -480,36 +480,6 @@ if __name__ == "__main__":
 	result += get_constructor_string()
 	result += get_methods_string()
 
-	'''
-	# gen_tac_for_ast(prog_ast_root)
-
-	# block_list = buildBasicBlocks(tac_list)
-
-	# computeLiveSets(block_list)
-
-	# for block in block_list:
-	# 	print block
-	# print
-	# sys.exit(1)
-
-	# print "blocks:",len(block_list)
-
-	# is_done = False
-	# while not is_done:
-	# 	computeLiveSets(block_list)
-		
-	# 	register_graph = build_register_graph(block_list)
-
-	# 	# print "graph",len(register_graph)
-
-	# 	combined_live_ranges = combine_block_live_ranges(block_list)
-
-	# 	is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
-	# # -- end while loop
-
-	# gen_asm_for_block_list(block_list, register_colors, spilled_registers)
-	'''
-
 	result += get_program_start_string()
 
 	# # Note: This must be called AFTER asm for all expressions has been generated
@@ -522,13 +492,4 @@ if __name__ == "__main__":
 	output_filename = input_filename[0:offset_from_end] + "s"
 	output_file = open(output_filename, 'w')
 	output_file.write(result)
-
-	'''
-	output_file.write("\t.section\t.rodata\n")
-	output_file.write(".int_fmt_string:\n\t.string \"%d\"\n")
-	output_file.write("\t.text\n")
-	output_file.write(".globl\tmain\n\t.type\tmain, @function\nmain:\n")
-	for asm_instr in asm_instr_list:
-		output_file.write(str(asm_instr))
-		output_file.write("\n")
-	'''
+	
