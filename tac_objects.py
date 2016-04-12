@@ -52,8 +52,9 @@ class TACMult:
 
 # x <- / y z
 class TACDiv:
-	def __init__(self, type_from_ast, assignee, op1, op2):
+	def __init__(self, type_from_ast, line, assignee, op1, op2):
 		self.type_from_ast = type_from_ast
+		self.line = line
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2

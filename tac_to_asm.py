@@ -347,6 +347,13 @@ def gen_asm_for_tac_div(tac_div):
 
 	asm_instr_list.append(ASMComment("divide"))
 
+	asm_instr_list.append(ASMComment("if " + op2_reg + " not zero, jmp over error"))
+	div_label = next_asm_label()
+	asm_instr_list.append(ASMCmpL("$0", op2_reg))
+	asm_instr_list.append(ASMJmpNz(div_label))
+	gen_asm_for_error(tac_div.line, "division by zero")
+	asm_instr_list.append(ASMLabel(div_label))
+
 	# Alloc temp stack space
 	asm_instr_list.append(ASMSubQ("$8", "%rsp"))
 

@@ -1,4 +1,4 @@
-Start Time:   Mon Apr 11 18:45:57 2016
+Start Time:   Mon Apr 11 20:21:26 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -111,12 +111,12 @@ t77: rbk2kb.zip-comparison_edge_cases_objects         ok
 
 Negative Test Cases
 
-t1: case-none                                  FAILED (empty output)
-t2: case-on-void                               FAILED (empty output)
-t3: dispatch-void-dynamic                      FAILED (empty output)
-t4: dispatch-void-static                       FAILED (empty output)
+t1: case-none                                    ok  
+t2: case-on-void                                 ok  
+t3: dispatch-void-dynamic                        ok  
+t4: dispatch-void-static                         ok  
 t5: div-by-zero                                FAILED (empty output)
 t6: substring-bad                              FAILED (empty output)
 t7: mjk6zt.zip-bug_maker                       FAILED
 t8: mjk6zt.zip-shallow_copy                    FAILED
-End Time: Mon Apr 11 18:47:08 2016
+End Time: Mon Apr 11 20:22:38 2016

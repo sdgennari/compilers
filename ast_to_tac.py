@@ -302,7 +302,7 @@ def gen_tac_for_exp(cur_tac_list, ast_exp):
 
 		# Use the unboxed values in the calculation
 		unboxed_assignee_symbol = new_symbol()
-		cur_tac_list.append(TACDiv(ast_exp.type_from_ast, unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
+		cur_tac_list.append(TACDiv(ast_exp.type_from_ast, ast_exp.line, unboxed_assignee_symbol, lhs_symbol_unboxed, rhs_symbol_unboxed))
 
 		# Box the answer and set assignee to pointer
 		assignee_symbol = gen_tac_for_box(cur_tac_list, unboxed_assignee_symbol, "Int")
