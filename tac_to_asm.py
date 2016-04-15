@@ -4,7 +4,6 @@ from shared_vars import *
 import sys
 
 # Initialize global vars
-# asm_instr_list = []
 register_color_map = {}
 spilled_register_location_map = {}
 asm_label_counter = 0
@@ -57,18 +56,18 @@ def get_asm_register(tac_register, size=32):
 	return register_name
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_const_int(tac_const_int):
+def gen_asm_for_tac_const_int(cur_asm_list, tac_const_int):
 	src = "$" + str(tac_const_int.val)
 	dest = get_asm_register(tac_const_int.assignee, 64)
 	dest_reg_offset = "24("+dest+")"
 
 	# Create a new Int and put value into box
-	asm_instr_list.append(ASMComment("new const Int: " + str(tac_const_int.val)))
-	gen_asm_for_new_boxed_type("Int", dest)
-	asm_instr_list.append(ASMMovL(src, dest_reg_offset))
+	cur_asm_list.append(ASMComment("new const Int: " + str(tac_const_int.val)))
+	gen_asm_for_new_boxed_type(cur_asm_list, "Int", dest)
+	cur_asm_list.append(ASMMovL(src, dest_reg_offset))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_const_bool(tac_const_bool):
+def gen_asm_for_tac_const_bool(cur_asm_list, tac_const_bool):
 	if tac_const_bool.val == "true":
 		src = "$1"
 	else:
@@ -78,461 +77,459 @@ def gen_asm_for_tac_const_bool(tac_const_bool):
 	dest_reg_offset = "24("+dest+")"
 
 	# Create new Bool and put value into box
-	asm_instr_list.append(ASMComment("const Bool"))
-	gen_asm_for_new_boxed_type("Bool", dest)
-	asm_instr_list.append(ASMMovL(src, dest_reg_offset))
+	cur_asm_list.append(ASMComment("const Bool"))
+	gen_asm_for_new_boxed_type(cur_asm_list, "Bool", dest)
+	cur_asm_list.append(ASMMovL(src, dest_reg_offset))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_const_string(tac_const_string):
+def gen_asm_for_tac_const_string(cur_asm_list, tac_const_string):
 	src = "$" + get_const_string_label(tac_const_string.val)
 	dest = get_asm_register(tac_const_string.assignee, 64)
 	dest_reg_offset = "24("+dest+")"
 
 	# Create new String and put raw string ptr into box
-	asm_instr_list.append(ASMComment("const String"))
-	gen_asm_for_new_boxed_type("String", dest)
-	asm_instr_list.append(ASMMovQ(src, dest_reg_offset))
+	cur_asm_list.append(ASMComment("const String"))
+	gen_asm_for_new_boxed_type(cur_asm_list, "String", dest)
+	cur_asm_list.append(ASMMovQ(src, dest_reg_offset))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_default(tac_default):
+def gen_asm_for_tac_default(cur_asm_list, tac_default):
 	# Set default value to $0
 	src = "$0"
 	if tac_default.type == "String":
 		src = "$empty.string"
 	dest = get_asm_register(tac_default.assignee, 64)
 
-	asm_instr_list.append(ASMComment("default " + tac_default.type))
+	cur_asm_list.append(ASMComment("default " + tac_default.type))
 	if tac_default.type == "Int" or tac_default.type == "Bool" or \
 			tac_default.type == "String":
 
 		# Make a new box for the type and store the value
 		dest_reg_offset = "24("+dest+")"
-		gen_asm_for_new_boxed_type(tac_default.type, dest)
-		asm_instr_list.append(ASMMovQ(src, dest_reg_offset))
+		gen_asm_for_new_boxed_type(cur_asm_list, tac_default.type, dest)
+		cur_asm_list.append(ASMMovQ(src, dest_reg_offset))
 
 	else:
 		# Move null ptr into dest
-		asm_instr_list.append(ASMMovQ(src, dest))
+		cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_label(tac_label):
+def gen_asm_for_tac_label(cur_asm_list, tac_label):
 	asm_label = "." + tac_label.label
 
-	asm_instr_list.append(ASMLabel(asm_label))
+	cur_asm_list.append(ASMLabel(asm_label))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_not(tac_neg_bool):
+def gen_asm_for_tac_not(cur_asm_list, tac_neg_bool):
 	# Uses unboxed values, so have 32-bit registers
 	src = get_asm_register(tac_neg_bool.op1)
 	dest = get_asm_register(tac_neg_bool.assignee)
 
-	asm_instr_list.append(ASMComment("not"))
-	asm_instr_list.append(ASMMovL(src, dest))
-	asm_instr_list.append(ASMXorL("$1", dest))
+	cur_asm_list.append(ASMComment("not"))
+	cur_asm_list.append(ASMMovL(src, dest))
+	cur_asm_list.append(ASMXorL("$1", dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_negate(tac_neg_arith):
+def gen_asm_for_tac_negate(cur_asm_list, tac_neg_arith):
 	# Uses unboxed values, so have 32-bit registers
 	src = get_asm_register(tac_neg_arith.op1)
 	dest = get_asm_register(tac_neg_arith.assignee)
 
-	asm_instr_list.append(ASMComment("negate"))
-	asm_instr_list.append(ASMMovL(src, dest))
-	asm_instr_list.append(ASMNegL(dest))
+	cur_asm_list.append(ASMComment("negate"))
+	cur_asm_list.append(ASMMovL(src, dest))
+	cur_asm_list.append(ASMNegL(dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_assign(tac_assign):
+def gen_asm_for_tac_assign(cur_asm_list, tac_assign):
 	src = get_asm_register(tac_assign.op1, 64)
 	dest = get_asm_register(tac_assign.assignee, 64)
 
-	asm_instr_list.append(ASMComment("assign"))
-	asm_instr_list.append(ASMMovQ(src, dest))
+	cur_asm_list.append(ASMComment("assign"))
+	cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_new(tac_new):
+def gen_asm_for_tac_new(cur_asm_list, tac_new):
 	dest = get_asm_register(tac_new.assignee, 64)
-	asm_instr_list.append(ASMComment("new " + tac_new.type))
-	gen_asm_for_new_boxed_type(tac_new.type, dest)
+	cur_asm_list.append(ASMComment("new " + tac_new.type))
+	gen_asm_for_new_boxed_type(cur_asm_list, tac_new.type, dest)
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_new_self_type(tac_instr):
+def gen_asm_for_tac_new_self_type(cur_asm_list, tac_instr):
 	dest = get_asm_register(tac_instr.assignee, 64)
 
-	asm_instr_list.append(ASMComment("Lookup 'new' in vtable for self"))
+	cur_asm_list.append(ASMComment("Lookup 'new' in vtable for self"))
 	# Get vtable ptr
-	asm_instr_list.append(ASMMovQ("16(%rbx)", "%rax"))
+	cur_asm_list.append(ASMMovQ("16(%rbx)", "%rax"))
 
 	# Find constructor dynamically
-	asm_instr_list.append(ASMMovQ("8(%rax)", "%rax"))
+	cur_asm_list.append(ASMMovQ("8(%rax)", "%rax"))
 
 	# Call method
-	asm_instr_list.append(ASMCall("*%rax"))
+	cur_asm_list.append(ASMCall("*%rax"))
 
 	# Move result into dest
-	asm_instr_list.append(ASMMovQ("%rax", dest))
+	cur_asm_list.append(ASMMovQ("%rax", dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_return(tac_return):
+def gen_asm_for_tac_return(cur_asm_list, tac_return):
 	src = get_asm_register(tac_return.op1, 64)
 	dest = "%rax"
 
-	asm_instr_list.append(ASMComment("return"))
-	asm_instr_list.append(ASMMovQ(src, dest))
-	asm_instr_list.append(ASMLeave())
-	asm_instr_list.append(ASMRet())
+	cur_asm_list.append(ASMComment("return"))
+	cur_asm_list.append(ASMMovQ(src, dest))
+	cur_asm_list.append(ASMLeave())
+	cur_asm_list.append(ASMRet())
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_jmp(tac_jmp):
+def gen_asm_for_tac_jmp(cur_asm_list, tac_jmp):
 	label = "." + str(tac_jmp.label)
 
-	asm_instr_list.append(ASMJmp(label))
+	cur_asm_list.append(ASMJmp(label))
 
-def gen_asm_for_tac_bt(tac_bt):
+def gen_asm_for_tac_bt(cur_asm_list, tac_bt):
 	label = "." + str(tac_bt.label)
 	reg = get_asm_register(tac_bt.op1)
 
-	# asm_instr_list.append(ASMCmpL("$1", reg))
-	# asm_instr_list.append(ASMJmpEq(label))
+	# cur_asm_list.append(ASMCmpL("$1", reg))
+	# cur_asm_list.append(ASMJmpEq(label))
 
-	asm_instr_list.append(ASMComment("branch " + label))
-	asm_instr_list.append(ASMTestL(reg, reg))
-	asm_instr_list.append(ASMJmpNz(label))
+	cur_asm_list.append(ASMComment("branch " + label))
+	cur_asm_list.append(ASMTestL(reg, reg))
+	cur_asm_list.append(ASMJmpNz(label))
 	# raise NotImplementedError("branch not yet implemented")
 
 # ---- TODO Update for boxing + unboxing
-def gen_asm_for_tac_store(tac_store):
+def gen_asm_for_tac_store(cur_asm_list, tac_store):
 	# raise NotImplementedError("tac_store not yet implemented")
 	src = get_asm_register(tac_store.op1, 64)
 	offset = spilled_register_location_map[tac_store.op1]
 
 	dest = str(offset) + "(%rbp)"
 
-	asm_instr_list.append(ASMComment("store"))
-	asm_instr_list.append(ASMMovQ(src, dest))
+	cur_asm_list.append(ASMComment("store"))
+	cur_asm_list.append(ASMMovQ(src, dest))
 
 # ---- TODO Update for boxing + unboxing
-def gen_asm_for_tac_load(tac_load):
+def gen_asm_for_tac_load(cur_asm_list, tac_load):
 	# raise NotImplementedError("tac_load not yet implemented")
 	dest = get_asm_register(tac_load.assignee, 64)
 
 	offset = spilled_register_location_map[tac_load.location]
 	src = str(offset) + "(%rbp)"
 
-	asm_instr_list.append(ASMComment("load"))
-	asm_instr_list.append(ASMMovQ(src, dest))
+	cur_asm_list.append(ASMComment("load"))
+	cur_asm_list.append(ASMMovQ(src, dest))
 
-def gen_asm_for_tac_out_int(tac_out_int):
+def gen_asm_for_tac_out_int(cur_asm_list, tac_out_int):
 	raise NotImplementedError("out_int not yet implemented")
-	# asm_instr_list.append(ASMComment("begin out_int"))
+	# cur_asm_list.append(ASMComment("begin out_int"))
 
 	# # Save all caller saved registers
 	# # TODO keep track of currently used registers and only save those
 	# for asm_register in caller_saved_registers:
-	# 	asm_instr_list.append(ASMPushQ(asm_register))
+	# 	cur_asm_list.append(ASMPushQ(asm_register))
 
 	# # Move the value to print into esi (param 2)
 	# reg_to_print = get_asm_register(tac_out_int.op1)
-	# asm_instr_list.append(ASMMovL(reg_to_print, "%esi"))
+	# cur_asm_list.append(ASMMovL(reg_to_print, "%esi"))
 
 	# # Move format string into edi (param 1)
-	# asm_instr_list.append(ASMMovL("$.int_fmt_string", "%edi"))
+	# cur_asm_list.append(ASMMovL("$.int_fmt_string", "%edi"))
 
 	# # Move 0 into eax (no vector params)
-	# asm_instr_list.append(ASMMovL("$0", "%eax"))
+	# cur_asm_list.append(ASMMovL("$0", "%eax"))
 
 	# # Call printf
-	# asm_instr_list.append(ASMCall("printf"))
+	# cur_asm_list.append(ASMCall("printf"))
 
 	# # Restore all caller saved registers
 	# # TODO keep track of currently used registers and only save those
 	# for asm_register in reversed(caller_saved_registers):
-	# 	asm_instr_list.append(ASMPopQ(asm_register))
+	# 	cur_asm_list.append(ASMPopQ(asm_register))
 
-	# asm_instr_list.append(ASMComment("end out_int"))
+	# cur_asm_list.append(ASMComment("end out_int"))
 
-def gen_asm_for_tac_in_int(tac_in_int):
+def gen_asm_for_tac_in_int(cur_asm_list, tac_in_int):
 	raise NotImplementedError("in_int() not yet implemented")
-	# asm_instr_list.append(ASMComment("begin in_int"))
+	# cur_asm_list.append(ASMComment("begin in_int"))
 
 	# # Allocate temp space on stack
-	# asm_instr_list.append(ASMSubQ("$4", "%rsp"))
+	# cur_asm_list.append(ASMSubQ("$4", "%rsp"))
 
 	# # Save all caller saved registers
 	# # TODO keep track of currently used registers and only save those
 	# offset = 0
 	# for asm_register in caller_saved_registers:
-	# 	asm_instr_list.append(ASMPushQ(asm_register))
+	# 	cur_asm_list.append(ASMPushQ(asm_register))
 	# 	offset += 8
 
 	# # Move address of temp space into esi (param 2)
 	# temp_space_loc = str(offset) + "(%rsp)"
-	# asm_instr_list.append(ASMLeaQ(temp_space_loc, "%rsi"))
+	# cur_asm_list.append(ASMLeaQ(temp_space_loc, "%rsi"))
 
 	# # Move format string into edi (param 1)
-	# asm_instr_list.append(ASMMovL("$.int_fmt_string", "%edi"))
+	# cur_asm_list.append(ASMMovL("$.int_fmt_string", "%edi"))
 
 	# # Move 0 into eax (no vector params)
-	# asm_instr_list.append(ASMMovL("$0", "%eax"))
+	# cur_asm_list.append(ASMMovL("$0", "%eax"))
 
 	# # Call scanf
-	# asm_instr_list.append(ASMCall("__isoc99_scanf"))
+	# cur_asm_list.append(ASMCall("__isoc99_scanf"))
 
 	# # Restore all caller saved registers
 	# # TODO keep track of currently used registers and only save those
 	# for asm_register in reversed(caller_saved_registers):
-	# 	asm_instr_list.append(ASMPopQ(asm_register))
+	# 	cur_asm_list.append(ASMPopQ(asm_register))
 
 	# # Move value from temp space to dest register
 	# dest = get_asm_register(tac_in_int.assignee)
-	# asm_instr_list.append(ASMMovL("(%rsp)", dest))
+	# cur_asm_list.append(ASMMovL("(%rsp)", dest))
 
 	# # Dealloc temp space on stack
-	# asm_instr_list.append(ASMAddQ("$4", "%rsp"))
+	# cur_asm_list.append(ASMAddQ("$4", "%rsp"))
 
-	# asm_instr_list.append(ASMComment("end in_int"))
+	# cur_asm_list.append(ASMComment("end in_int"))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_plus(tac_plus):
+def gen_asm_for_tac_plus(cur_asm_list, tac_plus):
 	# Uses unboxed values, so have 32-bit registers
 	op1_reg = get_asm_register(tac_plus.op1, 32)
 	op2_reg = get_asm_register(tac_plus.op2, 32)
 	dest = get_asm_register(tac_plus.assignee, 32)
 
-	asm_instr_list.append(ASMComment("plus"))
+	cur_asm_list.append(ASMComment("plus"))
 	
 	if op2_reg == dest:
-		asm_instr_list.append(ASMAddL(op1_reg, dest))
+		cur_asm_list.append(ASMAddL(op1_reg, dest))
 	else:
-		asm_instr_list.append(ASMMovL(op1_reg, dest))
-		asm_instr_list.append(ASMAddL(op2_reg, dest))
+		cur_asm_list.append(ASMMovL(op1_reg, dest))
+		cur_asm_list.append(ASMAddL(op2_reg, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_minus(tac_minus):
+def gen_asm_for_tac_minus(cur_asm_list, tac_minus):
 	# Uses unboxed values, so have 32-bit registers
 	op1_reg = get_asm_register(tac_minus.op1, 32)
 	op2_reg = get_asm_register(tac_minus.op2, 32)
 	dest = get_asm_register(tac_minus.assignee, 32)
 
-	asm_instr_list.append(ASMComment("minus"))
+	cur_asm_list.append(ASMComment("minus"))
 
 	if op2_reg == dest:
-		asm_instr_list.append(ASMSubL(op1_reg, dest))
-		asm_instr_list.append(ASMNegL(dest))
+		cur_asm_list.append(ASMSubL(op1_reg, dest))
+		cur_asm_list.append(ASMNegL(dest))
 	else:
-		asm_instr_list.append(ASMMovL(op1_reg, dest))
-		asm_instr_list.append(ASMSubL(op2_reg, dest))
+		cur_asm_list.append(ASMMovL(op1_reg, dest))
+		cur_asm_list.append(ASMSubL(op2_reg, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_mult(tac_mult):
+def gen_asm_for_tac_mult(cur_asm_list, tac_mult):
 	# Uses unboxed values, so have 32-bit registers
 	op1_reg = get_asm_register(tac_mult.op1, 32)
 	op2_reg = get_asm_register(tac_mult.op2, 32)
 	dest = get_asm_register(tac_mult.assignee, 32)
 
-	asm_instr_list.append(ASMComment("mult"))
+	cur_asm_list.append(ASMComment("mult"))
 
 	if op2_reg == dest:
-		asm_instr_list.append(ASMImulL(op1_reg, dest))
+		cur_asm_list.append(ASMImulL(op1_reg, dest))
 	else:
-		asm_instr_list.append(ASMMovL(op1_reg, dest))
-		asm_instr_list.append(ASMImulL(op2_reg, dest))
+		cur_asm_list.append(ASMMovL(op1_reg, dest))
+		cur_asm_list.append(ASMImulL(op2_reg, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_div(tac_div):
+def gen_asm_for_tac_div(cur_asm_list, tac_div):
 	# Uses unboxed values, so have 32-bit registers
 	#rX = rY / rZ
 	op1_reg = get_asm_register(tac_div.op1, 32)
 	op2_reg = get_asm_register(tac_div.op2, 32)
 	dest = get_asm_register(tac_div.assignee, 32)
 
-	asm_instr_list.append(ASMComment("divide"))
+	cur_asm_list.append(ASMComment("divide"))
 
-	asm_instr_list.append(ASMComment("if " + op2_reg + " not zero, jmp over error"))
+	cur_asm_list.append(ASMComment("if " + op2_reg + " not zero, jmp over error"))
 	div_label = next_asm_label()
-	asm_instr_list.append(ASMCmpL("$0", op2_reg))
-	asm_instr_list.append(ASMJmpNz(div_label))
-	gen_asm_for_error(tac_div.line, "division by zero")
-	asm_instr_list.append(ASMLabel(div_label))
+	cur_asm_list.append(ASMCmpL("$0", op2_reg))
+	cur_asm_list.append(ASMJmpNz(div_label))
+	gen_asm_for_error(cur_asm_list, tac_div.line, "division by zero")
+	cur_asm_list.append(ASMLabel(div_label))
 
 	# Alloc temp stack space
-	asm_instr_list.append(ASMSubQ("$8", "%rsp"))
+	cur_asm_list.append(ASMSubQ("$8", "%rsp"))
 
 	# Save registers
-	asm_instr_list.append(ASMPushQ("%rdx"))
-	asm_instr_list.append(ASMPushQ("%rax"))
-	asm_instr_list.append(ASMPushQ("%rcx"))
+	cur_asm_list.append(ASMPushQ("%rdx"))
+	cur_asm_list.append(ASMPushQ("%rax"))
+	cur_asm_list.append(ASMPushQ("%rcx"))
 
 	# Store rZ in temp space on stack
-	asm_instr_list.append(ASMMovL(op2_reg, "24(%rsp)"))
+	cur_asm_list.append(ASMMovL(op2_reg, "24(%rsp)"))
 
 	# Move rY into eax
-	asm_instr_list.append(ASMMovL(op1_reg, "%eax"))
+	cur_asm_list.append(ASMMovL(op1_reg, "%eax"))
 
 	# Zero extend eax to edx:eax
-	asm_instr_list.append(ASMCltd())
+	cur_asm_list.append(ASMCltd())
 
 	# Move rZ from stack to ecx
-	asm_instr_list.append(ASMMovL("24(%rsp)", "%ecx"))
+	cur_asm_list.append(ASMMovL("24(%rsp)", "%ecx"))
 
 	# Divide rY by rZ
-	asm_instr_list.append(ASMIdivL("%ecx"))
+	cur_asm_list.append(ASMIdivL("%ecx"))
 
 	# Store result in temp space on stack
-	asm_instr_list.append(ASMMovL("%eax", "28(%rsp)"))
+	cur_asm_list.append(ASMMovL("%eax", "28(%rsp)"))
 
 	# Restore registers
-	asm_instr_list.append(ASMPopQ("%rcx"))
-	asm_instr_list.append(ASMPopQ("%rax"))
-	asm_instr_list.append(ASMPopQ("%rdx"))
+	cur_asm_list.append(ASMPopQ("%rcx"))
+	cur_asm_list.append(ASMPopQ("%rax"))
+	cur_asm_list.append(ASMPopQ("%rdx"))
 
 	# Save result
-	asm_instr_list.append(ASMMovL("4(%rsp)", dest))
+	cur_asm_list.append(ASMMovL("4(%rsp)", dest))
 
 	# Dealloc temp stack space
-	asm_instr_list.append(ASMAddQ("$8", "%rsp"))
+	cur_asm_list.append(ASMAddQ("$8", "%rsp"))
 
-def gen_asm_for_tac_comp_l(tac_comp_l):
+def gen_asm_for_tac_comp_l(cur_asm_list, tac_comp_l):
 	# Get lhs_reg, rhs_reg, and dest
 	op1_reg = get_asm_register(tac_comp_l.op1, 64)
 	op2_reg = get_asm_register(tac_comp_l.op2, 64)
 	dest = get_asm_register(tac_comp_l.assignee, 64)
 
-	asm_instr_list.append(ASMComment("use lt_helper to compare " + op1_reg + " < " + op2_reg))
+	cur_asm_list.append(ASMComment("use lt_helper to compare " + op1_reg + " < " + op2_reg))
 
 	# Save all caller-saved regs
 	for reg in caller_saved_registers:
-		asm_instr_list.append(ASMPushQ(reg))
+		cur_asm_list.append(ASMPushQ(reg))
 
 	# Push lhs and rhs regs
-	asm_instr_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
-	asm_instr_list.append(ASMPushQ(op2_reg))
-	asm_instr_list.append(ASMPushQ(op1_reg))
+	cur_asm_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
+	cur_asm_list.append(ASMPushQ(op2_reg))
+	cur_asm_list.append(ASMPushQ(op1_reg))
 
 	# Call lt_helper
-	asm_instr_list.append(ASMCall("lt_helper"))
+	cur_asm_list.append(ASMCall("lt_helper"))
 
 	# Add 16 to stack to remove pushed lhs and rhs
-	asm_instr_list.append(ASMAddQ("$16", "%rsp"))
+	cur_asm_list.append(ASMAddQ("$16", "%rsp"))
 
 	# Restore all caller-saved regs
 	for reg in reversed(caller_saved_registers):
-		asm_instr_list.append(ASMPopQ(reg))
+		cur_asm_list.append(ASMPopQ(reg))
 
 	# Move result into dest
-	asm_instr_list.append(ASMComment("move comparison result into " + dest))
-	asm_instr_list.append(ASMMovQ("%rax", dest))
+	cur_asm_list.append(ASMComment("move comparison result into " + dest))
+	cur_asm_list.append(ASMMovQ("%rax", dest))
 
-def gen_asm_for_tac_comp_le(tac_comp_le):
+def gen_asm_for_tac_comp_le(cur_asm_list, tac_comp_le):
 	# Get lhs_reg, rhs_reg, and dest
 	op1_reg = get_asm_register(tac_comp_le.op1, 64)
 	op2_reg = get_asm_register(tac_comp_le.op2, 64)
 	dest = get_asm_register(tac_comp_le.assignee, 64)
 
-	asm_instr_list.append(ASMComment("use le_helper to compare " + op1_reg + " <= " + op2_reg))
+	cur_asm_list.append(ASMComment("use le_helper to compare " + op1_reg + " <= " + op2_reg))
 
 	# Save all caller-saved regs
 	for reg in caller_saved_registers:
-		asm_instr_list.append(ASMPushQ(reg))
+		cur_asm_list.append(ASMPushQ(reg))
 
 	# Push lhs and rhs regs
-	asm_instr_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
-	asm_instr_list.append(ASMPushQ(op2_reg))
-	asm_instr_list.append(ASMPushQ(op1_reg))
+	cur_asm_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
+	cur_asm_list.append(ASMPushQ(op2_reg))
+	cur_asm_list.append(ASMPushQ(op1_reg))
 
 	# Call lt_helper
-	asm_instr_list.append(ASMCall("le_helper"))
+	cur_asm_list.append(ASMCall("le_helper"))
 
 	# Add 16 to stack to remove pushed lhs and rhs
-	asm_instr_list.append(ASMAddQ("$16", "%rsp"))
+	cur_asm_list.append(ASMAddQ("$16", "%rsp"))
 
 	# Restore all caller-saved regs
 	for reg in reversed(caller_saved_registers):
-		asm_instr_list.append(ASMPopQ(reg))
+		cur_asm_list.append(ASMPopQ(reg))
 
 	# Move result into dest
-	asm_instr_list.append(ASMComment("move comparison result into " + dest))
-	asm_instr_list.append(ASMMovQ("%rax", dest))
+	cur_asm_list.append(ASMComment("move comparison result into " + dest))
+	cur_asm_list.append(ASMMovQ("%rax", dest))
 
-def gen_asm_for_tac_comp_e(tac_comp_eq):
+def gen_asm_for_tac_comp_e(cur_asm_list, tac_comp_eq):
 	# Get lhs_reg, rhs_reg, and dest
 	op1_reg = get_asm_register(tac_comp_eq.op1, 64)
 	op2_reg = get_asm_register(tac_comp_eq.op2, 64)
 	dest = get_asm_register(tac_comp_eq.assignee, 64)
 
-	asm_instr_list.append(ASMComment("use eq_helper to compare " + op1_reg + " = " + op2_reg))
+	cur_asm_list.append(ASMComment("use eq_helper to compare " + op1_reg + " = " + op2_reg))
 
 	# Save all caller-saved regs
 	for reg in caller_saved_registers:
-		asm_instr_list.append(ASMPushQ(reg))
+		cur_asm_list.append(ASMPushQ(reg))
 
 	# Push lhs and rhs regs
-	asm_instr_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
-	asm_instr_list.append(ASMPushQ(op2_reg))
-	asm_instr_list.append(ASMPushQ(op1_reg))
+	cur_asm_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
+	cur_asm_list.append(ASMPushQ(op2_reg))
+	cur_asm_list.append(ASMPushQ(op1_reg))
 
 	# Call lt_helper
-	asm_instr_list.append(ASMCall("eq_helper"))
+	cur_asm_list.append(ASMCall("eq_helper"))
 
 	# Add 16 to stack to remove pushed lhs and rhs
-	asm_instr_list.append(ASMAddQ("$16", "%rsp"))
+	cur_asm_list.append(ASMAddQ("$16", "%rsp"))
 
 	# Restore all caller-saved regs
 	for reg in reversed(caller_saved_registers):
-		asm_instr_list.append(ASMPopQ(reg))
+		cur_asm_list.append(ASMPopQ(reg))
 
 	# Move result into dest
-	asm_instr_list.append(ASMComment("move comparison result into " + dest))
-	asm_instr_list.append(ASMMovQ("%rax", dest))
+	cur_asm_list.append(ASMComment("move comparison result into " + dest))
+	cur_asm_list.append(ASMMovQ("%rax", dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_box(tac_box):
-	global asm_instr_list
+def gen_asm_for_tac_box(cur_asm_list, tac_box):
 	op1_reg = get_asm_register(tac_box.op1, 64)
 	dest = get_asm_register(tac_box.assignee, 64)
 
 	constructor_method = tac_box.exp_type + "..new"
 	dest_reg_offset = "24(" + dest + ")"
 
-	asm_instr_list.append(ASMComment("box value of " + op1_reg + " into " + dest),)
-	gen_asm_for_new_boxed_type(tac_box.exp_type, dest)
-	asm_instr_list.append(ASMMovQ(op1_reg, dest_reg_offset))
+	cur_asm_list.append(ASMComment("box value of " + op1_reg + " into " + dest),)
+	gen_asm_for_new_boxed_type(cur_asm_list, tac_box.exp_type, dest)
+	cur_asm_list.append(ASMMovQ(op1_reg, dest_reg_offset))
 
 # BOXED + UNBOXED
-def gen_asm_for_new_boxed_type(type_name, dest_reg):
-	global asm_instr_list
+def gen_asm_for_new_boxed_type(cur_asm_list, type_name, dest_reg):
 	constructor_method = type_name + "..new"
 
-	asm_instr_list.append(ASMComment("push caller-saved regs"))
+	cur_asm_list.append(ASMComment("push caller-saved regs"))
 	for reg in caller_saved_registers:
-		asm_instr_list.append(ASMPushQ(reg))
+		cur_asm_list.append(ASMPushQ(reg))
 
-	asm_instr_list.append(ASMCall(constructor_method))
+	cur_asm_list.append(ASMCall(constructor_method))
 
-	asm_instr_list.append(ASMComment("pop caller-saved regs"))
+	cur_asm_list.append(ASMComment("pop caller-saved regs"))
 	for reg in reversed(caller_saved_registers):
-		asm_instr_list.append(ASMPopQ(reg))
+		cur_asm_list.append(ASMPopQ(reg))
 
-	asm_instr_list.append(ASMMovQ("%rax", dest_reg))
+	cur_asm_list.append(ASMMovQ("%rax", dest_reg))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_unbox(tac_unbox):
+def gen_asm_for_tac_unbox(cur_asm_list, tac_unbox):
 	op1_reg = get_asm_register(tac_unbox.op1, 64)
 	dest = get_asm_register(tac_unbox.assignee, 64)
 
-	asm_instr_list.append(ASMComment("unbox value of " + op1_reg + " into " + dest))
+	cur_asm_list.append(ASMComment("unbox value of " + op1_reg + " into " + dest))
 	op1_reg_offset = "24(" + op1_reg + ")"
-	asm_instr_list.append(ASMMovQ(op1_reg_offset, dest))
+	cur_asm_list.append(ASMMovQ(op1_reg_offset, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_load_attr(tac_load_attr):
+def gen_asm_for_tac_load_attr(cur_asm_list, tac_load_attr):
 	global attr_offset_map, current_type
 
 	# Handle self explicitly
 	# Note: Up to this point self was treated as an attribute
 	if tac_load_attr.ident == "self":
 		dest = get_asm_register(tac_load_attr.assignee, 64)
-		asm_instr_list.append(ASMComment("move self ptr into " + dest))
-		asm_instr_list.append(ASMMovQ(SELF_REG, dest))
+		cur_asm_list.append(ASMComment("move self ptr into " + dest))
+		cur_asm_list.append(ASMMovQ(SELF_REG, dest))
 
 	else:
 		# Get the offset from the self ptr
@@ -543,11 +540,11 @@ def gen_asm_for_tac_load_attr(tac_load_attr):
 		# Move the contents of the attr into assignee
 		src = str(self_offset)+"("+SELF_REG+")"
 		dest = get_asm_register(tac_load_attr.assignee, 64)
-		asm_instr_list.append(ASMComment("load self[" + str(attr_idx) + "] (" + \
+		cur_asm_list.append(ASMComment("load self[" + str(attr_idx) + "] (" + \
 			tac_load_attr.ident + ") into " + dest))
-		asm_instr_list.append(ASMMovQ(src, dest))
+		cur_asm_list.append(ASMMovQ(src, dest))
 
-def gen_asm_for_tac_store_attr(tac_store_attr):
+def gen_asm_for_tac_store_attr(cur_asm_list, tac_store_attr):
 	global attr_offset_map, current_type
 
 	# Get the offset from the self ptr
@@ -558,11 +555,11 @@ def gen_asm_for_tac_store_attr(tac_store_attr):
 	# Move the value into the attr
 	src = get_asm_register(tac_store_attr.op1, 64)
 	dest = str(self_offset)+"("+SELF_REG+")"
-	asm_instr_list.append(ASMComment("store " + src + " in self[" + str(attr_idx) + \
+	cur_asm_list.append(ASMComment("store " + src + " in self[" + str(attr_idx) + \
 		"] (" + tac_store_attr.ident + ")"))
-	asm_instr_list.append(ASMMovQ(src, dest))
+	cur_asm_list.append(ASMMovQ(src, dest))
 
-def gen_asm_for_tac_call(tac_call):
+def gen_asm_for_tac_call(cur_asm_list, tac_call):
 	# Note: This function assumes that all params and the receiver object
 	# 	have already been evaluated and stored (done via TAC instructions)
 	global vtable_offset_map
@@ -571,21 +568,21 @@ def gen_asm_for_tac_call(tac_call):
 	num_regs_saved = 0
 	for reg in caller_saved_registers:
 		num_regs_saved += 1
-		asm_instr_list.append(ASMPushQ(reg))
+		cur_asm_list.append(ASMPushQ(reg))
 
 	# Store self ptr and INC NUM_REGS_SAVED (very important)
-	asm_instr_list.append(ASMComment("save self ptr (" + SELF_REG + ")"))
-	asm_instr_list.append(ASMPushQ(SELF_REG))
+	cur_asm_list.append(ASMComment("save self ptr (" + SELF_REG + ")"))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
 	num_regs_saved += 1
 
 	# Move all params from location on stack to new stack location
 	# Note: Take into account offset from above caller-saved regs
 	num_params = len(tac_call.params_list)
-	asm_instr_list.append(ASMComment("pushing " + str(num_params) + " params to the stack"))
+	cur_asm_list.append(ASMComment("pushing " + str(num_params) + " params to the stack"))
 	
 	# Allocate space for all the params
 	space_required = "$" + str(8 * num_params)
-	asm_instr_list.append(ASMSubQ(space_required, "%rsp"))
+	cur_asm_list.append(ASMSubQ(space_required, "%rsp"))
 	
 	original_value_stack_offset = 2 * num_params + num_regs_saved - 1
 
@@ -599,22 +596,22 @@ def gen_asm_for_tac_call(tac_call):
 		rsp_param_offset = str(param_offset) + "(%rsp)"
 
 		# Move the saved param value to the spot on the stack
-		asm_instr_list.append(ASMComment("moving rsp[" + str(value_offset) + "] to rsp[" + str(param_offset) + "]"))
-		asm_instr_list.append(ASMMovQ(rsp_value_offset, "%rax"))
-		asm_instr_list.append(ASMMovQ("%rax", rsp_param_offset))
+		cur_asm_list.append(ASMComment("moving rsp[" + str(value_offset) + "] to rsp[" + str(param_offset) + "]"))
+		cur_asm_list.append(ASMMovQ(rsp_value_offset, "%rax"))
+		cur_asm_list.append(ASMMovQ("%rax", rsp_param_offset))
 
 	# Set receiver object as self pointer (unless self dispatch)
 	if hasattr(tac_call, "receiver_obj"):
 		ro_reg = get_asm_register(tac_call.receiver_obj, 64)
-		asm_instr_list.append(ASMComment("set receiver_obj (" + ro_reg + ") as self ptr (" + SELF_REG + ")"))
-		asm_instr_list.append(ASMMovQ(ro_reg, SELF_REG))
+		cur_asm_list.append(ASMComment("set receiver_obj (" + ro_reg + ") as self ptr (" + SELF_REG + ")"))
+		cur_asm_list.append(ASMMovQ(ro_reg, SELF_REG))
 
 	# Get method pointer based on type of call
 	if isinstance(tac_call, TACStaticCall):
 		# Call method label explicitly
-		asm_instr_list.append(ASMComment("static: call method label explicitly"))
+		cur_asm_list.append(ASMComment("static: call method label explicitly"))
 		method_label = tac_call.static_type + "." + tac_call.method_ident
-		asm_instr_list.append(ASMCall(method_label))
+		cur_asm_list.append(ASMCall(method_label))
 	elif isinstance(tac_call, TACDynamicCall):
 		# Find method label via vtable
 		# Handle SELF_TYPE explicitly
@@ -625,22 +622,22 @@ def gen_asm_for_tac_call(tac_call):
 		tup = (receiver_obj_type, tac_call.method_ident)
 		method_idx = vtable_offset_map[tup]
 
-		asm_instr_list.append(ASMComment("dynamic: lookup method in vtable"))
+		cur_asm_list.append(ASMComment("dynamic: lookup method in vtable"))
 
 		# Get pointer to vtable (offset of 16 from receiver object)
-		asm_instr_list.append(ASMComment("get ptr to vtable from receiver obj"))
+		cur_asm_list.append(ASMComment("get ptr to vtable from receiver obj"))
 		vtable_ptr = "16(" + ro_reg + ")"
-		asm_instr_list.append(ASMMovQ(vtable_ptr, "%rax"))
+		cur_asm_list.append(ASMMovQ(vtable_ptr, "%rax"))
 
 		# Get pointer to method label from offset in vtable
-		asm_instr_list.append(ASMComment("find method " + tac_call.method_ident + " in vtable[" + str(method_idx) + "]"))
+		cur_asm_list.append(ASMComment("find method " + tac_call.method_ident + " in vtable[" + str(method_idx) + "]"))
 		vtable_offset = method_idx * 8
 		method_ptr = str(vtable_offset) + "(%rax)"
-		asm_instr_list.append(ASMMovQ(method_ptr, "%rax"))
+		cur_asm_list.append(ASMMovQ(method_ptr, "%rax"))
 
 		# Call method dynamically
-		asm_instr_list.append(ASMComment("call method dynamically"))
-		asm_instr_list.append(ASMCall("*%rax"))
+		cur_asm_list.append(ASMComment("call method dynamically"))
+		cur_asm_list.append(ASMCall("*%rax"))
 
 		# raise NotImplementedError("Dynamic not yet impl")
 	elif isinstance(tac_call, TACSelfCall):
@@ -649,99 +646,99 @@ def gen_asm_for_tac_call(tac_call):
 
 		method_idx = vtable_offset_map[tup]
 
-		asm_instr_list.append(ASMComment("self: lookup method in vtable"))
+		cur_asm_list.append(ASMComment("self: lookup method in vtable"))
 
 		# Get pointer to vtable (offset of 16 from self)
-		asm_instr_list.append(ASMComment("get ptr to vtable from self"))
+		cur_asm_list.append(ASMComment("get ptr to vtable from self"))
 		vtable_ptr = "16(" + SELF_REG + ")"
-		asm_instr_list.append(ASMMovQ(vtable_ptr, "%rax"))
+		cur_asm_list.append(ASMMovQ(vtable_ptr, "%rax"))
 
 		# Get pointer to method label from offset in vtable
-		asm_instr_list.append(ASMComment("find method " + tac_call.method_ident + " in vtable[" + str(method_idx) + "]"))
+		cur_asm_list.append(ASMComment("find method " + tac_call.method_ident + " in vtable[" + str(method_idx) + "]"))
 		vtable_offset = method_idx * 8
 		method_ptr = str(vtable_offset) + "(%rax)"
-		asm_instr_list.append(ASMMovQ(method_ptr, "%rax"))
+		cur_asm_list.append(ASMMovQ(method_ptr, "%rax"))
 
 		# Call method dynamically
-		asm_instr_list.append(ASMComment("call method dynamically"))
-		asm_instr_list.append(ASMCall("*%rax"))		
+		cur_asm_list.append(ASMComment("call method dynamically"))
+		cur_asm_list.append(ASMCall("*%rax"))		
 
 	else:
 		raise NotImplementedError("No dispatch for " + tac_call.__class__.__name__)
 
 	# Subtract offset from stack to remove params
-	asm_instr_list.append(ASMComment("removing " + str(num_params) + " params from stack with subq"))
+	cur_asm_list.append(ASMComment("removing " + str(num_params) + " params from stack with subq"))
 	offset = 8 * num_params
 	offset_str = "$" + str(offset)
-	asm_instr_list.append(ASMAddQ(offset_str, "%rsp"))
+	cur_asm_list.append(ASMAddQ(offset_str, "%rsp"))
 
 	# Store self ptr
-	asm_instr_list.append(ASMComment("restore self ptr (" + SELF_REG + ")"))
-	asm_instr_list.append(ASMPopQ(SELF_REG))
+	cur_asm_list.append(ASMComment("restore self ptr (" + SELF_REG + ")"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
 
 	# Pop all caller-saved regs
 	for reg in reversed(caller_saved_registers):
-		asm_instr_list.append(ASMPopQ(reg))
+		cur_asm_list.append(ASMPopQ(reg))
 
 	# Subtract offset from stack to remove stored params
-	asm_instr_list.append(ASMComment("removing " + str(num_params) + " stored params from stack (2nd time)"))
-	asm_instr_list.append(ASMAddQ(offset_str, "%rsp"))
+	cur_asm_list.append(ASMComment("removing " + str(num_params) + " stored params from stack (2nd time)"))
+	cur_asm_list.append(ASMAddQ(offset_str, "%rsp"))
 
 	# Move result into dest
 	dest = get_asm_register(tac_call.assignee, 64)
-	asm_instr_list.append(ASMComment("storing method result in " + dest))
-	asm_instr_list.append(ASMMovQ("%rax", dest))
+	cur_asm_list.append(ASMComment("storing method result in " + dest))
+	cur_asm_list.append(ASMMovQ("%rax", dest))
 
-# def gen_asm_for_tac_make_param_space(tac_instr):
+# def gen_asm_for_tac_make_param_space(cur_asm_list, tac_instr):
 # 	rsp_offset = 8 * tac_instr.num_params
 # 	rsp_offset = "$" + str(rsp_offset)
 
-# 	asm_instr_list.append(ASMComment("making room for " + str(tac_instr.num_params) + " params"))
-# 	asm_instr_list.append(ASMSubQ(rsp_offset, "%rsp"))
+# 	cur_asm_list.append(ASMComment("making room for " + str(tac_instr.num_params) + " params"))
+# 	cur_asm_list.append(ASMSubQ(rsp_offset, "%rsp"))
 
-# def gen_asm_for_tac_remove_param_space(tac_instr):
+# def gen_asm_for_tac_remove_param_space(cur_asm_list, tac_instr):
 # 	rsp_offset = 8 * tac_instr.num_params
 # 	rsp_offset = "$" + str(rsp_offset)
 
-# 	asm_instr_list.append(ASMComment("reset rsp after " + str(tac_instr.num_params) + " params"))
-# 	asm_instr_list.append(ASMAddQ(rsp_offset, "%rsp"))
+# 	cur_asm_list.append(ASMComment("reset rsp after " + str(tac_instr.num_params) + " params"))
+# 	cur_asm_list.append(ASMAddQ(rsp_offset, "%rsp"))
 
-def gen_asm_for_tac_store_param(tac_store_param):
+def gen_asm_for_tac_store_param(cur_asm_list, tac_store_param):
 	op1_reg = get_asm_register(tac_store_param.op1, 64)
-	asm_instr_list.append(ASMComment("storing param [" + str(tac_store_param.param_idx) + "]"))
-	asm_instr_list.append(ASMPushQ(op1_reg))
+	cur_asm_list.append(ASMComment("storing param [" + str(tac_store_param.param_idx) + "]"))
+	cur_asm_list.append(ASMPushQ(op1_reg))
 
-def gen_asm_for_tac_load_param(tac_load_param):
+def gen_asm_for_tac_load_param(cur_asm_list, tac_load_param):
 	dest = get_asm_register(tac_load_param.assignee, 64)
 
 	# Calculate the offset from rbp, taking into account ret addr and saved rbp (+2)
 	offset = 8 * (tac_load_param.param_idx + 2)
 	rbp_offset = str(offset) + "(%rbp)"
 
-	asm_instr_list.append(ASMComment("loading param [" + str(tac_load_param.param_idx) + "] into " + dest))
-	asm_instr_list.append(ASMMovQ(rbp_offset, dest))
+	cur_asm_list.append(ASMComment("loading param [" + str(tac_load_param.param_idx) + "] into " + dest))
+	cur_asm_list.append(ASMMovQ(rbp_offset, dest))
 
-def gen_asm_for_tac_is_void(tac_instr):
+def gen_asm_for_tac_is_void(cur_asm_list, tac_instr):
 	op1_reg = get_asm_register(tac_instr.op1, 64)
 	dest = get_asm_register(tac_instr.assignee, 64)
 	false_label = next_asm_label()
 
 	# Make a new Bool to hold the result
-	gen_asm_for_new_boxed_type("Bool", dest)
+	gen_asm_for_new_boxed_type(cur_asm_list, "Bool", dest)
 
 	# Compare op1_reg to $0 to see if it is void
-	asm_instr_list.append(ASMComment("check if " + op1_reg + " is void and set result accordingly"))
-	asm_instr_list.append(ASMCmpQ("$0", op1_reg))
-	asm_instr_list.append(ASMJmpNz(false_label))
+	cur_asm_list.append(ASMComment("check if " + op1_reg + " is void and set result accordingly"))
+	cur_asm_list.append(ASMCmpQ("$0", op1_reg))
+	cur_asm_list.append(ASMJmpNz(false_label))
 	dest_reg_offset = "24(" + dest + ")"
-	asm_instr_list.append(ASMMovQ("$1", dest_reg_offset))
-	asm_instr_list.append(ASMLabel(false_label))
+	cur_asm_list.append(ASMMovQ("$1", dest_reg_offset))
+	cur_asm_list.append(ASMLabel(false_label))
 
-def gen_asm_for_tac_error(tac_instr):
+def gen_asm_for_tac_error(cur_asm_list, tac_instr):
 	# Call helper function to generate asm
-	gen_asm_for_error(tac_instr.line, tac_instr.error_msg)
+	gen_asm_for_error(cur_asm_list, tac_instr.line, tac_instr.error_msg)
 
-def gen_asm_for_error(line, error_msg):
+def gen_asm_for_error(cur_asm_list, line, error_msg):
 	# Create a string of the form:
 	# ERROR: 3: Exception: case without matching branch: String()
 	error_string = "ERROR: " + str(line) + ": Exception: "
@@ -751,32 +748,32 @@ def gen_asm_for_error(line, error_msg):
 	error_string_label = get_const_string_label(error_string)
 
 	# Move the string into rdi and call raw_out_string
-	asm_instr_list.append(ASMMovQ("$" + error_string_label, "%rdi"))
-	asm_instr_list.append(ASMCall("raw_out_string"))
+	cur_asm_list.append(ASMMovQ("$" + error_string_label, "%rdi"))
+	cur_asm_list.append(ASMCall("raw_out_string"))
 
 	# Exit the program
-	asm_instr_list.append(ASMMovQ("$0", "%rax"))
-	asm_instr_list.append(ASMCall("exit"))
+	cur_asm_list.append(ASMMovQ("$0", "%rax"))
+	cur_asm_list.append(ASMCall("exit"))
 
-def gen_asm_for_tac_case_type_cmp(tac_instr):
+def gen_asm_for_tac_case_type_cmp(cur_asm_list, tac_instr):
 	op1_reg = get_asm_register(tac_instr.op1, 64)
 	# Get type tag from map
 	type_tag_num = "$" + str(type_tag_map[tac_instr.type_name])
 
-	asm_instr_list.append(ASMComment("check for type " + tac_instr.type_name))
-	asm_instr_list.append(ASMMovQ(type_tag_num, "%rax"))
-	asm_instr_list.append(ASMCmpQ("%rax", op1_reg))
-	asm_instr_list.append(ASMJmpEq("." + tac_instr.type_case_label))
+	cur_asm_list.append(ASMComment("check for type " + tac_instr.type_name))
+	cur_asm_list.append(ASMMovQ(type_tag_num, "%rax"))
+	cur_asm_list.append(ASMCmpQ("%rax", op1_reg))
+	cur_asm_list.append(ASMJmpEq("." + tac_instr.type_case_label))
 
-def gen_asm_for_tac_get_type_tag(tac_instr):
+def gen_asm_for_tac_get_type_tag(cur_asm_list, tac_instr):
 	op1_reg = get_asm_register(tac_instr.op1, 64)
 	dest = get_asm_register(tac_instr.assignee, 64)
 
 	op1_reg_offset = "0(" + op1_reg + ")"
-	asm_instr_list.append(ASMComment("move type tag of " + op1_reg + " into " + dest))
-	asm_instr_list.append(ASMMovQ(op1_reg_offset, dest))
+	cur_asm_list.append(ASMComment("move type tag of " + op1_reg + " into " + dest))
+	cur_asm_list.append(ASMMovQ(op1_reg_offset, dest))
 
-def gen_asm_for_tac_instr(tac_instr):
+def gen_asm_for_tac_instr(cur_asm_list, tac_instr):
 	# Skip instructions whose assignees do not have colors
 	# This will only skip instructions that are never live (dead code)
 	if not isinstance(tac_instr, TACIOCall) and hasattr(tac_instr, "assignee"):
@@ -785,136 +782,136 @@ def gen_asm_for_tac_instr(tac_instr):
 
 	# Check each type of TAC instruction and handle accordingly
 	if isinstance(tac_instr, TACConstInt):
-		gen_asm_for_tac_const_int(tac_instr)
+		gen_asm_for_tac_const_int(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACConstBool):
-		gen_asm_for_tac_const_bool(tac_instr)
+		gen_asm_for_tac_const_bool(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACConstString):
-		gen_asm_for_tac_const_string(tac_instr)
+		gen_asm_for_tac_const_string(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLabel):
-		gen_asm_for_tac_label(tac_instr)
+		gen_asm_for_tac_label(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACDefault):
-		gen_asm_for_tac_default(tac_instr)
+		gen_asm_for_tac_default(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACNegBool):
-		gen_asm_for_tac_not(tac_instr)
+		gen_asm_for_tac_not(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACNegArith):
-		gen_asm_for_tac_negate(tac_instr)
+		gen_asm_for_tac_negate(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACAssign):
-		gen_asm_for_tac_assign(tac_instr)
+		gen_asm_for_tac_assign(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACReturn):
-		gen_asm_for_tac_return(tac_instr)
+		gen_asm_for_tac_return(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACJmp):
-		gen_asm_for_tac_jmp(tac_instr)
+		gen_asm_for_tac_jmp(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACBt):
-		gen_asm_for_tac_bt(tac_instr)
+		gen_asm_for_tac_bt(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACStore):
-		gen_asm_for_tac_store(tac_instr)
+		gen_asm_for_tac_store(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLoad):
-		gen_asm_for_tac_load(tac_instr)
+		gen_asm_for_tac_load(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACOutInt):
-		# gen_asm_for_tac_out_int(tac_instr)
+		# gen_asm_for_tac_out_int(cur_asm_list, tac_instr)
 		raise ValueError("TACOutInt should not exist")
 
 	elif isinstance(tac_instr, TACInInt):
-		# gen_asm_for_tac_in_int(tac_instr)
+		# gen_asm_for_tac_in_int(cur_asm_list, tac_instr)
 		raise ValueError("TACInInt should not exist")
 
 	elif isinstance(tac_instr, TACPlus):
-		gen_asm_for_tac_plus(tac_instr)
+		gen_asm_for_tac_plus(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACMinus):
-		gen_asm_for_tac_minus(tac_instr)
+		gen_asm_for_tac_minus(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACMult):
-		gen_asm_for_tac_mult(tac_instr)
+		gen_asm_for_tac_mult(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACDiv):
-		gen_asm_for_tac_div(tac_instr)
+		gen_asm_for_tac_div(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACCompL):
-		gen_asm_for_tac_comp_l(tac_instr)
+		gen_asm_for_tac_comp_l(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACCompLE):
-		gen_asm_for_tac_comp_le(tac_instr)
+		gen_asm_for_tac_comp_le(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACCompE):
-		gen_asm_for_tac_comp_e(tac_instr)
+		gen_asm_for_tac_comp_e(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACBox):
-		gen_asm_for_tac_box(tac_instr)
+		gen_asm_for_tac_box(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACUnbox):
-		gen_asm_for_tac_unbox(tac_instr)
+		gen_asm_for_tac_unbox(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACAlloc):
-		gen_asm_for_tac_new(tac_instr)
+		gen_asm_for_tac_new(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLoadAttr):
-		gen_asm_for_tac_load_attr(tac_instr)
+		gen_asm_for_tac_load_attr(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACStoreAttr):
-		gen_asm_for_tac_store_attr(tac_instr)
+		gen_asm_for_tac_store_attr(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACIsVoid):
-		gen_asm_for_tac_is_void(tac_instr)
+		gen_asm_for_tac_is_void(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACNewSelfType):
-		gen_asm_for_tac_new_self_type(tac_instr)
+		gen_asm_for_tac_new_self_type(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACCaseCmpTypesAndJe):
-		gen_asm_for_tac_case_type_cmp(tac_instr)
+		gen_asm_for_tac_case_type_cmp(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACGetTypeTag):
-		gen_asm_for_tac_get_type_tag(tac_instr)
+		gen_asm_for_tac_get_type_tag(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACError):
-		gen_asm_for_tac_error(tac_instr)
+		gen_asm_for_tac_error(cur_asm_list, tac_instr)
 
 	# ========================================
 	# 				DISPATCH
 	# ========================================
 	elif isinstance(tac_instr, TACCall):
-		gen_asm_for_tac_call(tac_instr)
+		gen_asm_for_tac_call(cur_asm_list, tac_instr)
 
 	# elif isinstance(tac_instr, TACMakeParamSpace):
-	# 	gen_asm_for_tac_make_param_space(tac_instr)
+	# 	gen_asm_for_tac_make_param_space(cur_asm_list, tac_instr)
 
 	# elif isinstance(tac_instr, TACRemoveParamSpace):
-	# 	gen_asm_for_tac_remove_param_space(tac_instr)
+	# 	gen_asm_for_tac_remove_param_space(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACStoreParam):
-		gen_asm_for_tac_store_param(tac_instr)
+		gen_asm_for_tac_store_param(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLoadParam):
-		gen_asm_for_tac_load_param(tac_instr)
+		gen_asm_for_tac_load_param(cur_asm_list, tac_instr)
 
 	# elif isinstance(tac_instr, TACCall):
-	# 	gen_asm_for_tac_call(tac_instr)
+	# 	gen_asm_for_tac_call(cur_asm_list, tac_instr)
 
 	else:
 		raise NotImplementedError(str(tac_instr.__class__.__name__) + " not yet implemented")
 
 def add_initial_method_setup(stack_offset):
-	asm_instr_list.insert(1, ASMPushQ("%rbp"))
-	asm_instr_list.insert(2, ASMMovQ("%rsp", "%rbp"))
+	cur_asm_list.insert(1, ASMPushQ("%rbp"))
+	cur_asm_list.insert(2, ASMMovQ("%rsp", "%rbp"))
 
 	src = "$" + str(stack_offset)
 	dest = "%rsp"
-	asm_instr_list.insert(3, ASMSubQ(src, dest))
+	cur_asm_list.insert(3, ASMSubQ(src, dest))
 
-def gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_name):
+def gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_registers, type_name):
 	global register_color_map, spilled_register_location_map, current_type
 
 	# Set the current type
@@ -932,17 +929,17 @@ def gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_
 
 	# Allocate space on stack for saved regs
 	stack_offset_str = "$" + str(stack_offset)
-	asm_instr_list.append(ASMComment("allocate space to store " + str(len(spilled_registers)) + " spilled regs"))
-	asm_instr_list.append(ASMSubQ(stack_offset_str, "%rsp"))
+	cur_asm_list.append(ASMComment("allocate space to store " + str(len(spilled_registers)) + " spilled regs"))
+	cur_asm_list.append(ASMSubQ(stack_offset_str, "%rsp"))
 
 	# Generate the asm instructions for each tac instr
 	for block in block_list:
 		for tac_instr in block.instr_list:
-			gen_asm_for_tac_instr(tac_instr)
+			gen_asm_for_tac_instr(cur_asm_list, tac_instr)
 
 	# Restore stack ptr
-	asm_instr_list.append(ASMComment("remove temporary stack space for " + str(len(spilled_registers)) + " spilled regs"))
-	asm_instr_list.append(ASMAddQ(stack_offset_str, "%rsp"))
+	cur_asm_list.append(ASMComment("remove temporary stack space for " + str(len(spilled_registers)) + " spilled regs"))
+	cur_asm_list.append(ASMAddQ(stack_offset_str, "%rsp"))
 
 	# Add initial setup to the asm instr list
 	# add_initial_method_setup(stack_offset)
@@ -950,66 +947,64 @@ def gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_
 # ========================================
 #  INTERNAL FUNCTIONS
 # ========================================
-def gen_asm_for_internal_method(internal_name):
+def gen_asm_for_internal_method(cur_asm_list, internal_name):
 	if internal_name == "String.length":
-		gen_asm_for_internal_length()
+		gen_asm_for_internal_length(cur_asm_list)
 
 	elif internal_name == "IO.in_int":
-		gen_asm_for_internal_in_int()
+		gen_asm_for_internal_in_int(cur_asm_list)
 
 	elif internal_name == "IO.out_int":
-		gen_asm_for_internal_out_int()
+		gen_asm_for_internal_out_int(cur_asm_list)
 
 	elif internal_name == "IO.out_string":
-		gen_asm_for_internal_out_string()
+		gen_asm_for_internal_out_string(cur_asm_list)
 
 	elif internal_name == "IO.in_string":
-		gen_asm_for_internal_in_string()
+		gen_asm_for_internal_in_string(cur_asm_list)
 
 	elif internal_name == "Object.copy":
-		gen_asm_for_internal_copy()
+		gen_asm_for_internal_copy(cur_asm_list)
 
 	elif internal_name == "Object.abort":
-		gen_asm_for_internal_abort()
+		gen_asm_for_internal_abort(cur_asm_list)
 
 	else:
 		# raise NotImplementedError(internal_name + " has not been implemented")
 		pass
 
-def gen_asm_for_internal_abort():
+def gen_asm_for_internal_abort(cur_asm_list):
 	custom_asm = ASMCustomString(
 		"\t\t\tmovq $abort.string, %rdi\n" +
 		"\t\t\tcall raw_out_string\n" +
 		"\t\t\tmovq $0, %rdi\n" +
 		"\t\t\tcall exit\n"
 		)
-	asm_instr_list.append(custom_asm)
+	cur_asm_list.append(custom_asm)
 
-def gen_asm_for_internal_copy():
-	asm_instr_list.append(ASMComment("Make new obj to store result (same as doing SELF_TYPE..new)"))
+def gen_asm_for_internal_copy(cur_asm_list):
+	cur_asm_list.append(ASMComment("Make new obj to store result (same as doing SELF_TYPE..new)"))
 	# Get vtable ptr
-	asm_instr_list.append(ASMMovQ("16(%rbx)", "%rax"))
+	cur_asm_list.append(ASMMovQ("16(%rbx)", "%rax"))
 	# Find constructor dynamically
-	asm_instr_list.append(ASMMovQ("8(%rax)", "%rax"))
+	cur_asm_list.append(ASMMovQ("8(%rax)", "%rax"))
 	# Call method
-	asm_instr_list.append(ASMCall("*%rax"))
+	cur_asm_list.append(ASMCall("*%rax"))
 
 	# Setup and call memcpy
-	asm_instr_list.append(ASMComment("call memcpy to copy %rbx into %rax"))
-	asm_instr_list.append(ASMComment("use leaq to multiply the size by 8"))
-	asm_instr_list.append(ASMMovQ("8(%rbx)", "%rdx"))
-	asm_instr_list.append(ASMLeaQ("0(,%rdx,8)", "%rdx"))
-	asm_instr_list.append(ASMMovQ("%rbx", "%rsi"))
-	asm_instr_list.append(ASMMovQ("%rax", "%rdi"))
-	asm_instr_list.append(ASMCall("memcpy"))
+	cur_asm_list.append(ASMComment("call memcpy to copy %rbx into %rax"))
+	cur_asm_list.append(ASMComment("use leaq to multiply the size by 8"))
+	cur_asm_list.append(ASMMovQ("8(%rbx)", "%rdx"))
+	cur_asm_list.append(ASMLeaQ("0(,%rdx,8)", "%rdx"))
+	cur_asm_list.append(ASMMovQ("%rbx", "%rsi"))
+	cur_asm_list.append(ASMMovQ("%rax", "%rdi"))
+	cur_asm_list.append(ASMCall("memcpy"))
 
 	# Result of memcpy in %rax
-	asm_instr_list.append(ASMComment("result of mempy in %rax, so good to return"))
+	cur_asm_list.append(ASMComment("result of mempy in %rax, so good to return"))
 
-def gen_asm_for_internal_in_string():
-	global asm_instr_list
-
-	asm_instr_list.append(ASMComment("use generated code to get string"))
+def gen_asm_for_internal_in_string(cur_asm_list):
+	cur_asm_list.append(ASMComment("use generated code to get string"))
 
 	custom_asm = ASMCustomString(
 		"\t\t\tsubq	$32, %rsp\n" +
@@ -1064,35 +1059,33 @@ def gen_asm_for_internal_in_string():
 		# "\t\t\t## reset rsp\n" +
 		# "\t\t\taddq 	$32, %rsp\n"
 		)
-	asm_instr_list.append(custom_asm)
+	cur_asm_list.append(custom_asm)
 	# Note: the string is now at -8(%rbp)
-	asm_instr_list.append(ASMComment("result is now stored at -8(%rbp)"))
+	cur_asm_list.append(ASMComment("result is now stored at -8(%rbp)"))
 
 	# Create a new boxed string
-	asm_instr_list.append(ASMComment("make new box in %rax to hold the str val"))
-	gen_asm_for_new_boxed_type("String", "%rax")
+	cur_asm_list.append(ASMComment("make new box in %rax to hold the str val"))
+	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
 
 	# Move the value of the string into the box
-	asm_instr_list.append(ASMComment("use %r8 to move value of str into box"))
-	asm_instr_list.append(ASMPushQ("%r8"))
-	asm_instr_list.append(ASMMovQ("-8(%rbp)", "%r8"))
-	asm_instr_list.append(ASMMovQ("%r8", "24(%rax)"))
-	asm_instr_list.append(ASMPopQ("%r8"))
+	cur_asm_list.append(ASMComment("use %r8 to move value of str into box"))
+	cur_asm_list.append(ASMPushQ("%r8"))
+	cur_asm_list.append(ASMMovQ("-8(%rbp)", "%r8"))
+	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+	cur_asm_list.append(ASMPopQ("%r8"))
 
-def gen_asm_for_internal_out_string():
-	global asm_instr_list
-
+def gen_asm_for_internal_out_string(cur_asm_list):
 	# Unbox string to get raw value
 	# Note: string value must be in specific reg (%r8) for raw assembly to work
-	asm_instr_list.append(ASMComment("loading param [0] into %rax"))
-	asm_instr_list.append(ASMMovQ("16(%rbp)", "%rax"))
-	asm_instr_list.append(ASMComment("unboxing param [0] (in %rax) into %rdi for call to raw_out_string"))
-	asm_instr_list.append(ASMMovQ("24(%rax)", "%rdi"))
-	asm_instr_list.append(ASMCall("raw_out_string"))
+	cur_asm_list.append(ASMComment("loading param [0] into %rax"))
+	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rax"))
+	cur_asm_list.append(ASMComment("unboxing param [0] (in %rax) into %rdi for call to raw_out_string"))
+	cur_asm_list.append(ASMMovQ("24(%rax)", "%rdi"))
+	cur_asm_list.append(ASMCall("raw_out_string"))
 
 	# Move self ptr into %rax for return value
-	asm_instr_list.append(ASMComment("move self ptr into %rax for return"))
-	asm_instr_list.append(ASMMovQ(SELF_REG, "%rax"))
+	cur_asm_list.append(ASMComment("move self ptr into %rax for return"))
+	cur_asm_list.append(ASMMovQ(SELF_REG, "%rax"))
 
 def get_raw_out_string_helper():
 	result = "	.globl	raw_out_string\n" + \
@@ -1149,97 +1142,91 @@ def get_raw_out_string_helper():
 	"	.cfi_endproc\n"
 	return result
 
-def gen_asm_for_internal_out_int():
-	global asm_instr_list
-
+def gen_asm_for_internal_out_int(cur_asm_list):
 	# No need to save caller-saved regs because done before calling out_int
-	asm_instr_list.append(ASMComment("loading param [0] into %rax"))
-	asm_instr_list.append(ASMMovQ("16(%rbp)", "%rax"))
+	cur_asm_list.append(ASMComment("loading param [0] into %rax"))
+	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rax"))
 
 	# Setup and call printf
-	asm_instr_list.append(ASMComment("setup and call printf"))
-	asm_instr_list.append(ASMMovL("24(%rax)", "%esi"))
-	asm_instr_list.append(ASMMovQ("$out_int_format_str", "%rdi"))
-	asm_instr_list.append(ASMMovL("$0", "%eax"))
-	asm_instr_list.append(ASMCall("printf"))
+	cur_asm_list.append(ASMComment("setup and call printf"))
+	cur_asm_list.append(ASMMovL("24(%rax)", "%esi"))
+	cur_asm_list.append(ASMMovQ("$out_int_format_str", "%rdi"))
+	cur_asm_list.append(ASMMovL("$0", "%eax"))
+	cur_asm_list.append(ASMCall("printf"))
 
 	# Set return type to self ptr
-	asm_instr_list.append(ASMComment("set self ptr as return type"))
-	asm_instr_list.append(ASMMovQ(SELF_REG, "%rax"))
+	cur_asm_list.append(ASMComment("set self ptr as return type"))
+	cur_asm_list.append(ASMMovQ(SELF_REG, "%rax"))
 
-def gen_asm_for_internal_in_int():
-	global asm_instr_list
-
-	asm_instr_list.append(ASMComment("make tmp space on stack"))
-	asm_instr_list.append(ASMSubQ("$8", "%rsp"))
+def gen_asm_for_internal_in_int(cur_asm_list):
+	cur_asm_list.append(ASMComment("make tmp space on stack"))
+	cur_asm_list.append(ASMSubQ("$8", "%rsp"))
 
 	# Push caller-saved regs
 	offset = 0
 	for reg in caller_saved_registers:
-		asm_instr_list.append(ASMPushQ(reg))
+		cur_asm_list.append(ASMPushQ(reg))
 		offset += 1
 	rsp_offset = str(8 * offset) + "(%rsp)"
 
 	# Setup and call scanf
-	asm_instr_list.append(ASMComment("setup and call scanf"))
-	asm_instr_list.append(ASMLeaQ(rsp_offset, "%rsi"))
-	asm_instr_list.append(ASMMovQ("$in_int_format_str", "%rdi"))
-	asm_instr_list.append(ASMMovL("$0", "%eax"))
-	asm_instr_list.append(ASMCall("__isoc99_scanf"))
+	cur_asm_list.append(ASMComment("setup and call scanf"))
+	cur_asm_list.append(ASMLeaQ(rsp_offset, "%rsi"))
+	cur_asm_list.append(ASMMovQ("$in_int_format_str", "%rdi"))
+	cur_asm_list.append(ASMMovL("$0", "%eax"))
+	cur_asm_list.append(ASMCall("__isoc99_scanf"))
 
 	# Pop all caller-saved regs
 	for reg in reversed(caller_saved_registers):
-		asm_instr_list.append(ASMPopQ(reg))
+		cur_asm_list.append(ASMPopQ(reg))
 
 	# Make a new Int to store the result
-	asm_instr_list.append(ASMComment("make new Int object in %rax"))
+	cur_asm_list.append(ASMComment("make new Int object in %rax"))
 	for reg in caller_saved_registers:
-		asm_instr_list.append(ASMPushQ(reg))
+		cur_asm_list.append(ASMPushQ(reg))
 
-	asm_instr_list.append(ASMCall("Int..new"))
+	cur_asm_list.append(ASMCall("Int..new"))
 
 	for reg in reversed(caller_saved_registers):
-		asm_instr_list.append(ASMPopQ(reg))
+		cur_asm_list.append(ASMPopQ(reg))
 
 	# Box the result in the int
-	asm_instr_list.append(ASMComment("box answer in the new Int (use %r8 as tmp reg)"))
-	asm_instr_list.append(ASMPushQ("%r8"))
-	asm_instr_list.append(ASMMovQ("8(%rsp)", "%r8"))
-	asm_instr_list.append(ASMMovQ("%r8", "24(%rax)"))
-	asm_instr_list.append(ASMPopQ("%r8"))
+	cur_asm_list.append(ASMComment("box answer in the new Int (use %r8 as tmp reg)"))
+	cur_asm_list.append(ASMPushQ("%r8"))
+	cur_asm_list.append(ASMMovQ("8(%rsp)", "%r8"))
+	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+	cur_asm_list.append(ASMPopQ("%r8"))
 
 	# Remove tmp space on stack
-	asm_instr_list.append(ASMComment("remove tmp space on stack"))
-	asm_instr_list.append(ASMAddQ("$8", "%rsp"))
+	cur_asm_list.append(ASMComment("remove tmp space on stack"))
+	cur_asm_list.append(ASMAddQ("$8", "%rsp"))
 
-def gen_asm_for_internal_length():
-	global asm_instr_list
-
+def gen_asm_for_internal_length(cur_asm_list):
 	# Push all callee-saved regs
 	for reg in callee_saved_registers:
-		asm_instr_list.append(ASMPushQ(reg))
+		cur_asm_list.append(ASMPushQ(reg))
 
 	# Call strlen and keep result in rax
 	# Note: No need to save caller-saved regs since none are in use
-	asm_instr_list.append(ASMComment("call strlen to compute length"))
+	cur_asm_list.append(ASMComment("call strlen to compute length"))
 	str_val_src = "24("+SELF_REG+")"
-	asm_instr_list.append(ASMMovQ(str_val_src, "%rdi"))
-	asm_instr_list.append(ASMCall("strlen"))
-	asm_instr_list.append(ASMMovQ("%rax", "%r8")) 
+	cur_asm_list.append(ASMMovQ(str_val_src, "%rdi"))
+	cur_asm_list.append(ASMCall("strlen"))
+	cur_asm_list.append(ASMMovQ("%rax", "%r8")) 
 
 	# Make new Int box and put the result inside
 	# Note: r9 is arbitrary here
-	asm_instr_list.append(ASMComment("box final result"))
-	gen_asm_for_new_boxed_type("Int", "%r9")
-	asm_instr_list.append(ASMMovQ("%r8", "24(%r9)"))
+	cur_asm_list.append(ASMComment("box final result"))
+	gen_asm_for_new_boxed_type(cur_asm_list, "Int", "%r9")
+	cur_asm_list.append(ASMMovQ("%r8", "24(%r9)"))
 
 	# Move final result into rax to return
-	asm_instr_list.append(ASMComment("move result into rax"))
-	asm_instr_list.append(ASMMovQ("%r9", "%rax"))
+	cur_asm_list.append(ASMComment("move result into rax"))
+	cur_asm_list.append(ASMMovQ("%r9", "%rax"))
 
 	# Pop all callee-saved regs
 	for reg in reversed(callee_saved_registers):
-		asm_instr_list.append(ASMPopQ(reg))
+		cur_asm_list.append(ASMPopQ(reg))
 
 # ========================================
 #  COMPARISON FUNCTIONS

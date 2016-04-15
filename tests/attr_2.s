@@ -37,6 +37,10 @@ Main..vtable:		## vtable for Main
 			.quad Object.abort
 			.quad Object.copy
 			.quad Object.type_name
+			.quad IO.in_int
+			.quad IO.in_string
+			.quad IO.out_int
+			.quad IO.out_string
 			.quad Main.main
 
 .globl Object..vtable
@@ -297,7 +301,6 @@ Main..new:		## Constructor for Main
 			movq	%r8, 24(%r9)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r9, 24(%rbx)
 			## self[4] y <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -358,7 +361,6 @@ Main..new:		## Constructor for Main
 			movq	%r9, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 32(%rbx)
 			## assign self register to %rax
 			movq	%rbx, %rax
 			## pop callee-saved regs
@@ -623,8 +625,12 @@ Main.main:
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
 .Main_main_1:
-			## new const Int: 0
-			## push caller-saved regs
+			## load self[3] (x) into %r8
+			movq	24(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## storing param [0]
+			pushq	%r9
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -633,8 +639,24 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_int in vtable[7]
+			movq	56(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -643,8 +665,54 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
 			movq	%rax, %r8
-			movl	$0, 24(%r8)
+			## load self[4] (y) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## storing param [0]
+			pushq	%r9
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_int in vtable[7]
+			movq	56(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
 			## return
 			movq	%r8, %rax
 			leave

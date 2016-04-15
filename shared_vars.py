@@ -32,5 +32,3 @@ callee_saved_registers = [
 	"%r12", "%r13", "%r14",
 	"%r15", "%rbx"
 ]
-
-asm_instr_list = []

@@ -520,7 +520,6 @@ Main..new:		## Constructor for Main
 			movl	$111, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 32(%rbx)
 			## self[5] c <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -548,7 +547,6 @@ Main..new:		## Constructor for Main
 			movl	$2222, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 40(%rbx)
 			## self[6] d <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -576,7 +574,6 @@ Main..new:		## Constructor for Main
 			movl	$44, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 48(%rbx)
 			## self[7] e <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -604,7 +601,6 @@ Main..new:		## Constructor for Main
 			movl	$2, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 56(%rbx)
 			## self[8] f <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -632,7 +628,6 @@ Main..new:		## Constructor for Main
 			movl	$0, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 64(%rbx)
 			## self[9] g <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -660,7 +655,6 @@ Main..new:		## Constructor for Main
 			movl	$0, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 72(%rbx)
 			## self[10] h <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -688,7 +682,6 @@ Main..new:		## Constructor for Main
 			movl	$33, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 80(%rbx)
 			## self[12] j <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -716,7 +709,6 @@ Main..new:		## Constructor for Main
 			movl	$3095, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 96(%rbx)
 			## self[13] k <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -744,7 +736,6 @@ Main..new:		## Constructor for Main
 			movl	$2, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 104(%rbx)
 			## self[15] y <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -772,7 +763,6 @@ Main..new:		## Constructor for Main
 			movl	$10928310, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 120(%rbx)
 			## self[16] z <- init exp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
@@ -800,7 +790,6 @@ Main..new:		## Constructor for Main
 			movl	$88, 24(%r8)
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
-			movq	%r8, 128(%rbx)
 			## assign self register to %rax
 			movq	%rbx, %rax
 			## pop callee-saved regs
