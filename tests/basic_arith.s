@@ -1001,7 +1001,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 .globl string_1
 string_1:
-			.string "ERROR: 14: Exception: divide by 0"
+			.string "ERROR: 14: Exception: division by zero"
 
 .globl in_int_format_str
 in_int_format_str:

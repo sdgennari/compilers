@@ -201,25 +201,25 @@ def gen_asm_for_tac_bt(tac_bt):
 
 # ---- TODO Update for boxing + unboxing
 def gen_asm_for_tac_store(tac_store):
-	raise NotImplementedError("tac_store not yet implemented")
-	# src = get_asm_register(tac_store.op1, 64)
-	# offset = spilled_register_location_map[tac_store.op1]
+	# raise NotImplementedError("tac_store not yet implemented")
+	src = get_asm_register(tac_store.op1, 64)
+	offset = spilled_register_location_map[tac_store.op1]
 
-	# dest = str(offset) + "(%rbp)"
+	dest = str(offset) + "(%rbp)"
 
-	# asm_instr_list.append(ASMComment("store"))
-	# asm_instr_list.append(ASMMovL(src, dest))
+	asm_instr_list.append(ASMComment("store"))
+	asm_instr_list.append(ASMMovQ(src, dest))
 
 # ---- TODO Update for boxing + unboxing
 def gen_asm_for_tac_load(tac_load):
-	raise NotImplementedError("tac_load not yet implemented")
-	# dest = get_asm_register(tac_load.assignee)
+	# raise NotImplementedError("tac_load not yet implemented")
+	dest = get_asm_register(tac_load.assignee, 64)
 
-	# offset = spilled_register_location_map[tac_load.location]
-	# src = str(offset) + "(%rbp)"
+	offset = spilled_register_location_map[tac_load.location]
+	src = str(offset) + "(%rbp)"
 
-	# asm_instr_list.append(ASMComment("load"))
-	# asm_instr_list.append(ASMMovL(src, dest))
+	asm_instr_list.append(ASMComment("load"))
+	asm_instr_list.append(ASMMovQ(src, dest))
 
 def gen_asm_for_tac_out_int(tac_out_int):
 	raise NotImplementedError("out_int not yet implemented")
@@ -930,11 +930,6 @@ def gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_
 		spilled_register_location_map[register] = (idx+1) * -8
 		stack_offset += 8
 
-	# ===============================================
-	# TODO: Maybe save rbp here to ensure that offset from rbp is valid
-	# This would effectively make a new stack frame
-	# ===============================================
-
 	# Allocate space on stack for saved regs
 	stack_offset_str = "$" + str(stack_offset)
 	asm_instr_list.append(ASMComment("allocate space to store " + str(len(spilled_registers)) + " spilled regs"))
@@ -948,11 +943,6 @@ def gen_asm_for_block_list(block_list, register_colors, spilled_registers, type_
 	# Restore stack ptr
 	asm_instr_list.append(ASMComment("remove temporary stack space for " + str(len(spilled_registers)) + " spilled regs"))
 	asm_instr_list.append(ASMAddQ(stack_offset_str, "%rsp"))
-
-	# ===============================================
-	# TODO: Maybe restore rbp here to end stack frame
-	# ===============================================
-
 
 	# Add initial setup to the asm instr list
 	# add_initial_method_setup(stack_offset)

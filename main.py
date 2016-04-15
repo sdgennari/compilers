@@ -207,20 +207,43 @@ def gen_asm_for_constructor(type_name):
 
 		else: 
 			# Call default constructor for attr and assign to correct spot
-			constructor = ast_attr.feature_type + "..new"
+			# Handle SELF_TYPE explicitly
+			if ast_attr.feature_type == "SELF_TYPE":
+				# Push all caller-saved regs
+				for reg in caller_saved_registers:
+					asm_instr_list.append(ASMPushQ(reg))
+				asm_instr_list.append(ASMPushQ(SELF_REG))
 
-			# Push all caller-saved regs
-			for reg in caller_saved_registers:
-				asm_instr_list.append(ASMPushQ(reg))
-			asm_instr_list.append(ASMPushQ(SELF_REG))
+				asm_instr_list.append(ASMComment("Lookup 'new' in vtable for self"))
 
-			# Call constructor
-			asm_instr_list.append(ASMCall(constructor))
+				# Get vtable ptr
+				asm_instr_list.append(ASMMovQ("16(%rbx)", "%rax"))
 
-			# Pop all caller-saved regs
-			asm_instr_list.append(ASMPopQ(SELF_REG))
-			for reg in reversed(caller_saved_registers):
-				asm_instr_list.append(ASMPopQ(reg))
+				# Find constructor dynamically
+				asm_instr_list.append(ASMMovQ("8(%rax)", "%rax"))
+
+				# Call method
+				asm_instr_list.append(ASMCall("*%rax"))
+
+				# Pop all caller-saved regs
+				asm_instr_list.append(ASMPopQ(SELF_REG))
+				for reg in reversed(caller_saved_registers):
+					asm_instr_list.append(ASMPopQ(reg))
+			else:
+				constructor = ast_attr.feature_type + "..new"
+
+				# Push all caller-saved regs
+				for reg in caller_saved_registers:
+					asm_instr_list.append(ASMPushQ(reg))
+				asm_instr_list.append(ASMPushQ(SELF_REG))
+
+				# Call constructor
+				asm_instr_list.append(ASMCall(constructor))
+
+				# Pop all caller-saved regs
+				asm_instr_list.append(ASMPopQ(SELF_REG))
+				for reg in reversed(caller_saved_registers):
+					asm_instr_list.append(ASMPopQ(reg))
 
 			# Move result into attr offset
 			asm_instr_list.append(ASMMovQ("%rax", mem_offset))

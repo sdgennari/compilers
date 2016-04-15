@@ -682,6 +682,14 @@ Main..new:		## Constructor for Main
 			## unbox value of %r10 into %r9
 			movq	24(%r10), %r9
 			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_1
+			movq	$string_2, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_1:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -1116,7 +1124,7 @@ Main..new:		## Constructor for Main
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	$string_2, 24(%r8)
+			movq	$string_3, 24(%r8)
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -1252,7 +1260,7 @@ Main..new:		## Constructor for Main
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r9
-			movq	$string_3, 24(%r9)
+			movq	$string_4, 24(%r9)
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1275,9 +1283,9 @@ Main..new:		## Constructor for Main
 			movq	%rax, %r8
 			## check if %r9 is void and set result accordingly
 			cmpq	$0, %r9
-			jnz		.asm_label_1
+			jnz		.asm_label_2
 			movq	$1, 24(%r8)
-.asm_label_1:
+.asm_label_2:
 			## unbox value of %r8 into %r10
 			movq	24(%r8), %r10
 			## not
@@ -1290,7 +1298,7 @@ Main..new:		## Constructor for Main
 			test	%r8d, %r8d
 			jnz		.dispatch_7_not_void
 .dispatch_7_void:
-			movq	$string_4, %rdi
+			movq	$string_5, %rdi
 			call	raw_out_string
 			movq	$0, %rax
 			call	exit
@@ -1358,7 +1366,7 @@ Main..new:		## Constructor for Main
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	$string_5, 24(%r8)
+			movq	$string_6, 24(%r8)
 			## assign
 			movq	%r8, %r9
 			jmp		.if_exit_6
@@ -1809,22 +1817,26 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 .globl string_4
 string_4:
-			.string "ERROR: 75: Exception: dispatch on void"
+			.string "halt"
 
 .globl string_5
 string_5:
-			.string "continue"
+			.string "ERROR: 75: Exception: dispatch on void"
+
+.globl string_2
+string_2:
+			.string "ERROR: 55: Exception: division by zero"
 
 .globl string_1
 string_1:
 			.string "2 is trivially prime.\\n"
 
+.globl string_6
+string_6:
+			.string "continue"
+
 .globl string_3
 string_3:
-			.string "halt"
-
-.globl string_2
-string_2:
 			.string " is prime.\\n"
 
 .globl in_int_format_str

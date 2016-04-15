@@ -1,4 +1,4 @@
-Start Time:   Mon Apr 11 20:21:26 2016
+Start Time:   Mon Apr 11 22:56:42 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -15,6 +15,11 @@ Archive:  ../sdg6vt.zip
   inflating: tac_objects.py          
   inflating: tac_to_asm.py           
  extracting: team.txt                
+  inflating: test1.cl                
+  inflating: test2.cl                
+  inflating: test3.cl                
+  inflating: test4.cl                
+  inflating: readme.txt              
 ZIP file: done ...
 Checking for main.{py,rb,ml,js,hs} ...
 main.py: found
@@ -40,9 +45,7 @@ t14: dispatch-override-static                    ok
 t15: eval-order-args                             ok  
 t16: eval-order-arith                            ok  
 t17: eval-order-self                             ok  
-t18: hairyscary                           (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t18: hairyscary                                FAILED (empty compiled-program output)
 t19: hello                                       ok  
 t20: huge-case-in-big-loop                       ok  
 t21: in-int-32bit                              FAILED
@@ -96,9 +99,7 @@ t65: atc8kq.zip-shallowCopy                      ok
 t66: cyh4mw.zip-bound_variables2               FAILED
 t67: jch3xf.zip-a                              FAILED (empty compiled-program output)
 t68: jch3xf.zip-b                              FAILED (empty compiled-program output)
-t69: jhl4qf.zip-minus                     (your compiler outputs to stdout/stderr: should be none)
- (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t69: jhl4qf.zip-minus                          FAILED
 t70: ktt3ja.zip-arithmetic                       ok  
 t71: mfm4eb.zip-good10                           ok  
 t72: mfm4eb.zip-good9                          FAILED (empty compiled-program output)
@@ -115,8 +116,8 @@ t1: case-none                                    ok
 t2: case-on-void                                 ok  
 t3: dispatch-void-dynamic                        ok  
 t4: dispatch-void-static                         ok  
-t5: div-by-zero                                FAILED (empty output)
+t5: div-by-zero                                  ok  
 t6: substring-bad                              FAILED (empty output)
 t7: mjk6zt.zip-bug_maker                       FAILED
 t8: mjk6zt.zip-shallow_copy                    FAILED
-End Time: Mon Apr 11 20:22:38 2016
+End Time: Mon Apr 11 22:57:55 2016

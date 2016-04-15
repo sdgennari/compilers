@@ -2,6 +2,20 @@
 			##  VTABLES
 			## ::::::::::::::::::::::::::::::::::::::::
 
+.globl Bazz..vtable
+Bazz..vtable:		## vtable for Bazz
+			.quad type_name_Bazz
+			.quad Bazz..new
+			.quad Object.abort
+			.quad Object.copy
+			.quad Object.type_name
+			.quad IO.in_int
+			.quad IO.in_string
+			.quad IO.out_int
+			.quad IO.out_string
+			.quad Bazz.printh
+			.quad Bazz.doh
+
 .globl Bool..vtable
 Bool..vtable:		## vtable for Bool
 			.quad type_name_Bool
@@ -9,6 +23,20 @@ Bool..vtable:		## vtable for Bool
 			.quad Object.abort
 			.quad Object.copy
 			.quad Object.type_name
+
+.globl Foo..vtable
+Foo..vtable:		## vtable for Foo
+			.quad type_name_Foo
+			.quad Foo..new
+			.quad Object.abort
+			.quad Object.copy
+			.quad Object.type_name
+			.quad IO.in_int
+			.quad IO.in_string
+			.quad IO.out_int
+			.quad IO.out_string
+			.quad Bazz.printh
+			.quad Foo.doh
 
 .globl IO..vtable
 IO..vtable:		## vtable for IO
@@ -66,6 +94,173 @@ String..vtable:		## vtable for String
 			##  CONSTRUCTORS
 			## ::::::::::::::::::::::::::::::::::::::::
 
+.globl Bazz..new
+Bazz..new:		## Constructor for Bazz
+			pushq	%rbp
+			movq	%rsp, %rbp
+			## push callee-saved regs
+			pushq	%r12
+			pushq	%r13
+			pushq	%r14
+			pushq	%r15
+			pushq	%rbx
+			## Allocate space for Bazz
+			movq	$8, %rsi
+			movq	$6, %rdi
+			call	calloc
+			movq	%rax, %rbx
+			## Store type_tag, obj_size, vtable
+			movq	$6, %rax
+			movq	%rax, 0(%rbx)
+			movq	$6, %rax
+			movq	%rax, 8(%rbx)
+			movq	$Bazz..vtable, %rax
+			movq	%rax, 16(%rbx)
+			## create default attrs
+			## self[3] holds h (Int)
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			call	Int..new
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, 24(%rbx)
+			## self[4] holds g (Foo)
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			call	Foo..new
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, 32(%rbx)
+			## self[5] holds i (Object)
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			call	Object..new
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, 40(%rbx)
+			## initialize attrs
+			## self[3] h <- init exp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
+			## new const Int: 1
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movl	$1, 24(%r8)
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			movq	%r8, 24(%rbx)
+			## self[5] i <- init exp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 0 params to the stack
+			subq	$0, %rsp
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method printh in vtable[9]
+			movq	72(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 0 params from stack with subq
+			addq	$0, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 0 stored params from stack (2nd time)
+			addq	$0, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			movq	%r8, 40(%rbx)
+			## assign self register to %rax
+			movq	%rbx, %rax
+			## pop callee-saved regs
+			popq	%rbx
+			popq	%r15
+			popq	%r14
+			popq	%r13
+			popq	%r12
+			leave
+			ret
+
 .globl Bool..new
 Bool..new:		## Constructor for Bool
 			pushq	%rbp
@@ -92,6 +287,173 @@ Bool..new:		## Constructor for Bool
 			## self[3] holds val (raw.Int)
 			movl	$0, 24(%rbx)
 			## initialize attrs
+			## assign self register to %rax
+			movq	%rbx, %rax
+			## pop callee-saved regs
+			popq	%rbx
+			popq	%r15
+			popq	%r14
+			popq	%r13
+			popq	%r12
+			leave
+			ret
+
+.globl Foo..new
+Foo..new:		## Constructor for Foo
+			pushq	%rbp
+			movq	%rsp, %rbp
+			## push callee-saved regs
+			pushq	%r12
+			pushq	%r13
+			pushq	%r14
+			pushq	%r15
+			pushq	%rbx
+			## Allocate space for Foo
+			movq	$8, %rsi
+			movq	$6, %rdi
+			call	calloc
+			movq	%rax, %rbx
+			## Store type_tag, obj_size, vtable
+			movq	$7, %rax
+			movq	%rax, 0(%rbx)
+			movq	$6, %rax
+			movq	%rax, 8(%rbx)
+			movq	$Foo..vtable, %rax
+			movq	%rax, 16(%rbx)
+			## create default attrs
+			## self[3] holds h (Int)
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			call	Int..new
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, 24(%rbx)
+			## self[4] holds g (Foo)
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			call	Foo..new
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, 32(%rbx)
+			## self[5] holds i (Object)
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			call	Object..new
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, 40(%rbx)
+			## initialize attrs
+			## self[3] h <- init exp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
+			## new const Int: 1
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movl	$1, 24(%r8)
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			movq	%r8, 24(%rbx)
+			## self[5] i <- init exp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 0 params to the stack
+			subq	$0, %rsp
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method printh in vtable[9]
+			movq	72(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 0 params from stack with subq
+			addq	$0, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 0 stored params from stack (2nd time)
+			addq	$0, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			movq	%r8, 40(%rbx)
 			## assign self register to %rax
 			movq	%rbx, %rax
 			## pop callee-saved regs
@@ -187,18 +549,66 @@ Main..new:		## Constructor for Main
 			pushq	%rbx
 			## Allocate space for Main
 			movq	$8, %rsi
-			movq	$3, %rdi
+			movq	$4, %rdi
 			call	calloc
 			movq	%rax, %rbx
 			## Store type_tag, obj_size, vtable
 			movq	$5, %rax
 			movq	%rax, 0(%rbx)
-			movq	$3, %rax
+			movq	$4, %rax
 			movq	%rax, 8(%rbx)
 			movq	$Main..vtable, %rax
 			movq	%rax, 16(%rbx)
 			## create default attrs
+			## self[3] holds a (Bazz)
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			call	Bazz..new
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, 24(%rbx)
 			## initialize attrs
+			## self[3] a <- init exp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
+			## new Bazz
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Bazz..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			movq	%r8, 24(%rbx)
 			## assign self register to %rax
 			movq	%rbx, %rax
 			## pop callee-saved regs
@@ -285,6 +695,252 @@ String..new:		## Constructor for String
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  METHOD IMPLEMENTATIONS
 			## ::::::::::::::::::::::::::::::::::::::::
+
+.globl Bazz.printh
+Bazz.printh:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
+.Bazz_printh_1:
+			## load self[3] (h) into %r9
+			movq	24(%rbx), %r9
+			## assign
+			movq	%r9, %r8
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_int in vtable[7]
+			movq	56(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## new const Int: 0
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movl	$0, 24(%r8)
+			## return
+			movq	%r8, %rax
+			leave
+			ret
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+
+.globl Bazz.doh
+Bazz.doh:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
+.Bazz_doh_2:
+			## load self[3] (h) into %r9
+			movq	24(%rbx), %r9
+			## assign
+			movq	%r9, %r8
+			## assign
+			movq	%r8, %r9
+			## load self[3] (h) into %r8
+			movq	24(%rbx), %r8
+			## assign
+			movq	%r8, %r11
+			## new const Int: 1
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movl	$1, 24(%r10)
+			## unbox value of %r11 into %r8
+			movq	24(%r11), %r8
+			## unbox value of %r10 into %r11
+			movq	24(%r10), %r11
+			## plus
+			movl	%r8d, %r12d
+			addl	%r11d, %r12d
+			## box value of %r12 into %r10
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movq	%r12, 24(%r10)
+			## store %r10 in self[3] (h)
+			movq	%r10, 24(%rbx)
+			## assign
+			movq	%r10, %r8
+			## assign
+			movq	%r9, %r8
+			## assign
+			movq	%r8, %r9
+			## return
+			movq	%r9, %rax
+			leave
+			ret
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+
+.globl Foo.doh
+Foo.doh:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
+.Foo_doh_3:
+			## load self[3] (h) into %r8
+			movq	24(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## assign
+			movq	%r9, %r8
+			## load self[3] (h) into %r10
+			movq	24(%rbx), %r10
+			## assign
+			movq	%r10, %r9
+			## new const Int: 2
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r12
+			movl	$2, 24(%r12)
+			## unbox value of %r9 into %r10
+			movq	24(%r9), %r10
+			## unbox value of %r12 into %r11
+			movq	24(%r12), %r11
+			## plus
+			movl	%r10d, %r9d
+			addl	%r11d, %r9d
+			## box value of %r9 into %r10
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			call	Int..new
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movq	%r9, 24(%r10)
+			## store %r10 in self[3] (h)
+			movq	%r10, 24(%rbx)
+			## assign
+			movq	%r10, %r9
+			## assign
+			movq	%r8, %r9
+			## assign
+			movq	%r9, %r8
+			## return
+			movq	%r8, %rax
+			leave
+			ret
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
 
 .globl IO.in_int
 IO.in_int:
@@ -462,8 +1118,8 @@ Main.main:
 			movq	%rsp, %rbp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
-.Main_main_1:
-			## default Int
+.Main_main_4:
+			## const String
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -473,7 +1129,7 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			call	Int..new
+			call	String..new
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -483,106 +1139,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	$0, 24(%r9)
-			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r10
-			movq	$0, 24(%r10)
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 0 params to the stack
-			subq	$0, %rsp
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method in_int in vtable[5]
-			movq	40(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 0 params from stack with subq
-			addq	$0, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 0 stored params from stack (2nd time)
-			addq	$0, %rsp
-			## storing method result in %r8
 			movq	%rax, %r8
-			## assign
-			movq	%r8, %r9
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 0 params to the stack
-			subq	$0, %rsp
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method in_int in vtable[5]
-			movq	40(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 0 params from stack with subq
-			addq	$0, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 0 stored params from stack (2nd time)
-			addq	$0, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## assign
-			movq	%r8, %r10
-			## assign
-			movq	%r9, %r8
+			movq	$string_1, 24(%r8)
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -603,8 +1161,8 @@ Main.main:
 			## self: lookup method in vtable
 			## get ptr to vtable from self
 			movq	16(%rbx), %rax
-			## find method out_int in vtable[7]
-			movq	56(%rax), %rax
+			## find method out_string in vtable[8]
+			movq	64(%rax), %rax
 			## call method dynamically
 			call	*%rax
 			## removing 1 params from stack with subq
@@ -623,10 +1181,8 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## assign
-			movq	%r10, %r8
-			## storing param [0]
-			pushq	%r8
+			## const String
+			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -635,24 +1191,8 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method out_int in vtable[7]
-			movq	56(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
+			call	String..new
+			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -661,14 +1201,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r8
 			movq	%rax, %r8
-			## assign
-			movq	%r8, %r9
+			movq	$string_2, 24(%r8)
 			## return
-			movq	%r9, %rax
+			movq	%r8, %rax
 			leave
 			ret
 			## remove temporary stack space for 0 spilled regs
@@ -787,9 +1323,17 @@ main:
 			##  CONSTANT STRINGS
 			## ::::::::::::::::::::::::::::::::::::::::
 
+.globl type_name_Bazz 
+type_name_Bazz:			## type_name string for Bazz
+			.string "Bazz"
+
 .globl type_name_Bool 
 type_name_Bool:			## type_name string for Bool
 			.string "Bool"
+
+.globl type_name_Foo 
+type_name_Foo:			## type_name string for Foo
+			.string "Foo"
 
 .globl type_name_IO 
 type_name_IO:			## type_name string for IO
@@ -818,6 +1362,14 @@ empty.string:			## empty string for default Strings
 .globl abort.string
 abort.string:			## abort string for Object.abort
 			.string "abort\n"
+.globl string_1
+string_1:
+			.string "\\n"
+
+.globl string_2
+string_2:
+			.string "do nothing"
+
 .globl in_int_format_str
 in_int_format_str:
 			.string "%lld"

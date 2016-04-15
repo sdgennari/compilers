@@ -1275,6 +1275,14 @@ Main.main:
 			## unbox value of %r15 into %r10
 			movq	24(%r15), %r10
 			## divide
+			## if %r10d not zero, jmp over error
+			cmpl	$0, %r10d
+			jnz		.asm_label_1
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_1:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -1390,6 +1398,14 @@ Main.main:
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_2
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_2:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -1556,6 +1572,14 @@ Main.main:
 			## unbox value of %r9 into %r10
 			movq	24(%r9), %r10
 			## divide
+			## if %r10d not zero, jmp over error
+			cmpl	$0, %r10d
+			jnz		.asm_label_3
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_3:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -1883,6 +1907,14 @@ Main.main:
 			## unbox value of %r9 into %r12
 			movq	24(%r9), %r12
 			## divide
+			## if %r12d not zero, jmp over error
+			cmpl	$0, %r12d
+			jnz		.asm_label_4
+			movq	$string_2, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_4:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -2071,6 +2103,14 @@ Main.main:
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_5
+			movq	$string_2, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_5:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -2148,6 +2188,14 @@ Main.main:
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_6
+			movq	$string_3, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_6:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -2369,6 +2417,14 @@ Main.main:
 			## unbox value of %r14 into %r10
 			movq	24(%r14), %r10
 			## divide
+			## if %r10d not zero, jmp over error
+			cmpl	$0, %r10d
+			jnz		.asm_label_7
+			movq	$string_4, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_7:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -3008,6 +3064,14 @@ Main.main:
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_8
+			movq	$string_5, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_8:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -3105,6 +3169,14 @@ Main.main:
 			## unbox value of %r15 into %r9
 			movq	24(%r15), %r9
 			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_9
+			movq	$string_5, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_9:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -3275,6 +3347,14 @@ Main.main:
 			## unbox value of %r10 into %r8
 			movq	24(%r10), %r8
 			## divide
+			## if %r8d not zero, jmp over error
+			cmpl	$0, %r8d
+			jnz		.asm_label_10
+			movq	$string_6, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_10:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -3555,6 +3635,14 @@ Main.main:
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## divide
+			## if %r8d not zero, jmp over error
+			cmpl	$0, %r8d
+			jnz		.asm_label_11
+			movq	$string_7, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_11:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -3861,6 +3949,14 @@ Main.main:
 			## unbox value of %r10 into %rcx
 			movq	24(%r10), %rcx
 			## divide
+			## if %ecx not zero, jmp over error
+			cmpl	$0, %ecx
+			jnz		.asm_label_12
+			movq	$string_8, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_12:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -4078,6 +4174,14 @@ Main.main:
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_13
+			movq	$string_9, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_13:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -4365,6 +4469,14 @@ Main.main:
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## divide
+			## if %r8d not zero, jmp over error
+			cmpl	$0, %r8d
+			jnz		.asm_label_14
+			movq	$string_10, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_14:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -4557,6 +4669,14 @@ Main.main:
 			## unbox value of %r10 into %r9
 			movq	24(%r10), %r9
 			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_15
+			movq	$string_11, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_15:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -4712,6 +4832,14 @@ Main.main:
 			## unbox value of %r8 into %r15
 			movq	24(%r8), %r15
 			## divide
+			## if %r15d not zero, jmp over error
+			cmpl	$0, %r15d
+			jnz		.asm_label_16
+			movq	$string_12, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_16:
 			subq	$8, %rsp
 			pushq	%rdx
 			pushq	%rax
@@ -5442,6 +5570,54 @@ empty.string:			## empty string for default Strings
 .globl abort.string
 abort.string:			## abort string for Object.abort
 			.string "abort\n"
+.globl string_11
+string_11:
+			.string "ERROR: 34: Exception: division by zero"
+
+.globl string_5
+string_5:
+			.string "ERROR: 28: Exception: division by zero"
+
+.globl string_6
+string_6:
+			.string "ERROR: 29: Exception: division by zero"
+
+.globl string_12
+string_12:
+			.string "ERROR: 35: Exception: division by zero"
+
+.globl string_10
+string_10:
+			.string "ERROR: 33: Exception: division by zero"
+
+.globl string_3
+string_3:
+			.string "ERROR: 25: Exception: division by zero"
+
+.globl string_4
+string_4:
+			.string "ERROR: 26: Exception: division by zero"
+
+.globl string_8
+string_8:
+			.string "ERROR: 31: Exception: division by zero"
+
+.globl string_2
+string_2:
+			.string "ERROR: 24: Exception: division by zero"
+
+.globl string_7
+string_7:
+			.string "ERROR: 30: Exception: division by zero"
+
+.globl string_9
+string_9:
+			.string "ERROR: 32: Exception: division by zero"
+
+.globl string_1
+string_1:
+			.string "ERROR: 21: Exception: division by zero"
+
 .globl in_int_format_str
 in_int_format_str:
 			.string "%lld"

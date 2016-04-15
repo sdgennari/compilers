@@ -581,6 +581,7 @@ def gen_tac_for_exp(cur_tac_list, ast_exp):
 			cur_tac_list.append(TACCaseCmpTypesAndJe(type_symbol, type_name, branch_label))
 
 		# Generate expressions for each branch
+		branch_assignee_symbol = new_symbol()
 		for ast_case_elem in ast_exp.case_exp_list:
 			# Add symbol table for scope in case branch
 			symbol_table_list.append({})
@@ -598,8 +599,8 @@ def gen_tac_for_exp(cur_tac_list, ast_exp):
 			# Generate tac for branch expression
 			branch_exp_symbol, branch_exp_type = gen_tac_for_exp(cur_tac_list, ast_case_elem.exp)
 
-			# Assign the value of the branch exp to the assignee
-			cur_tac_list.append(TACAssign(branch_exp_type, assignee_symbol, branch_exp_symbol))
+			# Assign the value of the branch exp to the branch assignee symbol
+			cur_tac_list.append(TACAssign(branch_exp_type, branch_assignee_symbol, branch_exp_symbol))
 
 			# Jump to the exit
 			cur_tac_list.append(TACJmp(exit_label))
@@ -613,6 +614,7 @@ def gen_tac_for_exp(cur_tac_list, ast_exp):
 
 		# Add exit label
 		cur_tac_list.append(TACLabel(exit_label))
+		cur_tac_list.append(TACAssign(ast_exp.type_from_ast, assignee_symbol, branch_assignee_symbol))
 
 	else:
 		raise NotImplementedError(ast_exp.__class__.__name__ + " not yet implemented")
