@@ -1024,9 +1024,23 @@ def gen_asm_for_internal_method(cur_asm_list, internal_name):
 	elif internal_name == "Object.abort":
 		gen_asm_for_internal_abort(cur_asm_list)
 
+	elif internal_name == "Object.type_name":
+		gen_asm_for_internal_type_name(cur_asm_list)
+
 	else:
 		# raise NotImplementedError(internal_name + " has not been implemented")
 		pass
+
+def gen_asm_for_internal_type_name(cur_asm_list):
+	# Make new String to hold result
+	cur_asm_list.append(ASMComment("make new String to hold the result"))
+	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
+
+	# Move the value of type_name from vtable into the new String
+	cur_asm_list.append(ASMComment("move type_name from vtable[0] into String in %rax"))
+	cur_asm_list.append(ASMMovQ("16("+SELF_REG+")", "%r8"))
+	cur_asm_list.append(ASMMovQ("0(%r8)", "%r8"))
+	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 def gen_asm_for_internal_abort(cur_asm_list):
 	custom_asm = ASMCustomString(
