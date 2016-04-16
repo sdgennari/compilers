@@ -111,7 +111,7 @@ def get_io_format_strings():
 	# in_int format string
 	result = ".globl in_int_format_str\n"
 	result += "in_int_format_str:\n"
-	result += "\t\t\t.string \"%lld\"\n"
+	result += "\t\t\t.string \"%ld\"\n"
 	result += "\n"
 
 	# out_int format string

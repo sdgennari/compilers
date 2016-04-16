@@ -1234,47 +1234,92 @@ def gen_asm_for_internal_out_int(cur_asm_list):
 	cur_asm_list.append(ASMMovQ(SELF_REG, "%rax"))
 
 def gen_asm_for_internal_in_int(cur_asm_list):
-	cur_asm_list.append(ASMComment("make tmp space on stack"))
-	cur_asm_list.append(ASMSubQ("$8", "%rsp"))
+	cur_asm_list.append(ASMComment("use generated function to read int"))
+	custom_asm = ASMCustomString(
+		# "\t\t\tpushq\t%rbp\n" +
+		# "\t\t\tmovq\t%rsp, %rbp\n" +
+		"\t\t\tsubq\t$32, %rsp\n" +
+		"\t\t\tmovl\t$32, -24(%rbp)\n" +
+		"\t\t\tmovl\t$0, -20(%rbp)\n" +
+		"\t\t\tmovl\t-24(%rbp), %eax\n" +
+		"\t\t\tcltq\n" +
+		"\t\t\tmovq\t%rax, %rdi\n" +
+		"\t\t\tcall\tmalloc\n" +
+		"\t\t\tmovq\t%rax, -8(%rbp)\n" +
+		".in_int_5:\n" +
+		"\t\t\tcall\tgetchar\n" +
+		"\t\t\tmovb\t%al, -25(%rbp)\n" +
+		"\t\t\tcmpb\t$10, -25(%rbp)\n" +
+		"\t\t\tje\t.in_int_2\n" +
+		"\t\t\tcmpb\t$-1, -25(%rbp)\n" +
+		"\t\t\tje\t.in_int_2\n" +
+		"\t\t\tmovl\t-20(%rbp), %eax\n" +
+		"\t\t\tmovslq\t%eax, %rdx\n" +
+		"\t\t\tmovq\t-8(%rbp), %rax\n" +
+		"\t\t\taddq\t%rax, %rdx\n" +
+		"\t\t\tmovzbl\t-25(%rbp), %eax\n" +
+		"\t\t\tmovb\t%al, (%rdx)\n" +
+		"\t\t\taddl\t$1, -20(%rbp)\n" +
+		"\t\t\tcmpb\t$0, -25(%rbp)\n" +
+		"\t\t\tjne\t.in_int_3\n" +
+		"\t\t\tmovl\t$0, -20(%rbp)\n" +
+		"\t\t\tjmp\t.in_int_2\n" +
+		".in_int_3:\n" +
+		"\t\t\tmovl\t-20(%rbp), %eax\n" +
+		"\t\t\tcmpl\t-24(%rbp), %eax\n" +
+		"\t\t\tjne\t.in_int_4\n" +
+		"\t\t\taddl\t$20, -24(%rbp)\n" +
+		"\t\t\tmovl\t-24(%rbp), %eax\n" +
+		"\t\t\tmovslq\t%eax, %rdx\n" +
+		"\t\t\tmovq\t-8(%rbp), %rax\n" +
+		"\t\t\tmovq\t%rdx, %rsi\n" +
+		"\t\t\tmovq\t%rax, %rdi\n" +
+		"\t\t\tcall\trealloc\n" +
+		"\t\t\tmovq\t%rax, -8(%rbp)\n" +
+		"\t\t\tjmp\t.in_int_5\n" +
+		".in_int_4:\n" +
+		"\t\t\tjmp\t.in_int_5\n" +
+		".in_int_2:\n" +
+		"\t\t\tmovq\t-8(%rbp), %rax\n" +
+		"\t\t\tmovq\t%rax, %rdi\n" +
+		"\t\t\tcall\tatol\n" +
+		"\t\t\tmovq\t%rax, -16(%rbp)\n" +
+		"\t\t\tcmpq\t$2147483647, -16(%rbp)\n" +
+		"\t\t\tjle\t.in_int_6\n" +
+		"\t\t\tmovq\t$0, -16(%rbp)\n" +
+		"\t\t\tjmp\t.in_int_7\n" +
+		".in_int_6:\n" +
+		"\t\t\tcmpq\t$-2147483648, -16(%rbp)\n" +
+		"\t\t\tjge\t.in_int_7\n" +
+		"\t\t\tmovq\t$0, -16(%rbp)\n" +
+		".in_int_7:\n" +
+		"\t\t\tmovq\t-16(%rbp), %r8\n"
 
-	# Push caller-saved regs
-	offset = 0
-	for reg in caller_saved_registers:
-		cur_asm_list.append(ASMPushQ(reg))
-		offset += 1
-	rsp_offset = str(8 * offset) + "(%rsp)"
+		# OLD METHOD BELOW
+		# "\t\t\tsubq	$16, %rsp\n" +
+		# "\t\t\tleaq	-8(%rbp), %rax\n" +
+		# "\t\t\tmovq	%rax, %rsi\n" +
+		# "\t\t\tmovl	$in_int_format_str, %edi\n" +
+		# "\t\t\tmovl	$0, %eax\n" +
+		# "\t\t\tcall	__isoc99_scanf\n" +
+		# "\t\t\tmovq	-8(%rbp), %rax\n" +
+		# "\t\t\tcmpq	$2147483647, %rax\n" +
+		# "\t\t\tjle	.in_int_2\n" +
+		# "\t\t\tmovq	$0, -8(%rbp)\n" +
+		# "\t\t\tjmp	.in_int_3\n" +
+		# ".in_int_2:\n" +
+		# "\t\t\tmovq	-8(%rbp), %rax\n" +
+		# "\t\t\tcmpq	$-2147483648, %rax\n" +
+		# "\t\t\tjge	.in_int_3\n" +
+		# "\t\t\tmovq	$0, -8(%rbp)\n" +
+		# ".in_int_3:\n" +
+		# "\t\t\tmovq	-8(%rbp), %r8\n"
+	)
+	cur_asm_list.append(custom_asm)
 
-	# Setup and call scanf
-	cur_asm_list.append(ASMComment("setup and call scanf"))
-	cur_asm_list.append(ASMLeaQ(rsp_offset, "%rsi"))
-	cur_asm_list.append(ASMMovQ("$in_int_format_str", "%rdi"))
-	cur_asm_list.append(ASMMovL("$0", "%eax"))
-	cur_asm_list.append(ASMCall("__isoc99_scanf"))
-
-	# Pop all caller-saved regs
-	for reg in reversed(caller_saved_registers):
-		cur_asm_list.append(ASMPopQ(reg))
-
-	# Make a new Int to store the result
-	cur_asm_list.append(ASMComment("make new Int object in %rax"))
-	for reg in caller_saved_registers:
-		cur_asm_list.append(ASMPushQ(reg))
-
-	cur_asm_list.append(ASMCall("Int..new"))
-
-	for reg in reversed(caller_saved_registers):
-		cur_asm_list.append(ASMPopQ(reg))
-
-	# Box the result in the int
-	cur_asm_list.append(ASMComment("box answer in the new Int (use %r8 as tmp reg)"))
-	cur_asm_list.append(ASMPushQ("%r8"))
-	cur_asm_list.append(ASMMovQ("8(%rsp)", "%r8"))
+	gen_asm_for_new_boxed_type(cur_asm_list, "Int", "%rax")
+	cur_asm_list.append(ASMComment("move result into boxed Int"))
 	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
-	cur_asm_list.append(ASMPopQ("%r8"))
-
-	# Remove tmp space on stack
-	cur_asm_list.append(ASMComment("remove tmp space on stack"))
-	cur_asm_list.append(ASMAddQ("$8", "%rsp"))
 
 def gen_asm_for_internal_length(cur_asm_list):
 	# Push all callee-saved regs

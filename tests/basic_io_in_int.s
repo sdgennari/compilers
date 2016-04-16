@@ -296,8 +296,65 @@ String..new:		## Constructor for String
 IO.in_int:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## make tmp space on stack
-			subq	$8, %rsp
+			## use generated function to read int
+			subq	$32, %rsp
+			movl	$32, -24(%rbp)
+			movl	$0, -20(%rbp)
+			movl	-24(%rbp), %eax
+			cltq
+			movq	%rax, %rdi
+			call	malloc
+			movq	%rax, -8(%rbp)
+.in_int_5:
+			call	getchar
+			movb	%al, -25(%rbp)
+			cmpb	$10, -25(%rbp)
+			je	.in_int_2
+			cmpb	$-1, -25(%rbp)
+			je	.in_int_2
+			movl	-20(%rbp), %eax
+			movslq	%eax, %rdx
+			movq	-8(%rbp), %rax
+			addq	%rax, %rdx
+			movzbl	-25(%rbp), %eax
+			movb	%al, (%rdx)
+			addl	$1, -20(%rbp)
+			cmpb	$0, -25(%rbp)
+			jne	.in_int_3
+			movl	$0, -20(%rbp)
+			jmp	.in_int_2
+.in_int_3:
+			movl	-20(%rbp), %eax
+			cmpl	-24(%rbp), %eax
+			jne	.in_int_4
+			addl	$20, -24(%rbp)
+			movl	-24(%rbp), %eax
+			movslq	%eax, %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	realloc
+			movq	%rax, -8(%rbp)
+			jmp	.in_int_5
+.in_int_4:
+			jmp	.in_int_5
+.in_int_2:
+			movq	-8(%rbp), %rax
+			movq	%rax, %rdi
+			call	atol
+			movq	%rax, -16(%rbp)
+			cmpq	$2147483647, -16(%rbp)
+			jle	.in_int_6
+			movq	$0, -16(%rbp)
+			jmp	.in_int_7
+.in_int_6:
+			cmpq	$-2147483648, -16(%rbp)
+			jge	.in_int_7
+			movq	$0, -16(%rbp)
+.in_int_7:
+			movq	-16(%rbp), %r8
+
+			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -306,29 +363,12 @@ IO.in_int:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## setup and call scanf
-			leaq	64(%rsp), %rsi
-			movq	$in_int_format_str, %rdi
-			movl	$0, %eax
-			call	__isoc99_scanf
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## make new Int object in %rax
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -337,13 +377,9 @@ IO.in_int:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## box answer in the new Int (use %r8 as tmp reg)
-			pushq	%r8
-			movq	8(%rsp), %r8
+			movq	%rax, %rax
+			## move result into boxed Int
 			movq	%r8, 24(%rax)
-			popq	%r8
-			## remove tmp space on stack
-			addq	$8, %rsp
 			leave
 			ret
 
@@ -646,6 +682,72 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movq	$string_1, 24(%r8)
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_string in vtable[8]
+			movq	64(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
 			movq	%r10, %r8
 			## storing param [0]
@@ -670,6 +772,72 @@ Main.main:
 			movq	16(%rbx), %rax
 			## find method out_int in vtable[7]
 			movq	56(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## const String
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movq	$string_1, 24(%r8)
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_string in vtable[8]
+			movq	64(%rax), %rax
 			## call method dynamically
 			call	*%rax
 			## removing 1 params from stack with subq
@@ -743,6 +911,35 @@ Object.copy:
 Object.type_name:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## make new String to hold the result
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %rax
+			## move type_name from vtable[0] into String in %rax
+			movq	16(%rbx), %r8
+			movq	0(%r8), %r8
+			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -854,9 +1051,13 @@ empty.string:			## empty string for default Strings
 .globl abort.string
 abort.string:			## abort string for Object.abort
 			.string "abort\n"
+.globl string_1
+string_1:
+			.string "\\n"
+
 .globl in_int_format_str
 in_int_format_str:
-			.string "%lld"
+			.string "%ld"
 
 .globl out_int_format_str
 out_int_format_str:
