@@ -1038,13 +1038,19 @@ def gen_asm_for_internal_abort(cur_asm_list):
 	cur_asm_list.append(custom_asm)
 
 def gen_asm_for_internal_copy(cur_asm_list):
-	cur_asm_list.append(ASMComment("Make new obj to store result (same as doing SELF_TYPE..new)"))
+	cur_asm_list.append(ASMComment("save self reg"))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
+
+	cur_asm_list.append(ASMComment("make new obj to store result (same as doing SELF_TYPE..new)"))
 	# Get vtable ptr
 	cur_asm_list.append(ASMMovQ("16(%rbx)", "%rax"))
 	# Find constructor dynamically
 	cur_asm_list.append(ASMMovQ("8(%rax)", "%rax"))
 	# Call method
 	cur_asm_list.append(ASMCall("*%rax"))
+
+	cur_asm_list.append(ASMComment("restore self reg"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
 
 	# Setup and call memcpy
 	cur_asm_list.append(ASMComment("call memcpy to copy %rbx into %rax"))
@@ -1399,7 +1405,13 @@ def get_cmp_lt_helper_string():
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
 
+	tmp_instr_list.append(ASMComment("save self reg"))
+	tmp_instr_list.append(ASMPushQ(SELF_REG))
+
 	tmp_instr_list.append(ASMCall("Bool..new"))
+
+	tmp_instr_list.append(ASMComment("restore self reg"))
+	tmp_instr_list.append(ASMPopQ(SELF_REG))
 
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
@@ -1413,7 +1425,13 @@ def get_cmp_lt_helper_string():
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
 
+	tmp_instr_list.append(ASMComment("save self reg"))
+	tmp_instr_list.append(ASMPushQ(SELF_REG))	
+
 	tmp_instr_list.append(ASMCall("Bool..new"))
+
+	tmp_instr_list.append(ASMComment("restore self reg"))
+	tmp_instr_list.append(ASMPopQ(SELF_REG))
 
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
@@ -1547,7 +1565,13 @@ def get_cmp_le_helper_string():
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
 
+	tmp_instr_list.append(ASMComment("save self reg"))
+	tmp_instr_list.append(ASMPushQ(SELF_REG))
+
 	tmp_instr_list.append(ASMCall("Bool..new"))
+
+	tmp_instr_list.append(ASMComment("restore self reg"))
+	tmp_instr_list.append(ASMPopQ(SELF_REG))
 
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
@@ -1561,7 +1585,13 @@ def get_cmp_le_helper_string():
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
 
+	tmp_instr_list.append(ASMComment("save self reg"))
+	tmp_instr_list.append(ASMPushQ(SELF_REG))
+
 	tmp_instr_list.append(ASMCall("Bool..new"))
+
+	tmp_instr_list.append(ASMComment("restore self reg"))
+	tmp_instr_list.append(ASMPopQ(SELF_REG))
 
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
@@ -1695,7 +1725,13 @@ def get_cmp_eq_helper_string():
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
 
+	tmp_instr_list.append(ASMComment("save self reg"))
+	tmp_instr_list.append(ASMPushQ(SELF_REG))
+
 	tmp_instr_list.append(ASMCall("Bool..new"))
+
+	tmp_instr_list.append(ASMComment("restore self reg"))
+	tmp_instr_list.append(ASMPopQ(SELF_REG))
 
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
@@ -1709,7 +1745,13 @@ def get_cmp_eq_helper_string():
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
 
+	tmp_instr_list.append(ASMComment("save self reg"))
+	tmp_instr_list.append(ASMPushQ(SELF_REG))
+
 	tmp_instr_list.append(ASMCall("Bool..new"))
+
+	tmp_instr_list.append(ASMComment("restore self reg"))
+	tmp_instr_list.append(ASMPopQ(SELF_REG))
 
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))

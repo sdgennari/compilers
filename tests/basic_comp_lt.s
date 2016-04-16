@@ -66,36 +66,38 @@ String..vtable:		## vtable for String
 Bool..new:		## Constructor for Bool
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
 			## push callee-saved regs
 			pushq	%r12
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-			pushq	%rbx
-			## Allocate space for Bool
+			## allocate space for Bool (size: 4)
 			movq	$8, %rsi
 			movq	$4, %rdi
 			call	calloc
 			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
+			## store type_tag, obj_size, vtable in %rbx
 			movq	$0, %rax
 			movq	%rax, 0(%rbx)
 			movq	$4, %rax
 			movq	%rax, 8(%rbx)
 			movq	$Bool..vtable, %rax
 			movq	%rax, 16(%rbx)
-			## create default attrs
-			## self[3] holds val (raw.Int)
-			movl	$0, 24(%rbx)
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
+			## default raw.Int
+			movq	$0, %r8
+			## store %r8 in self[3] (val)
+			movq	%r8, 24(%rbx)
 			## pop callee-saved regs
-			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
 			popq	%r12
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			## assign self register to %rax for return
+			movq	%rbx, %rax
 			leave
 			ret
 
@@ -103,34 +105,34 @@ Bool..new:		## Constructor for Bool
 IO..new:		## Constructor for IO
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
 			## push callee-saved regs
 			pushq	%r12
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-			pushq	%rbx
-			## Allocate space for IO
+			## allocate space for IO (size: 3)
 			movq	$8, %rsi
 			movq	$3, %rdi
 			call	calloc
 			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
+			## store type_tag, obj_size, vtable in %rbx
 			movq	$2, %rax
 			movq	%rax, 0(%rbx)
 			movq	$3, %rax
 			movq	%rax, 8(%rbx)
 			movq	$IO..vtable, %rax
 			movq	%rax, 16(%rbx)
-			## create default attrs
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
 			## pop callee-saved regs
-			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
 			popq	%r12
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			## assign self register to %rax for return
+			movq	%rbx, %rax
 			leave
 			ret
 
@@ -138,36 +140,38 @@ IO..new:		## Constructor for IO
 Int..new:		## Constructor for Int
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
 			## push callee-saved regs
 			pushq	%r12
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-			pushq	%rbx
-			## Allocate space for Int
+			## allocate space for Int (size: 4)
 			movq	$8, %rsi
 			movq	$4, %rdi
 			call	calloc
 			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
+			## store type_tag, obj_size, vtable in %rbx
 			movq	$1, %rax
 			movq	%rax, 0(%rbx)
 			movq	$4, %rax
 			movq	%rax, 8(%rbx)
 			movq	$Int..vtable, %rax
 			movq	%rax, 16(%rbx)
-			## create default attrs
-			## self[3] holds val (raw.Int)
-			movl	$0, 24(%rbx)
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
+			## default raw.Int
+			movq	$0, %r8
+			## store %r8 in self[3] (val)
+			movq	%r8, 24(%rbx)
 			## pop callee-saved regs
-			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
 			popq	%r12
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			## assign self register to %rax for return
+			movq	%rbx, %rax
 			leave
 			ret
 
@@ -175,34 +179,34 @@ Int..new:		## Constructor for Int
 Main..new:		## Constructor for Main
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
 			## push callee-saved regs
 			pushq	%r12
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-			pushq	%rbx
-			## Allocate space for Main
+			## allocate space for Main (size: 3)
 			movq	$8, %rsi
 			movq	$3, %rdi
 			call	calloc
 			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
+			## store type_tag, obj_size, vtable in %rbx
 			movq	$5, %rax
 			movq	%rax, 0(%rbx)
 			movq	$3, %rax
 			movq	%rax, 8(%rbx)
 			movq	$Main..vtable, %rax
 			movq	%rax, 16(%rbx)
-			## create default attrs
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
 			## pop callee-saved regs
-			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
 			popq	%r12
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			## assign self register to %rax for return
+			movq	%rbx, %rax
 			leave
 			ret
 
@@ -210,34 +214,34 @@ Main..new:		## Constructor for Main
 Object..new:		## Constructor for Object
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
 			## push callee-saved regs
 			pushq	%r12
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-			pushq	%rbx
-			## Allocate space for Object
+			## allocate space for Object (size: 3)
 			movq	$8, %rsi
 			movq	$3, %rdi
 			call	calloc
 			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
+			## store type_tag, obj_size, vtable in %rbx
 			movq	$3, %rax
 			movq	%rax, 0(%rbx)
 			movq	$3, %rax
 			movq	%rax, 8(%rbx)
 			movq	$Object..vtable, %rax
 			movq	%rax, 16(%rbx)
-			## create default attrs
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
 			## pop callee-saved regs
-			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
 			popq	%r12
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			## assign self register to %rax for return
+			movq	%rbx, %rax
 			leave
 			ret
 
@@ -245,36 +249,38 @@ Object..new:		## Constructor for Object
 String..new:		## Constructor for String
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## allocate space to store 0 spilled regs
+			subq	$0, %rsp
 			## push callee-saved regs
 			pushq	%r12
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-			pushq	%rbx
-			## Allocate space for String
+			## allocate space for String (size: 4)
 			movq	$8, %rsi
 			movq	$4, %rdi
 			call	calloc
 			movq	%rax, %rbx
-			## Store type_tag, obj_size, vtable
+			## store type_tag, obj_size, vtable in %rbx
 			movq	$4, %rax
 			movq	%rax, 0(%rbx)
 			movq	$4, %rax
 			movq	%rax, 8(%rbx)
 			movq	$String..vtable, %rax
 			movq	%rax, 16(%rbx)
-			## create default attrs
-			## self[3] holds val (raw.String)
-			movq	$empty.string, 24(%rbx)
-			## initialize attrs
-			## assign self register to %rax
-			movq	%rbx, %rax
+			## default raw.String
+			movq	$empty.string, %r8
+			## store %r8 in self[3] (val)
+			movq	%r8, 24(%rbx)
 			## pop callee-saved regs
-			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
 			popq	%r12
+			## remove temporary stack space for 0 spilled regs
+			addq	$0, %rsp
+			## assign self register to %rax for return
+			movq	%rbx, %rax
 			leave
 			ret
 
@@ -403,7 +409,11 @@ IO.in_string:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	String..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -458,6 +468,11 @@ Main.main:
 			movq	%rsp, %rbp
 			## allocate space to store 0 spilled regs
 			subq	$0, %rsp
+			## push callee-saved regs
+			pushq	%r12
+			pushq	%r13
+			pushq	%r14
+			pushq	%r15
 .Main_main_1:
 			## new const Int: 123
 			## push caller-saved regs
@@ -469,7 +484,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Int..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -493,7 +512,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Int..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -506,7 +529,7 @@ Main.main:
 			movq	%rax, %r8
 			movl	$2, 24(%r8)
 			## assign
-			movq	%r8, %r12
+			movq	%r8, %r13
 			## new const Int: 3
 			## push caller-saved regs
 			pushq	%rcx
@@ -517,7 +540,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Int..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -530,7 +557,7 @@ Main.main:
 			movq	%rax, %r8
 			movl	$3, 24(%r8)
 			## assign
-			movq	%r8, %r13
+			movq	%r8, %r14
 			## new IO
 			## push caller-saved regs
 			pushq	%rcx
@@ -541,7 +568,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	IO..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -551,11 +582,11 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
+			movq	%rax, %r9
 			## assign
-			movq	%r8, %r14
+			movq	%r9, %r8
 			## default Object
-			movq	$0, %r8
+			movq	$0, %r9
 			## new const Int: 5
 			## push caller-saved regs
 			pushq	%rcx
@@ -566,29 +597,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Int..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r10
-			movl	$5, 24(%r10)
-			## new const Int: 7
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	Int..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -599,8 +612,9 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r11
-			movl	$7, 24(%r11)
-			## use lt_helper to compare %r10 < %r11
+			movl	$5, 24(%r11)
+			## new const Int: 7
+			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -609,9 +623,34 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push lhs (%r10) and rhs (%r11)
-			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r12
+			movl	$7, 24(%r12)
+			## use lt_helper to compare %r11 < %r12
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
 			pushq	%r10
+			pushq	%r11
+			## push lhs (%r11) and rhs (%r12)
+			pushq	%r12
+			pushq	%r11
 			call	lt_helper
 			addq	$16, %rsp
 			popq	%r11
@@ -622,8 +661,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
+			## move comparison result into %r10
+			movq	%rax, %r10
 			## new const Int: 9001
 			## push caller-saved regs
 			pushq	%rcx
@@ -634,7 +673,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Int..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -656,7 +699,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Int..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -666,9 +713,9 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r11
-			movl	$777, 24(%r11)
-			## use lt_helper to compare %r10 < %r11
+			movq	%rax, %r12
+			movl	$777, 24(%r12)
+			## use lt_helper to compare %r10 < %r12
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -677,8 +724,8 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push lhs (%r10) and rhs (%r11)
-			pushq	%r11
+			## push lhs (%r10) and rhs (%r12)
+			pushq	%r12
 			pushq	%r10
 			call	lt_helper
 			addq	$16, %rsp
@@ -690,8 +737,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
+			## move comparison result into %r11
+			movq	%rax, %r11
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -702,7 +749,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	String..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -712,8 +763,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	$string_1, 24(%r10)
+			movq	%rax, %r12
+			movq	$string_1, 24(%r12)
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -724,7 +775,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	String..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -736,7 +791,7 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r11
 			movq	$string_2, 24(%r11)
-			## use lt_helper to compare %r10 < %r11
+			## use lt_helper to compare %r12 < %r11
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -745,9 +800,9 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push lhs (%r10) and rhs (%r11)
+			## push lhs (%r12) and rhs (%r11)
 			pushq	%r11
-			pushq	%r10
+			pushq	%r12
 			call	lt_helper
 			addq	$16, %rsp
 			popq	%r11
@@ -758,8 +813,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
+			## move comparison result into %r10
+			movq	%rax, %r10
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -770,29 +825,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	String..new
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r11
-			movq	$string_3, 24(%r11)
-			## const String
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			call	String..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -803,8 +840,9 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r10
-			movq	$string_1, 24(%r10)
-			## use lt_helper to compare %r11 < %r10
+			movq	$string_3, 24(%r10)
+			## const String
+			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -813,9 +851,34 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push lhs (%r11) and rhs (%r10)
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r12
+			movq	$string_1, 24(%r12)
+			## use lt_helper to compare %r10 < %r12
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push lhs (%r10) and rhs (%r12)
+			pushq	%r12
+			pushq	%r10
 			call	lt_helper
 			addq	$16, %rsp
 			popq	%r11
@@ -826,8 +889,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
+			## move comparison result into %r11
+			movq	%rax, %r11
 			## const Bool
 			## push caller-saved regs
 			pushq	%rcx
@@ -838,7 +901,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Bool..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -848,8 +915,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$0, 24(%r9)
+			movq	%rax, %r12
+			movl	$0, 24(%r12)
 			## const Bool
 			## push caller-saved regs
 			pushq	%rcx
@@ -860,7 +927,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Bool..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -872,7 +943,7 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r11
 			movl	$1, 24(%r11)
-			## use lt_helper to compare %r9 < %r11
+			## use lt_helper to compare %r12 < %r11
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -881,9 +952,9 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push lhs (%r9) and rhs (%r11)
+			## push lhs (%r12) and rhs (%r11)
 			pushq	%r11
-			pushq	%r9
+			pushq	%r12
 			call	lt_helper
 			addq	$16, %rsp
 			popq	%r11
@@ -906,7 +977,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Bool..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -916,8 +991,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r11
-			movl	$1, 24(%r11)
+			movq	%rax, %r12
+			movl	$1, 24(%r12)
 			## const Bool
 			## push caller-saved regs
 			pushq	%rcx
@@ -928,7 +1003,11 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Bool..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -940,7 +1019,7 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r10
 			movl	$0, 24(%r10)
-			## use lt_helper to compare %r11 < %r10
+			## use lt_helper to compare %r12 < %r10
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -949,9 +1028,9 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push lhs (%r11) and rhs (%r10)
+			## push lhs (%r12) and rhs (%r10)
 			pushq	%r10
-			pushq	%r11
+			pushq	%r12
 			call	lt_helper
 			addq	$16, %rsp
 			popq	%r11
@@ -962,40 +1041,12 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
+			## move comparison result into %r11
+			movq	%rax, %r11
 			## assign
-			movq	%r12, %r11
+			movq	%r13, %r10
 			## assign
-			movq	%r14, %r9
-			## use lt_helper to compare %r11 < %r9
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push lhs (%r11) and rhs (%r9)
-			pushq	%r9
-			pushq	%r11
-			call	lt_helper
-			addq	$16, %rsp
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## move comparison result into %r10
-			movq	%rax, %r10
-			## assign
-			movq	%r12, %r10
-			## assign
-			movq	%r13, %r11
+			movq	%r8, %r11
 			## use lt_helper to compare %r10 < %r11
 			pushq	%rcx
 			pushq	%rdx
@@ -1018,40 +1069,12 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
+			## move comparison result into %r8
+			movq	%rax, %r8
 			## assign
 			movq	%r13, %r11
 			## assign
-			movq	%r12, %r9
-			## use lt_helper to compare %r11 < %r9
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push lhs (%r11) and rhs (%r9)
-			pushq	%r9
-			pushq	%r11
-			call	lt_helper
-			addq	$16, %rsp
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## move comparison result into %r10
-			movq	%rax, %r10
-			## assign
-			movq	%r12, %r11
-			## assign
-			movq	%r8, %r10
+			movq	%r14, %r10
 			## use lt_helper to compare %r11 < %r10
 			pushq	%rcx
 			pushq	%rdx
@@ -1074,72 +1097,135 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
+			## move comparison result into %r8
+			movq	%rax, %r8
+			## assign
+			movq	%r14, %r11
+			## assign
+			movq	%r13, %r10
+			## use lt_helper to compare %r11 < %r10
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r11) and rhs (%r10)
+			pushq	%r10
+			pushq	%r11
+			call	lt_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r8
+			movq	%rax, %r8
+			## assign
+			movq	%r13, %r10
+			## assign
+			movq	%r9, %r8
+			## use lt_helper to compare %r10 < %r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r8)
+			pushq	%r8
+			pushq	%r10
+			call	lt_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r11
+			movq	%rax, %r11
+			## assign
+			movq	%r9, %r10
+			## assign
+			movq	%r13, %r8
+			## use lt_helper to compare %r10 < %r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r8)
+			pushq	%r8
+			pushq	%r10
+			call	lt_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r11
+			movq	%rax, %r11
+			## assign
+			movq	%r9, %r10
+			## assign
+			movq	%r9, %r8
+			## use lt_helper to compare %r10 < %r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push lhs (%r10) and rhs (%r8)
+			pushq	%r8
+			pushq	%r10
+			call	lt_helper
+			addq	$16, %rsp
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
 			## move comparison result into %r9
 			movq	%rax, %r9
 			## assign
-			movq	%r8, %r10
-			## assign
-			movq	%r12, %r9
-			## use lt_helper to compare %r10 < %r9
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push lhs (%r10) and rhs (%r9)
-			pushq	%r9
-			pushq	%r10
-			call	lt_helper
-			addq	$16, %rsp
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## move comparison result into %r11
-			movq	%rax, %r11
-			## assign
-			movq	%r8, %r10
-			## assign
-			movq	%r8, %r9
-			## use lt_helper to compare %r10 < %r9
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push lhs (%r10) and rhs (%r9)
-			pushq	%r9
-			pushq	%r10
-			call	lt_helper
-			addq	$16, %rsp
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## move comparison result into %r11
-			movq	%rax, %r11
-			## assign
-			movq	%r11, %r8
+			movq	%r9, %r8
 			## return
 			movq	%r8, %rax
 			leave
 			ret
+			## pop callee-saved regs
+			popq	%r15
+			popq	%r14
+			popq	%r13
+			popq	%r12
 			## remove temporary stack space for 0 spilled regs
 			addq	$0, %rsp
+			leave
+			ret
 
 .globl Object.abort
 Object.abort:
@@ -1157,10 +1243,14 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## Make new obj to store result (same as doing SELF_TYPE..new)
+			## save self reg
+			pushq	%rbx
+			## make new obj to store result (same as doing SELF_TYPE..new)
 			movq	16(%rbx), %rax
 			movq	8(%rax), %rax
 			call	*%rax
+			## restore self reg
+			popq	%rbx
 			## call memcpy to copy %rbx into %rax
 			## use leaq to multiply the size by 8
 			movq	8(%rbx), %rdx
@@ -1194,7 +1284,6 @@ String.length:
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-			pushq	%rbx
 			## call strlen to compute length
 			movq	24(%rbx), %rdi
 			call	strlen
@@ -1209,7 +1298,11 @@ String.length:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
+			pushq	%rbx
 			call	Int..new
+			## restore self ptr
+			popq	%rbx
 			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
@@ -1223,7 +1316,6 @@ String.length:
 			movq	%r8, 24(%r9)
 			## move result into rax
 			movq	%r9, %rax
-			popq	%rbx
 			popq	%r15
 			popq	%r14
 			popq	%r13
@@ -1423,7 +1515,11 @@ cmp_lt_true:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1445,7 +1541,11 @@ cmp_lt_false:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1525,7 +1625,11 @@ cmp_le_true:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1547,7 +1651,11 @@ cmp_le_false:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1627,7 +1735,11 @@ cmp_eq_true:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1649,7 +1761,11 @@ cmp_eq_false:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9

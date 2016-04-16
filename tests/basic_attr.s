@@ -857,10 +857,14 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## Make new obj to store result (same as doing SELF_TYPE..new)
+			## save self reg
+			pushq	%rbx
+			## make new obj to store result (same as doing SELF_TYPE..new)
 			movq	16(%rbx), %rax
 			movq	8(%rax), %rax
 			call	*%rax
+			## restore self reg
+			popq	%rbx
 			## call memcpy to copy %rbx into %rax
 			## use leaq to multiply the size by 8
 			movq	8(%rbx), %rdx
@@ -1113,7 +1117,11 @@ cmp_lt_true:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1135,7 +1143,11 @@ cmp_lt_false:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1215,7 +1227,11 @@ cmp_le_true:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1237,7 +1253,11 @@ cmp_le_false:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1317,7 +1337,11 @@ cmp_eq_true:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1339,7 +1363,11 @@ cmp_eq_false:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## save self reg
+			pushq	%rbx
 			call	Bool..new
+			## restore self reg
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
