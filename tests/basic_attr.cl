@@ -4,8 +4,12 @@ class Main inherits IO {
 
 	main() : Object {
 		{
-			9001 + some_attr;
+			out_int(some_attr);
+			out_int(9001 + some_attr);
 			some_attr <- 123;
+			out_int(some_attr);
+			out_int(another_attr);
+
 		}
 	};
 };

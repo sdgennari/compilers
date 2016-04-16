@@ -4,6 +4,9 @@ class Main inherits IO {
 	s : SELF_TYPE <- self;
 
 	main() : Object {
-		0
+		{
+			out_int(i);
+			s.out_int(i);
+		}
 	};
 };

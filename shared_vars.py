@@ -30,5 +30,5 @@ caller_saved_registers = [
 # Note: explicitly exlcude ebx, ebp, esp
 callee_saved_registers = [
 	"%r12", "%r13", "%r14",
-	"%r15", "%rbx"
+	"%r15",
 ]

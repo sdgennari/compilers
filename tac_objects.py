@@ -153,7 +153,7 @@ class TACNegArith:
 
 ''' Allocation '''
 # x <- new <type>
-class TACAlloc:
+class TACNew:
 	def __init__(self, type_from_ast, assignee, allocType):
 		self.type_from_ast = type_from_ast
 		self.assignee = assignee
@@ -426,6 +426,14 @@ class TACError(TACCustom):
 	def __str__(self):
 		return "throw error for line " + str(self.line) + ": " + self.error_msg
 
+class TACAllocType(TACCustom):
+	def __init__(self, type_name, obj_size, type_tag):
+		self.type_name = type_name
+		self.obj_size = obj_size
+		self.type_tag = type_tag
+
+	def __str__(self):
+		return "self <- space for " + self.type_name + " (tag: " + str(self.type_tag) + ") with size " + str(self.obj_size)
 
 # class TACMakeParamSpace(TACCustom):
 # 	def __init__(self, num_params):

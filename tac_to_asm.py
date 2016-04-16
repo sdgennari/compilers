@@ -96,10 +96,13 @@ def gen_asm_for_tac_const_string(cur_asm_list, tac_const_string):
 def gen_asm_for_tac_default(cur_asm_list, tac_default):
 	# Set default value to $0
 	src = "$0"
-	if tac_default.type == "String":
+
+	# Change default value for Strings and raw Strings
+	if tac_default.type == "String" or tac_default.type == "raw.String":
 		src = "$empty.string"
 	dest = get_asm_register(tac_default.assignee, 64)
 
+	# Check for Ints, Strings, and Bools
 	cur_asm_list.append(ASMComment("default " + tac_default.type))
 	if tac_default.type == "Int" or tac_default.type == "Bool" or \
 			tac_default.type == "String":
@@ -108,6 +111,13 @@ def gen_asm_for_tac_default(cur_asm_list, tac_default):
 		dest_reg_offset = "24("+dest+")"
 		gen_asm_for_new_boxed_type(cur_asm_list, tac_default.type, dest)
 		cur_asm_list.append(ASMMovQ(src, dest_reg_offset))
+
+	# Handle raw.Int and raw.String explicitly
+	elif tac_default.type == "raw.Int":
+		cur_asm_list.append(ASMMovQ(src, dest))
+
+	elif tac_default.type == "raw.String":
+		cur_asm_list.append(ASMMovQ(src, dest))		
 
 	else:
 		# Move null ptr into dest
@@ -503,7 +513,13 @@ def gen_asm_for_new_boxed_type(cur_asm_list, type_name, dest_reg):
 	for reg in caller_saved_registers:
 		cur_asm_list.append(ASMPushQ(reg))
 
+	cur_asm_list.append(ASMComment("push self ptr"))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
+
 	cur_asm_list.append(ASMCall(constructor_method))
+
+	cur_asm_list.append(ASMComment("restore self ptr"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
 
 	cur_asm_list.append(ASMComment("pop caller-saved regs"))
 	for reg in reversed(caller_saved_registers):
@@ -558,6 +574,32 @@ def gen_asm_for_tac_store_attr(cur_asm_list, tac_store_attr):
 	cur_asm_list.append(ASMComment("store " + src + " in self[" + str(attr_idx) + \
 		"] (" + tac_store_attr.ident + ")"))
 	cur_asm_list.append(ASMMovQ(src, dest))
+
+def gen_asm_for_tac_alloc_type(cur_asm_list, tac_instr):
+	# Allocate space for the object based on the size via calloc(obj_size {rdi}, 8 {rsi})
+	type_size = "$" + str(tac_instr.obj_size)
+	type_name = tac_instr.type_name
+	cur_asm_list.append(ASMComment("allocate space for " + type_name + " (size: " + str(tac_instr.obj_size) + ")"))
+	cur_asm_list.append(ASMMovQ("$8", "%rsi"))
+	cur_asm_list.append(ASMMovQ(type_size, "%rdi"))
+	cur_asm_list.append(ASMCall("calloc"))
+
+	# Move the pointer to the object into SELF_REG
+	cur_asm_list.append(ASMMovQ("%rax", SELF_REG))
+
+	# Store type_tag, obj_size, vtable ptr
+	type_tag = "$" + str(tac_instr.type_tag)
+	vtable_str = "$" + tac_instr.type_name + "..vtable"
+
+	cur_asm_list.append(ASMComment("store type_tag, obj_size, vtable in " + SELF_REG))
+	cur_asm_list.append(ASMMovQ(type_tag, "%rax"))
+	cur_asm_list.append(ASMMovQ("%rax", "0("+SELF_REG+")"))
+	cur_asm_list.append(ASMMovQ(type_size, "%rax"))
+	cur_asm_list.append(ASMMovQ("%rax", "8("+SELF_REG+")"))
+	cur_asm_list.append(ASMMovQ(vtable_str, "%rax"))
+	cur_asm_list.append(ASMMovQ("%rax", "16("+SELF_REG+")"))
+
+
 
 def gen_asm_for_tac_call(cur_asm_list, tac_call):
 	# Note: This function assumes that all params and the receiver object
@@ -855,7 +897,7 @@ def gen_asm_for_tac_instr(cur_asm_list, tac_instr):
 	elif isinstance(tac_instr, TACUnbox):
 		gen_asm_for_tac_unbox(cur_asm_list, tac_instr)
 
-	elif isinstance(tac_instr, TACAlloc):
+	elif isinstance(tac_instr, TACNew):
 		gen_asm_for_tac_new(cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLoadAttr):
@@ -878,6 +920,9 @@ def gen_asm_for_tac_instr(cur_asm_list, tac_instr):
 
 	elif isinstance(tac_instr, TACError):
 		gen_asm_for_tac_error(cur_asm_list, tac_instr)
+
+	elif isinstance(tac_instr, TACAllocType):
+		gen_asm_for_tac_alloc_type(cur_asm_list, tac_instr)
 
 	# ========================================
 	# 				DISPATCH
@@ -927,15 +972,25 @@ def gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_re
 		spilled_register_location_map[register] = (idx+1) * -8
 		stack_offset += 8
 
-	# Allocate space on stack for saved regs
+	# Allocate space on stack for spilled regs
 	stack_offset_str = "$" + str(stack_offset)
 	cur_asm_list.append(ASMComment("allocate space to store " + str(len(spilled_registers)) + " spilled regs"))
 	cur_asm_list.append(ASMSubQ(stack_offset_str, "%rsp"))
+
+	# Push all callee-saved registers
+	cur_asm_list.append(ASMComment("push callee-saved regs"))
+	for reg in callee_saved_registers:
+		cur_asm_list.append(ASMPushQ(reg))
 
 	# Generate the asm instructions for each tac instr
 	for block in block_list:
 		for tac_instr in block.instr_list:
 			gen_asm_for_tac_instr(cur_asm_list, tac_instr)
+
+	# Pop all callee-saved registers
+	cur_asm_list.append(ASMComment("pop callee-saved regs"))
+	for reg in reversed(callee_saved_registers):
+		cur_asm_list.append(ASMPopQ(reg))
 
 	# Restore stack ptr
 	cur_asm_list.append(ASMComment("remove temporary stack space for " + str(len(spilled_registers)) + " spilled regs"))

@@ -121,7 +121,7 @@ def build_TAC_instr_list(file_line_list):
 				elif instr_type == "~":			# Arithmetic negation
 					TAC_instr_list.append(TACNegArith(assignee, op1))
 				elif instr_type == "new":		# Allocation with 'new'
-					TAC_instr_list.append(TACAlloc(assignee, op1))		# op1 = type
+					TAC_instr_list.append(TACNew(assignee, op1))		# op1 = type
 				elif instr_type == "default":	# Default value
 					TAC_instr_list.append(TACDefault(assignee, op1))	# op1 = type
 				elif instr_type == "isvoid":
