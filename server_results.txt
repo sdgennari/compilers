@@ -1,4 +1,4 @@
-Start Time:   Sat Apr 16 18:03:20 2016
+Start Time:   Fri Apr 29 17:35:44 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -32,13 +32,13 @@ t1: abort                                        ok
 t2: alias                                        ok  
 t3: assignments                                  ok  
 t4: bigexpr                                    FAILED
-t5: big-prog-with-many-exprs                   FAILED
-t6: book-list-static-dynamic-dispatch          FAILED (empty compiled-program output)
-t7: bool-assigned-in-let                       FAILED
+t5: big-prog-with-many-exprs                     ok  
+t6: book-list-static-dynamic-dispatch            ok  
+t7: bool-assigned-in-let                         ok  
 t8: bool-comparison                              ok  
 t9: calls-with-same-formal-name                  ok  
 t10: case-order                                  ok  
-t11: copy-self-dispatch                        FAILED (empty compiled-program output)
+t11: copy-self-dispatch                          ok  
 t12: copy-self-init                            FAILED
 t13: dispatch-override-dynamic                   ok  
 t14: dispatch-override-static                    ok  
@@ -53,18 +53,18 @@ t22: in-int                                      ok
 t23: in-int-garbage                              ok  
 t24: init-order-self                             ok  
 t25: init-order-super                            ok  
-t26: in-string                                 FAILED
+t26: in-string                                   ok  
 t27: in-string-garbage                         FAILED
-t28: in-string-huge                            FAILED
+t28: in-string-huge                              ok  
 t29: lambda-term-cool-code-generator           FAILED
 t30: lambda-term-evaluation-simulation           ok  
 t31: let-nested                                  ok  
 t32: mainio                                      ok  
-t33: newbasic                                  FAILED
+t33: newbasic                                    ok  
 t34: new                                         ok  
-t35: new-self-dispatch                         FAILED (empty compiled-program output)
-t36: new-self-init                             FAILED
-t37: new-self-type                             FAILED
+t35: new-self-dispatch                           ok  
+t36: new-self-init                               ok  
+t37: new-self-type                               ok  
 t38: nonvoid-comparison                          ok  
 t39: not                                         ok  
 t40: numcalls                                    ok  
@@ -73,7 +73,7 @@ t42: one-nested-exp-with-789-arith-ops    (no non-empty .cl-asm or .s file produ
       FAILED (empty compiled-program output)
 t43: override-builtin-method                   FAILED
 t44: primes                                      ok  
-t45: receiver-class-hard-to-determine          FAILED
+t45: receiver-class-hard-to-determine            ok  
 t46: scoping                                   FAILED
 t47: shadow-attr-case                            ok  
 t48: shadow-attr-formal                          ok  
@@ -86,7 +86,7 @@ t54: shadow-let-let                              ok
 t55: stack-overflow-not                          ok  
 t56: string-comparison                           ok  
 t57: string-internals                            ok  
-t58: substring-ok                              FAILED (empty compiled-program output)
+t58: substring-ok                                ok  
 t59: typename                                    ok  
 t60: void-comparison                             ok  
 t61: amh4bm.zip-copy                             ok  
@@ -107,7 +107,7 @@ t73: mgr3yp.zip-test_self                        ok
 t74: mjp2ff.zip-shallow_copy_self_good           ok  
 t75: rab9nn.zip-deep_copy_vs_shallow_copy         ok  
 t76: rbk2kb.zip-clone_attribute_changes          ok  
-t77: rbk2kb.zip-comparison_edge_cases_objects       FAILED
+t77: rbk2kb.zip-comparison_edge_cases_objects         ok  
 
 
 Negative Test Cases
@@ -117,7 +117,7 @@ t2: case-on-void                                 ok
 t3: dispatch-void-dynamic                        ok  
 t4: dispatch-void-static                         ok  
 t5: div-by-zero                                  ok  
-t6: substring-bad                              FAILED (empty output)
-t7: mjk6zt.zip-bug_maker                       FAILED
-t8: mjk6zt.zip-shallow_copy                    FAILED
-End Time: Sat Apr 16 18:04:30 2016
+t6: substring-bad                                ok  
+t7: mjk6zt.zip-bug_maker                         ok  
+t8: mjk6zt.zip-shallow_copy                      ok  
+End Time: Fri Apr 29 17:36:53 2016
