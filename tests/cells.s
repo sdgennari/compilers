@@ -3089,7 +3089,7 @@ Main.main:
 			addq	$0, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## new const Int: 1
+			## new const Int: 20
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3114,7 +3114,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$1, 24(%r8)
+			movl	$20, 24(%r8)
 			## assign
 			movq	%r8, %r11
 			jmp		.loop_start_23
@@ -3709,13 +3709,17 @@ error.substr_range:		## error string for String.substr
 string_7:
 			.string "ERROR: 67: Exception: dispatch on void"
 
+.globl string_11
+string_11:
+			.string "ERROR: 88: Exception: dispatch on void"
+
 .globl string_3
 string_3:
 			.string "ERROR: 23: Exception: dispatch on void"
 
-.globl string_11
-string_11:
-			.string "ERROR: 88: Exception: dispatch on void"
+.globl string_8
+string_8:
+			.string "         X         "
 
 .globl string_6
 string_6:
@@ -3728,10 +3732,6 @@ string_10:
 .globl string_2
 string_2:
 			.string "ERROR: 17: Exception: dispatch on void"
-
-.globl string_8
-string_8:
-			.string "         X"
 
 .globl string_9
 string_9:

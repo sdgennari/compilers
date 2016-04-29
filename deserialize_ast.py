@@ -314,7 +314,7 @@ def get_input_list(filename):
 	f = open(filename)
 	input_lines = []
 	for line in f:
-		input_lines.append(line.rstrip())
+		input_lines.append(line.rstrip('\n'))
 
 	return ast_from_input(input_lines)
 
@@ -448,7 +448,7 @@ def get_input_list_from_annotated_ast(filename):
 	# Read all lines from the file
 	input_lines = []
 	for line in f:
-		input_lines.append(line.rstrip())
+		input_lines.append(line.rstrip('\n'))
 
 	# Deserialize the class map
 	line = next_string(input_lines)

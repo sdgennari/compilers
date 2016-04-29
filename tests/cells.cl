@@ -82,7 +82,7 @@ class Main {
         {
             cells <- (new CellularAutomaton).init("         X         ");
             cells.print();
-            (let countdown : Int <- 1 in
+            (let countdown : Int <- 20 in
                 while 0 < countdown loop
                     {
                         cells.evolve();
