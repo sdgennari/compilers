@@ -185,10 +185,13 @@ def gen_asm_for_tac_return(cur_asm_list, tac_return):
 	src = get_asm_register(tac_return.op1, 64)
 	dest = "%rax"
 
-	cur_asm_list.append(ASMComment("return"))
-	cur_asm_list.append(ASMMovQ(src, dest))
-	cur_asm_list.append(ASMLeave())
-	cur_asm_list.append(ASMRet())
+	cur_asm_list.append(ASMComment("move ret val " + src + " into " + dest))
+	cur_asm_list.append(ASMMovQ(src, dest));
+
+	# cur_asm_list.append(ASMComment("return"))
+	# cur_asm_list.append(ASMMovQ(src, dest))
+	# cur_asm_list.append(ASMLeave())
+	# cur_asm_list.append(ASMRet())
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_jmp(cur_asm_list, tac_jmp):
@@ -409,8 +412,10 @@ def gen_asm_for_tac_comp_l(cur_asm_list, tac_comp_l):
 	cur_asm_list.append(ASMComment("use lt_helper to compare " + op1_reg + " < " + op2_reg))
 
 	# Save all caller-saved regs
+	cur_asm_list.append(ASMComment("push caller-saved regs and self ptr"))
 	for reg in caller_saved_registers:
 		cur_asm_list.append(ASMPushQ(reg))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
 
 	# Push lhs and rhs regs
 	cur_asm_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
@@ -424,6 +429,8 @@ def gen_asm_for_tac_comp_l(cur_asm_list, tac_comp_l):
 	cur_asm_list.append(ASMAddQ("$16", "%rsp"))
 
 	# Restore all caller-saved regs
+	cur_asm_list.append(ASMComment("pop self ptr and caller-saved regs"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
 	for reg in reversed(caller_saved_registers):
 		cur_asm_list.append(ASMPopQ(reg))
 
@@ -440,8 +447,10 @@ def gen_asm_for_tac_comp_le(cur_asm_list, tac_comp_le):
 	cur_asm_list.append(ASMComment("use le_helper to compare " + op1_reg + " <= " + op2_reg))
 
 	# Save all caller-saved regs
+	cur_asm_list.append(ASMComment("push caller-saved regs and self ptr"))
 	for reg in caller_saved_registers:
 		cur_asm_list.append(ASMPushQ(reg))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
 
 	# Push lhs and rhs regs
 	cur_asm_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
@@ -455,6 +464,8 @@ def gen_asm_for_tac_comp_le(cur_asm_list, tac_comp_le):
 	cur_asm_list.append(ASMAddQ("$16", "%rsp"))
 
 	# Restore all caller-saved regs
+	cur_asm_list.append(ASMComment("pop self ptr and caller-saved regs"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
 	for reg in reversed(caller_saved_registers):
 		cur_asm_list.append(ASMPopQ(reg))
 
@@ -471,8 +482,10 @@ def gen_asm_for_tac_comp_e(cur_asm_list, tac_comp_eq):
 	cur_asm_list.append(ASMComment("use eq_helper to compare " + op1_reg + " = " + op2_reg))
 
 	# Save all caller-saved regs
+	cur_asm_list.append(ASMComment("push caller-saved regs and self ptr"))
 	for reg in caller_saved_registers:
 		cur_asm_list.append(ASMPushQ(reg))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
 
 	# Push lhs and rhs regs
 	cur_asm_list.append(ASMComment("push lhs (" + op1_reg + ") and rhs (" + op2_reg + ")"))
@@ -486,6 +499,8 @@ def gen_asm_for_tac_comp_e(cur_asm_list, tac_comp_eq):
 	cur_asm_list.append(ASMAddQ("$16", "%rsp"))
 
 	# Restore all caller-saved regs
+	cur_asm_list.append(ASMComment("pop self ptr and caller-saved regs"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
 	for reg in reversed(caller_saved_registers):
 		cur_asm_list.append(ASMPopQ(reg))
 
@@ -512,7 +527,6 @@ def gen_asm_for_new_boxed_type(cur_asm_list, type_name, dest_reg):
 	cur_asm_list.append(ASMComment("push caller-saved regs"))
 	for reg in caller_saved_registers:
 		cur_asm_list.append(ASMPushQ(reg))
-
 	cur_asm_list.append(ASMComment("push self ptr"))
 	cur_asm_list.append(ASMPushQ(SELF_REG))
 
@@ -520,7 +534,6 @@ def gen_asm_for_new_boxed_type(cur_asm_list, type_name, dest_reg):
 
 	cur_asm_list.append(ASMComment("restore self ptr"))
 	cur_asm_list.append(ASMPopQ(SELF_REG))
-
 	cur_asm_list.append(ASMComment("pop caller-saved regs"))
 	for reg in reversed(caller_saved_registers):
 		cur_asm_list.append(ASMPopQ(reg))
@@ -1006,6 +1019,12 @@ def gen_asm_for_internal_method(cur_asm_list, internal_name):
 	if internal_name == "String.length":
 		gen_asm_for_internal_length(cur_asm_list)
 
+	elif internal_name == "String.concat":
+		gen_asm_for_internal_str_concat(cur_asm_list)
+
+	elif internal_name == "String.substr":
+		gen_asm_for_internal_str_substr(cur_asm_list)
+
 	elif internal_name == "IO.in_int":
 		gen_asm_for_internal_in_int(cur_asm_list)
 
@@ -1030,6 +1049,122 @@ def gen_asm_for_internal_method(cur_asm_list, internal_name):
 	else:
 		# raise NotImplementedError(internal_name + " has not been implemented")
 		pass
+
+def gen_asm_for_internal_str_concat(cur_asm_list):
+	# Unbox values into rdi and rsi
+	cur_asm_list.append(ASMComment("unbox self into rdi"))
+	cur_asm_list.append(ASMMovQ("24(%rbx)", "%rdi"))
+	cur_asm_list.append(ASMComment("unbox param[0] into rsi"))
+	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rax"))
+	cur_asm_list.append(ASMMovQ("24(%rax)", "%rsi"))
+
+	# Call string concat helper
+	cur_asm_list.append(ASMCall("cool_str_concat"))
+
+	# Box result in a new String
+	cur_asm_list.append(ASMComment("make new box in rax to store result (moved into r8 temporarily)"))
+	cur_asm_list.append(ASMMovQ("%rax", "%r8"))
+	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
+	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+
+def get_string_concat_helper():
+	result = "cool_str_concat:\n" + \
+	"\t\t\tpushq\t%rbp\n" + \
+	"\t\t\tmovq\t%rsp, %rbp\n" + \
+	"\t\t\tsubq\t$32, %rsp\n" + \
+	"\t\t\tmovq\t%rdi, -24(%rbp)\n" + \
+	"\t\t\tmovq\t%rsi, -32(%rbp)\n" + \
+	"\t\t\tmovq\t-24(%rbp), %rax\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\tstrlen\n" + \
+	"\t\t\tmovl\t%eax, -16(%rbp)\n" + \
+	"\t\t\tmovq\t-32(%rbp), %rax\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\tstrlen\n" + \
+	"\t\t\tmovl\t%eax, -12(%rbp)\n" + \
+	"\t\t\tmovl\t-12(%rbp), %eax\n" + \
+	"\t\t\tmovl\t-16(%rbp), %edx\n" + \
+	"\t\t\taddl\t%edx, %eax\n" + \
+	"\t\t\taddl\t$1, %eax\n" + \
+	"\t\t\tcltq\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\tmalloc\n" + \
+	"\t\t\tmovq\t%rax, -8(%rbp)\n" + \
+	"\t\t\tmovq\t-24(%rbp), %rdx\n" + \
+	"\t\t\tmovq\t-8(%rbp), %rax\n" + \
+	"\t\t\tmovq\t%rdx, %rsi\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\tstrcpy\n" + \
+	"\t\t\tmovq\t-32(%rbp), %rdx\n" + \
+	"\t\t\tmovq\t-8(%rbp), %rax\n" + \
+	"\t\t\tmovq\t%rdx, %rsi\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\tstrcat\n" + \
+	"\t\t\tmovq\t-8(%rbp), %rax\n" + \
+	"\t\t\tleave\n" + \
+	"\t\t\tret\n"
+	return result
+
+def gen_asm_for_internal_str_substr(cur_asm_list):
+	# Unbox values into rdi, rsi, and rdx
+	cur_asm_list.append(ASMComment("unbox self into rdi"))
+	cur_asm_list.append(ASMMovQ("24(%rbx)", "%rdi"))
+	cur_asm_list.append(ASMComment("unbox param[0] into rsi"))
+	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rax"))
+	cur_asm_list.append(ASMMovQ("24(%rax)", "%rsi"))
+	cur_asm_list.append(ASMComment("unbox param[1] into rdx"))
+	cur_asm_list.append(ASMMovQ("24(%rbp)", "%rax"))
+	cur_asm_list.append(ASMMovQ("24(%rax)", "%rdx"))
+
+	# Call string substr helper
+	cur_asm_list.append(ASMCall("cool_str_substr"))
+
+	# Box result in a new String
+	cur_asm_list.append(ASMComment("make new box to store result (moved into r8 temporarily)"))
+	cur_asm_list.append(ASMMovQ("%rax", "%r8"))
+	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
+	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+
+def get_string_substr_helper():
+	result = "cool_str_substr:\n" + \
+	"\t\t\tpushq\t%rbp\n" + \
+	"\t\t\tmovq\t%rsp, %rbp\n" + \
+	"\t\t\tpushq\t%rbx\n" + \
+	"\t\t\tsubq\t$24, %rsp\n" + \
+	"\t\t\tmovq\t%rdi, -24(%rbp)\n" + \
+	"\t\t\tmovl\t%esi, -28(%rbp)\n" + \
+	"\t\t\tmovl\t%edx, -32(%rbp)\n" + \
+	"\t\t\tcmpl\t$0, -28(%rbp)\n" + \
+	"\t\t\tjs\t.substr_L4\n" + \
+	"\t\t\tmovl\t-32(%rbp), %eax\n" + \
+	"\t\t\tmovl\t-28(%rbp), %edx\n" + \
+	"\t\t\taddl\t%edx, %eax\n" + \
+	"\t\t\tmovslq\t%eax, %rbx\n" + \
+	"\t\t\tmovq\t-24(%rbp), %rax\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\tstrlen\n" + \
+	"\t\t\tcmpq\t%rax, %rbx\n" + \
+	"\t\t\tjbe\t.substr_L5\n" + \
+	".substr_L4:\n" + \
+	"\t\t\tmovq\t$error.substr_range, %rdi\n" + \
+	"\t\t\tcall\traw_out_string\n" + \
+	"\t\t\tmovq\t$0, %rax\n" + \
+	"\t\t\tcall\texit\n" + \
+	".substr_L5:\n" + \
+	"\t\t\tmovl\t-32(%rbp), %eax\n" + \
+	"\t\t\tcltq\n" + \
+	"\t\t\tmovl\t-28(%rbp), %edx\n" + \
+	"\t\t\tmovslq\t%edx, %rcx\n" + \
+	"\t\t\tmovq\t-24(%rbp), %rdx\n" + \
+	"\t\t\taddq\t%rcx, %rdx\n" + \
+	"\t\t\tmovq\t%rax, %rsi\n" + \
+	"\t\t\tmovq\t%rdx, %rdi\n" + \
+	"\t\t\tcall\tstrndup\n" + \
+	"\t\t\taddq\t$24, %rsp\n" + \
+	"\t\t\tpopq\t%rbx\n" + \
+	"\t\t\tpopq\t%rbp\n" + \
+	"\t\t\tret\n"
+	return result
 
 def gen_asm_for_internal_type_name(cur_asm_list):
 	# Make new String to hold result
@@ -1463,7 +1598,6 @@ def get_cmp_lt_helper_string():
 	tmp_instr_list.append(ASMLabel(true_label))
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
-
 	tmp_instr_list.append(ASMComment("save self reg"))
 	tmp_instr_list.append(ASMPushQ(SELF_REG))
 
@@ -1471,7 +1605,6 @@ def get_cmp_lt_helper_string():
 
 	tmp_instr_list.append(ASMComment("restore self reg"))
 	tmp_instr_list.append(ASMPopQ(SELF_REG))
-
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
 
@@ -1483,7 +1616,6 @@ def get_cmp_lt_helper_string():
 	tmp_instr_list.append(ASMLabel(false_label))
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
-
 	tmp_instr_list.append(ASMComment("save self reg"))
 	tmp_instr_list.append(ASMPushQ(SELF_REG))	
 
@@ -1491,7 +1623,6 @@ def get_cmp_lt_helper_string():
 
 	tmp_instr_list.append(ASMComment("restore self reg"))
 	tmp_instr_list.append(ASMPopQ(SELF_REG))
-
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
 
@@ -1623,7 +1754,6 @@ def get_cmp_le_helper_string():
 	tmp_instr_list.append(ASMLabel(true_label))
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
-
 	tmp_instr_list.append(ASMComment("save self reg"))
 	tmp_instr_list.append(ASMPushQ(SELF_REG))
 
@@ -1631,7 +1761,6 @@ def get_cmp_le_helper_string():
 
 	tmp_instr_list.append(ASMComment("restore self reg"))
 	tmp_instr_list.append(ASMPopQ(SELF_REG))
-
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
 
@@ -1643,7 +1772,6 @@ def get_cmp_le_helper_string():
 	tmp_instr_list.append(ASMLabel(false_label))
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
-
 	tmp_instr_list.append(ASMComment("save self reg"))
 	tmp_instr_list.append(ASMPushQ(SELF_REG))
 
@@ -1651,7 +1779,6 @@ def get_cmp_le_helper_string():
 
 	tmp_instr_list.append(ASMComment("restore self reg"))
 	tmp_instr_list.append(ASMPopQ(SELF_REG))
-
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
 
@@ -1783,7 +1910,6 @@ def get_cmp_eq_helper_string():
 	tmp_instr_list.append(ASMLabel(true_label))
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
-
 	tmp_instr_list.append(ASMComment("save self reg"))
 	tmp_instr_list.append(ASMPushQ(SELF_REG))
 
@@ -1791,7 +1917,6 @@ def get_cmp_eq_helper_string():
 
 	tmp_instr_list.append(ASMComment("restore self reg"))
 	tmp_instr_list.append(ASMPopQ(SELF_REG))
-
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
 
@@ -1803,7 +1928,6 @@ def get_cmp_eq_helper_string():
 	tmp_instr_list.append(ASMLabel(false_label))
 	for reg in caller_saved_registers:
 		tmp_instr_list.append(ASMPushQ(reg))
-
 	tmp_instr_list.append(ASMComment("save self reg"))
 	tmp_instr_list.append(ASMPushQ(SELF_REG))
 
@@ -1811,7 +1935,6 @@ def get_cmp_eq_helper_string():
 
 	tmp_instr_list.append(ASMComment("restore self reg"))
 	tmp_instr_list.append(ASMPopQ(SELF_REG))
-
 	for reg in reversed(caller_saved_registers):
 		tmp_instr_list.append(ASMPopQ(reg))
 

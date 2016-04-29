@@ -399,10 +399,8 @@ CellularAutomaton.init:
 			movq	%rbx, %r9
 			## assign
 			movq	%r9, %r8
-			## return
+			## move ret val %r8 into %rax
 			movq	%r8, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -588,10 +586,8 @@ CellularAutomaton.print:
 			movq	%rbx, %r9
 			## assign
 			movq	%r9, %r8
-			## return
+			## move ret val %r8 into %rax
 			movq	%r8, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -702,10 +698,8 @@ CellularAutomaton.num_cells:
 			addq	$0, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## return
+			## move ret val %r8 into %rax
 			movq	%r8, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -856,10 +850,8 @@ CellularAutomaton.cell:
 			addq	$16, %rsp
 			## storing method result in %r9
 			movq	%rax, %r9
-			## return
+			## move ret val %r9 into %rax
 			movq	%r9, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -913,6 +905,7 @@ CellularAutomaton.cell_left_neighbor:
 			movq	%rax, %r9
 			movl	$0, 24(%r9)
 			## use eq_helper to compare %r10 = %r9
+			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -921,11 +914,14 @@ CellularAutomaton.cell_left_neighbor:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			## push lhs (%r10) and rhs (%r9)
 			pushq	%r9
 			pushq	%r10
 			call	eq_helper
 			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1191,10 +1187,8 @@ CellularAutomaton.cell_left_neighbor:
 			movq	%r9, %r8
 			jmp		.if_exit_9
 .if_exit_9:
-			## return
+			## move ret val %r8 into %rax
 			movq	%r8, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -1316,6 +1310,7 @@ CellularAutomaton.cell_right_neighbor:
 			movq	%rax, %r9
 			movq	%r8, 24(%r9)
 			## use eq_helper to compare %r11 = %r9
+			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1324,11 +1319,14 @@ CellularAutomaton.cell_right_neighbor:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			## push lhs (%r11) and rhs (%r9)
 			pushq	%r9
 			pushq	%r11
 			call	eq_helper
 			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1526,10 +1524,8 @@ CellularAutomaton.cell_right_neighbor:
 			movq	%r8, %r9
 			jmp		.if_exit_11
 .if_exit_11:
-			## return
+			## move ret val %r9 into %rax
 			movq	%r9, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -1623,6 +1619,7 @@ CellularAutomaton.cell_at_next_evolution:
 			movq	%rax, %r10
 			movq	$string_5, 24(%r10)
 			## use eq_helper to compare %r9 = %r10
+			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1631,11 +1628,14 @@ CellularAutomaton.cell_at_next_evolution:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			## push lhs (%r9) and rhs (%r10)
 			pushq	%r10
 			pushq	%r9
 			call	eq_helper
 			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1787,6 +1787,7 @@ CellularAutomaton.cell_at_next_evolution:
 			movq	%rax, %r10
 			movq	$string_5, 24(%r10)
 			## use eq_helper to compare %r8 = %r10
+			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1795,11 +1796,14 @@ CellularAutomaton.cell_at_next_evolution:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			## push lhs (%r8) and rhs (%r10)
 			pushq	%r10
 			pushq	%r8
 			call	eq_helper
 			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -1984,6 +1988,7 @@ CellularAutomaton.cell_at_next_evolution:
 			movq	%rax, %r8
 			movq	$string_5, 24(%r8)
 			## use eq_helper to compare %r11 = %r8
+			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1992,11 +1997,14 @@ CellularAutomaton.cell_at_next_evolution:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			## push lhs (%r11) and rhs (%r8)
 			pushq	%r8
 			pushq	%r11
 			call	eq_helper
 			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -2139,6 +2147,7 @@ CellularAutomaton.cell_at_next_evolution:
 			movq	%rax, %r10
 			movl	$1, 24(%r10)
 			## use eq_helper to compare %r9 = %r10
+			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2147,11 +2156,14 @@ CellularAutomaton.cell_at_next_evolution:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			## push lhs (%r9) and rhs (%r10)
 			pushq	%r10
 			pushq	%r9
 			call	eq_helper
 			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -2234,10 +2246,8 @@ CellularAutomaton.cell_at_next_evolution:
 			movq	%r9, %r8
 			jmp		.if_exit_13
 .if_exit_13:
-			## return
+			## move ret val %r8 into %rax
 			movq	%r8, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -2356,6 +2366,7 @@ CellularAutomaton.evolve:
 			## assign
 			movq	%r11, %r13
 			## use lt_helper to compare %r10 < %r13
+			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2364,11 +2375,14 @@ CellularAutomaton.evolve:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			## push lhs (%r10) and rhs (%r13)
 			pushq	%r13
 			pushq	%r10
 			call	lt_helper
 			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -2609,10 +2623,8 @@ CellularAutomaton.evolve:
 			movq	%r9, %r8
 			## assign
 			movq	%r8, %r9
-			## return
+			## move ret val %r9 into %rax
 			movq	%r9, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -3077,7 +3089,7 @@ Main.main:
 			addq	$0, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## new const Int: 20
+			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3102,7 +3114,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$20, 24(%r8)
+			movl	$1, 24(%r8)
 			## assign
 			movq	%r8, %r11
 			jmp		.loop_start_23
@@ -3136,6 +3148,7 @@ Main.main:
 			## assign
 			movq	%r11, %r10
 			## use lt_helper to compare %r8 < %r10
+			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -3144,11 +3157,14 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			pushq	%rbx
 			## push lhs (%r8) and rhs (%r10)
 			pushq	%r10
 			pushq	%r8
 			call	lt_helper
 			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -3420,10 +3436,8 @@ Main.main:
 			movq	%rbx, %r9
 			## assign
 			movq	%r9, %r8
-			## return
+			## move ret val %r8 into %rax
 			movq	%r8, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -3509,6 +3523,39 @@ Object.type_name:
 String.concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## unbox self into rdi
+			movq	24(%rbx), %rdi
+			## unbox param[0] into rsi
+			movq	16(%rbp), %rax
+			movq	24(%rax), %rsi
+			call	cool_str_concat
+			## make new box in rax to store result (moved into r8 temporarily)
+			movq	%rax, %r8
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %rax
+			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -3563,6 +3610,42 @@ String.length:
 String.substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## unbox self into rdi
+			movq	24(%rbx), %rdi
+			## unbox param[0] into rsi
+			movq	16(%rbp), %rax
+			movq	24(%rax), %rsi
+			## unbox param[1] into rdx
+			movq	24(%rbp), %rax
+			movq	24(%rax), %rdx
+			call	cool_str_substr
+			## make new box to store result (moved into r8 temporarily)
+			movq	%rax, %r8
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %rax
+			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -3617,6 +3700,11 @@ empty.string:			## empty string for default Strings
 .globl abort.string
 abort.string:			## abort string for Object.abort
 			.string "abort\n"
+
+.globl error.substr_range
+error.substr_range:		## error string for String.substr
+			.string "ERROR: 0: Exception: String.substr out of range\n"
+
 .globl string_7
 string_7:
 			.string "ERROR: 67: Exception: dispatch on void"
@@ -3725,6 +3813,79 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+cool_str_concat:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			subq	$32, %rsp
+			movq	%rdi, -24(%rbp)
+			movq	%rsi, -32(%rbp)
+			movq	-24(%rbp), %rax
+			movq	%rax, %rdi
+			call	strlen
+			movl	%eax, -16(%rbp)
+			movq	-32(%rbp), %rax
+			movq	%rax, %rdi
+			call	strlen
+			movl	%eax, -12(%rbp)
+			movl	-12(%rbp), %eax
+			movl	-16(%rbp), %edx
+			addl	%edx, %eax
+			addl	$1, %eax
+			cltq
+			movq	%rax, %rdi
+			call	malloc
+			movq	%rax, -8(%rbp)
+			movq	-24(%rbp), %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	strcpy
+			movq	-32(%rbp), %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	strcat
+			movq	-8(%rbp), %rax
+			leave
+			ret
+cool_str_substr:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			pushq	%rbx
+			subq	$24, %rsp
+			movq	%rdi, -24(%rbp)
+			movl	%esi, -28(%rbp)
+			movl	%edx, -32(%rbp)
+			cmpl	$0, -28(%rbp)
+			js	.substr_L4
+			movl	-32(%rbp), %eax
+			movl	-28(%rbp), %edx
+			addl	%edx, %eax
+			movslq	%eax, %rbx
+			movq	-24(%rbp), %rax
+			movq	%rax, %rdi
+			call	strlen
+			cmpq	%rax, %rbx
+			jbe	.substr_L5
+.substr_L4:
+			movq	$error.substr_range, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.substr_L5:
+			movl	-32(%rbp), %eax
+			cltq
+			movl	-28(%rbp), %edx
+			movslq	%edx, %rcx
+			movq	-24(%rbp), %rdx
+			addq	%rcx, %rdx
+			movq	%rax, %rsi
+			movq	%rdx, %rdi
+			call	strndup
+			addq	$24, %rsp
+			popq	%rbx
+			popq	%rbp
+			ret
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

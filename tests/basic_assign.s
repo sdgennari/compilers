@@ -761,10 +761,8 @@ Main.main:
 			movq	%rax, %r9
 			## assign
 			movq	%r9, %r8
-			## return
+			## move ret val %r8 into %rax
 			movq	%r8, %rax
-			leave
-			ret
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -850,6 +848,39 @@ Object.type_name:
 String.concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## unbox self into rdi
+			movq	24(%rbx), %rdi
+			## unbox param[0] into rsi
+			movq	16(%rbp), %rax
+			movq	24(%rax), %rsi
+			call	cool_str_concat
+			## make new box in rax to store result (moved into r8 temporarily)
+			movq	%rax, %r8
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %rax
+			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -904,6 +935,42 @@ String.length:
 String.substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## unbox self into rdi
+			movq	24(%rbx), %rdi
+			## unbox param[0] into rsi
+			movq	16(%rbp), %rax
+			movq	24(%rax), %rsi
+			## unbox param[1] into rdx
+			movq	24(%rbp), %rax
+			movq	24(%rax), %rdx
+			call	cool_str_substr
+			## make new box to store result (moved into r8 temporarily)
+			movq	%rax, %r8
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %rax
+			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -954,6 +1021,11 @@ empty.string:			## empty string for default Strings
 .globl abort.string
 abort.string:			## abort string for Object.abort
 			.string "abort\n"
+
+.globl error.substr_range
+error.substr_range:			## error string for String.substr
+			.string "ERROR: 0: Exception: String.substr out of range\n"
+
 .globl in_int_format_str
 in_int_format_str:
 			.string "%ld"
@@ -1014,6 +1086,79 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+cool_str_concat:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			subq	$32, %rsp
+			movq	%rdi, -24(%rbp)
+			movq	%rsi, -32(%rbp)
+			movq	-24(%rbp), %rax
+			movq	%rax, %rdi
+			call	strlen
+			movl	%eax, -16(%rbp)
+			movq	-32(%rbp), %rax
+			movq	%rax, %rdi
+			call	strlen
+			movl	%eax, -12(%rbp)
+			movl	-12(%rbp), %eax
+			movl	-16(%rbp), %edx
+			addl	%edx, %eax
+			addl	$1, %eax
+			cltq
+			movq	%rax, %rdi
+			call	malloc
+			movq	%rax, -8(%rbp)
+			movq	-24(%rbp), %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	strcpy
+			movq	-32(%rbp), %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	strcat
+			movq	-8(%rbp), %rax
+			leave
+			ret
+cool_str_substr:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			pushq	%rbx
+			subq	$24, %rsp
+			movq	%rdi, -24(%rbp)
+			movl	%esi, -28(%rbp)
+			movl	%edx, -32(%rbp)
+			cmpl	$0, -28(%rbp)
+			js	.substr_L4
+			movl	-32(%rbp), %eax
+			movl	-28(%rbp), %edx
+			addl	%edx, %eax
+			movslq	%eax, %rbx
+			movq	-24(%rbp), %rax
+			movq	%rax, %rdi
+			call	strlen
+			cmpq	%rax, %rbx
+			jbe	.substr_L5
+.substr_L4:
+			movq	$error.substr_range, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.substr_L5:
+			movl	-32(%rbp), %eax
+			cltq
+			movl	-28(%rbp), %edx
+			movslq	%edx, %rcx
+			movq	-24(%rbp), %rdx
+			addq	%rcx, %rdx
+			movq	%rax, %rsi
+			movq	%rdx, %rdi
+			call	strndup
+			addq	$24, %rsp
+			popq	%rbx
+			popq	%rbp
+			ret
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

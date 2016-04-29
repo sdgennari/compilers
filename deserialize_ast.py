@@ -391,6 +391,13 @@ def make_global_implementation_map(input_lines):
 		# -- end method loop
 	# -- end class looop
 
+	# for type_name in implementation_map:
+	# 	print "methods for: " + type_name
+	# 	for method in implementation_map[type_name]:
+	# 		print method.containing_class + "." + method.ident
+	# 	print
+	# sys.exit(1)
+
 def update_global_implementation_map(ast_root):
 	global implementation_map
 
@@ -400,7 +407,7 @@ def update_global_implementation_map(ast_root):
 		impl_map_method_list = implementation_map[ast_class.typ]
 
 		# Use a copy here to include built-in functions
-		new_method_list = copy.copy(impl_map_method_list)
+		# new_method_list = copy.copy(impl_map_method_list)
 
 		# Iterate through each ast_feature
 		for ast_feature in ast_class.feature_list:
@@ -411,13 +418,20 @@ def update_global_implementation_map(ast_root):
 			# Find the appropriate feature in the impl map and set its containing class
 			for method in impl_map_method_list:
 				if ast_feature.ident == method.ident:
-					ast_feature.containing_class = method.containing_class
-					new_method_list.remove(method)
-					new_method_list.append(ast_feature)
+					method.formals_list = ast_feature.formals_list
+					# new_method_list.remove(method)
+					# new_method_list.append(ast_feature)
 					break
 
 		# Set the updated list in the implementation map
-		implementation_map[ast_class.typ] = new_method_list
+		# implementation_map[ast_class.typ] = new_method_list
+
+	# for type_name in implementation_map:
+	# 	print "methods for: " + type_name
+	# 	for method in implementation_map[type_name]:
+	# 		print method.containing_class + "." + method.ident
+	# 	print
+	# sys.exit(1)
 
 def make_global_parent_map(input_lines):
 	global parent_map

@@ -1,50 +1,80 @@
 	.file	"internal_substr.c"
-	.text
-	.p2align 4,,15
-	.globl	substr
-	.type	substr, @function
-substr:
-.LFB49:
-	.cfi_startproc
-	pushq	%rbx
-	.cfi_def_cfa_offset 16
-	.cfi_offset 3, -16
-	movslq	%esi, %rax
-	movslq	%edx, %rsi
-	addq	%rax, %rdi
-	call	strndup
-	movq	%rax, %rbx
-	movq	%rax, %rdi
-	call	puts
-	movq	%rbx, %rax
-	popq	%rbx
-	.cfi_def_cfa_offset 8
-	ret
-	.cfi_endproc
-.LFE49:
-	.size	substr, .-substr
-	.section	.rodata.str1.1,"aMS",@progbits,1
+	.section	.rodata
 .LC0:
 	.string	"hello c\n"
-	.section	.text.startup,"ax",@progbits
-	.p2align 4,,15
+	.text
 	.globl	main
 	.type	main, @function
 main:
-.LFB48:
+.LFB0:
 	.cfi_startproc
-	subq	$8, %rsp
+	pushq	%rbp
 	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	subq	$16, %rsp
+	movq	$.LC0, -16(%rbp)
+	movq	-16(%rbp), %rax
 	movl	$3, %edx
 	movl	$2, %esi
-	movl	$.LC0, %edi
-	call	substr
-	xorl	%eax, %eax
-	addq	$8, %rsp
-	.cfi_def_cfa_offset 8
+	movq	%rax, %rdi
+	call	cool_str_substr
+	movq	%rax, -8(%rbp)
+	movq	-8(%rbp), %rax
+	movq	%rax, %rdi
+	call	puts
+	movl	$0, %eax
+	leave
+	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE48:
+.LFE0:
 	.size	main, .-main
+	.section	.rodata
+.LC1:
+	.string	"xyz"
+	.text
+	.globl	cool_str_substr
+	.type	cool_str_substr, @function
+cool_str_substr:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	pushq	%rbx
+	subq	$24, %rsp
+	movq	%rdi, -24(%rbp)
+	movl	%esi, -28(%rbp)
+	movl	%edx, -32(%rbp)
+	cmpl	$0, -28(%rbp)
+	js	.substr_L4
+	movl	-32(%rbp), %eax
+	movl	-28(%rbp), %edx
+	addl	%edx, %eax
+	movslq	%eax, %rbx
+	movq	-24(%rbp), %rax
+	movq	%rax, %rdi
+	call	strlen
+	cmpq	%rax, %rbx
+	jbe	.substr_L5
+.substr_L4:
+	// TODO HANDLE ERROR HERE
+	movl	$.LC1, %eax
+	// ----
+.substr_L5:
+	movl	-32(%rbp), %eax
+	cltq
+	movl	-28(%rbp), %edx
+	movslq	%edx, %rcx
+	movq	-24(%rbp), %rdx
+	addq	%rcx, %rdx
+	movq	%rax, %rsi
+	movq	%rdx, %rdi
+	call	strndup
+	addq	$24, %rsp
+	popq	%rbx
+	popq	%rbp
+	ret
+.LFE1:
+	.size	cool_str_substr, .-cool_str_substr
 	.ident	"GCC: (Ubuntu 4.8.4-2ubuntu1~14.04.1) 4.8.4"
 	.section	.note.GNU-stack,"",@progbits

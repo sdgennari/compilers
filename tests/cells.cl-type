@@ -687,7 +687,7 @@ Int
 85
 Int
 integer
-20
+1
 86
 Object
 while
@@ -1388,7 +1388,7 @@ Int
 85
 Int
 integer
-20
+1
 86
 Object
 while

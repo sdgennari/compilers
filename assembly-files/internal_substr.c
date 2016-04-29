@@ -1,20 +1,24 @@
 #include <stdio.h>
 #include <string.h>
 
-char *substr(char *str, int i, int l);
+char *cool_str_substr(char *str, int i, int l);
 
 int main() {
 	char *s1 = "hello c\n";
+	char *result;
 	int i;
 
-	substr(s1, 2, 3);
+	result = cool_str_substr(s1, 2, 3);
+	printf("%s\n", result);
 
 	return 0;
 }
 
-char *substr(char *str, int i, int l) {
-	char *p;
-	p = strndup(str+i, l);
-	printf("%s\n", p);
-	return p;
+char *cool_str_substr(char *str, int i, int l) {
+	// Bounds check i and l
+	if (i < 0 || (i + l) > strlen(str)) {
+		return "xyz";
+	}
+
+	return strndup(str+i, l);
 }

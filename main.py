@@ -60,9 +60,12 @@ def get_constants_string():
 	result += get_type_name_strings()
 	result += get_empty_string()
 	result += get_abort_string()
+	result += get_substr_error_string()
 	result += gen_const_strings()
 	result += get_io_format_strings()
 	result += get_raw_out_string_helper()
+	result += get_string_concat_helper()
+	result += get_string_substr_helper()
 	# ---- TODO: Get execption strings
 	return result
 
@@ -89,7 +92,15 @@ def get_empty_string():
 def get_abort_string():
 	result = ".globl abort.string\n"
 	result += "abort.string:\t\t\t## abort string for Object.abort\n"
-	result += "\t\t\t.string \"abort\\n\""
+	result += "\t\t\t.string \"abort\\n\"\n"
+	result += "\n"
+	return result
+
+# Make an error string for String.substr
+def get_substr_error_string():
+	result = ".globl error.substr_range\n"
+	result += "error.substr_range:\t\t## error string for String.substr\n"
+	result += "\t\t\t.string \"ERROR: 0: Exception: String.substr out of range\\n\"\n"
 	result += "\n"
 	return result
 

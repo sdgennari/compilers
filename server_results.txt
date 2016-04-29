@@ -1,4 +1,4 @@
-Start Time:   Sat Apr 16 16:49:06 2016
+Start Time:   Sat Apr 16 18:03:20 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -48,9 +48,9 @@ t17: eval-order-self                             ok
 t18: hairyscary                                  ok  
 t19: hello                                       ok  
 t20: huge-case-in-big-loop                       ok  
-t21: in-int-32bit                              FAILED
+t21: in-int-32bit                                ok  
 t22: in-int                                      ok  
-t23: in-int-garbage                            FAILED
+t23: in-int-garbage                              ok  
 t24: init-order-self                             ok  
 t25: init-order-super                            ok  
 t26: in-string                                 FAILED
@@ -90,7 +90,7 @@ t58: substring-ok                              FAILED (empty compiled-program ou
 t59: typename                                    ok  
 t60: void-comparison                             ok  
 t61: amh4bm.zip-copy                             ok  
-t62: amh4bm.zip-in_int                         FAILED
+t62: amh4bm.zip-in_int                           ok  
 t63: aml3sc.zip-copy                             ok  
 t64: as3kc.zip-test104                    (your compiler outputs to stdout/stderr: should be none)
  (no non-empty .cl-asm or .s file produced)
@@ -99,10 +99,10 @@ t65: atc8kq.zip-shallowCopy                      ok
 t66: cyh4mw.zip-bound_variables2               FAILED
 t67: jch3xf.zip-a                                ok  
 t68: jch3xf.zip-b                                ok  
-t69: jhl4qf.zip-minus                          FAILED
+t69: jhl4qf.zip-minus                            ok  
 t70: ktt3ja.zip-arithmetic                       ok  
 t71: mfm4eb.zip-good10                           ok  
-t72: mfm4eb.zip-good9                          FAILED
+t72: mfm4eb.zip-good9                            ok  
 t73: mgr3yp.zip-test_self                        ok  
 t74: mjp2ff.zip-shallow_copy_self_good           ok  
 t75: rab9nn.zip-deep_copy_vs_shallow_copy         ok  
@@ -120,4 +120,4 @@ t5: div-by-zero                                  ok
 t6: substring-bad                              FAILED (empty output)
 t7: mjk6zt.zip-bug_maker                       FAILED
 t8: mjk6zt.zip-shallow_copy                    FAILED
-End Time: Sat Apr 16 16:50:16 2016
+End Time: Sat Apr 16 18:04:30 2016
