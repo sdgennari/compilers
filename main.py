@@ -175,8 +175,10 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 	type_tag = type_tag_map[type_name]
 	cur_tac_list.append(TACAllocType(type_name, obj_size, type_tag))
 
-	# TODO ADD ATTRS TO SYMBOL TABLE
 	symbol_table_list = []
+	
+	# Populate the symbol table with attrs
+	add_attrs_to_symbol_table(symbol_table_list, type_name)
 
 	# Create default attributes
 	for ast_attr in class_map[type_name]:
@@ -344,10 +346,24 @@ def get_methods_string():
 
 	return result
 
+def add_attrs_to_symbol_table(symbol_table_list, type_name):
+	# Use None to indicate the ident is an attr that must be loaded
+	symbol_table_list.append({})
+	for ast_attr in class_map[type_name]:
+		symbol_table_list[-1][ast_attr.ident] = None
+
+	# Add self explicitly to the table (self is treated like an implicit attr)
+	symbol_table_list[-1]["self"] = None
+
 def ast_method_to_asm(cur_asm_list, ast_method, type_name):
+	symbol_table_list = []
+
+	# Populate the symbol table with attrs
+	add_attrs_to_symbol_table(symbol_table_list, type_name)
+		
 	# Generate the TAC for the exp
 	cur_tac_list = []
-	gen_tac_for_feature(cur_tac_list, ast_method, type_name)
+	gen_tac_for_method(symbol_table_list, cur_tac_list, ast_method, type_name)
 
 	# print len(cur_tac_list)
 	# for tac_instr in cur_tac_list:
