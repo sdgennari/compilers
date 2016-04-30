@@ -1336,7 +1336,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl string_7

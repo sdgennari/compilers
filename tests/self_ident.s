@@ -876,12 +876,12 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r10
 			## assign
-			movq	%r8, %r11
+			movq	%r10, %r9
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -911,7 +911,7 @@ Main.main:
 			## storing param [0]
 			pushq	%r8
 			## assign
-			movq	%r11, %r10
+			movq	%r9, %r11
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -936,18 +936,18 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r10 is void and set result accordingly
-			cmpq	$0, %r10
+			## check if %r11 is void and set result accordingly
+			cmpq	$0, %r11
 			jnz		.asm_label_4
 			movq	$1, 24(%r8)
 .asm_label_4:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## not
-			movl	%r9d, %r8d
+			movl	%r10d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_5_void
-			test	%r9d, %r9d
+			test	%r10d, %r10d
 			jnz		.dispatch_5_void
 			## branch .dispatch_5_not_void
 			test	%r8d, %r8d
@@ -974,11 +974,11 @@ Main.main:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r10) as self ptr (%rbx)
-			movq	%r10, %rbx
+			## set receiver_obj (%r11) as self ptr (%rbx)
+			movq	%r11, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r10), %rax
+			movq	16(%r11), %rax
 			## find method out_string in vtable[8]
 			movq	64(%rax), %rax
 			## call method dynamically
@@ -1000,7 +1000,7 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r11, %r10
+			movq	%r9, %r11
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1025,18 +1025,18 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r10 is void and set result accordingly
-			cmpq	$0, %r10
+			## check if %r11 is void and set result accordingly
+			cmpq	$0, %r11
 			jnz		.asm_label_5
 			movq	$1, 24(%r8)
 .asm_label_5:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## not
-			movl	%r9d, %r8d
+			movl	%r10d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_6_void
-			test	%r9d, %r9d
+			test	%r10d, %r10d
 			jnz		.dispatch_6_void
 			## branch .dispatch_6_not_void
 			test	%r8d, %r8d
@@ -1060,11 +1060,11 @@ Main.main:
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r10) as self ptr (%rbx)
-			movq	%r10, %rbx
+			## set receiver_obj (%r11) as self ptr (%rbx)
+			movq	%r11, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r10), %rax
+			movq	16(%r11), %rax
 			## find method some_method in vtable[10]
 			movq	80(%rax), %rax
 			## call method dynamically
@@ -1088,7 +1088,7 @@ Main.main:
 			## storing param [0]
 			pushq	%r8
 			## assign
-			movq	%r11, %r10
+			movq	%r9, %r11
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1113,18 +1113,18 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r10 is void and set result accordingly
-			cmpq	$0, %r10
+			## check if %r11 is void and set result accordingly
+			cmpq	$0, %r11
 			jnz		.asm_label_6
 			movq	$1, 24(%r8)
 .asm_label_6:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## not
-			movl	%r9d, %r8d
+			movl	%r10d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_7_void
-			test	%r9d, %r9d
+			test	%r10d, %r10d
 			jnz		.dispatch_7_void
 			## branch .dispatch_7_not_void
 			test	%r8d, %r8d
@@ -1151,11 +1151,11 @@ Main.main:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r10) as self ptr (%rbx)
-			movq	%r10, %rbx
+			## set receiver_obj (%r11) as self ptr (%rbx)
+			movq	%r11, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r10), %rax
+			movq	16(%r11), %rax
 			## find method out_int in vtable[7]
 			movq	56(%rax), %rax
 			## call method dynamically
@@ -1205,7 +1205,7 @@ Main.main:
 			## storing param [0]
 			pushq	%r8
 			## assign
-			movq	%r11, %r9
+			movq	%r9, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1230,18 +1230,18 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_7
 			movq	$1, 24(%r8)
 .asm_label_7:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_8_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_8_void
 			## branch .dispatch_8_not_void
 			test	%r8d, %r8d
@@ -1268,11 +1268,11 @@ Main.main:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method out_string in vtable[8]
 			movq	64(%rax), %rax
 			## call method dynamically
@@ -1291,10 +1291,10 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r10
-			movq	%rax, %r10
+			## storing method result in %r9
+			movq	%rax, %r9
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r8
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs
@@ -1607,7 +1607,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl string_5

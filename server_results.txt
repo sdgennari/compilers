@@ -1,4 +1,4 @@
-Start Time:   Fri Apr 29 17:35:44 2016
+Start Time:   Fri Apr 29 22:56:45 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -39,7 +39,7 @@ t8: bool-comparison                              ok
 t9: calls-with-same-formal-name                  ok  
 t10: case-order                                  ok  
 t11: copy-self-dispatch                          ok  
-t12: copy-self-init                            FAILED
+t12: copy-self-init                              ok  
 t13: dispatch-override-dynamic                   ok  
 t14: dispatch-override-static                    ok  
 t15: eval-order-args                             ok  
@@ -56,7 +56,7 @@ t25: init-order-super                            ok
 t26: in-string                                   ok  
 t27: in-string-garbage                         FAILED
 t28: in-string-huge                              ok  
-t29: lambda-term-cool-code-generator           FAILED
+t29: lambda-term-cool-code-generator             ok  
 t30: lambda-term-evaluation-simulation           ok  
 t31: let-nested                                  ok  
 t32: mainio                                      ok  
@@ -68,13 +68,13 @@ t37: new-self-type                               ok
 t38: nonvoid-comparison                          ok  
 t39: not                                         ok  
 t40: numcalls                                    ok  
-t41: old                                       FAILED
+t41: old                                         ok  
 t42: one-nested-exp-with-789-arith-ops    (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
-t43: override-builtin-method                   FAILED
+t43: override-builtin-method                     ok  
 t44: primes                                      ok  
 t45: receiver-class-hard-to-determine            ok  
-t46: scoping                                   FAILED
+t46: scoping                                     ok  
 t47: shadow-attr-case                            ok  
 t48: shadow-attr-formal                          ok  
 t49: shadow-attr-let                             ok  
@@ -96,7 +96,7 @@ t64: as3kc.zip-test104                    (your compiler outputs to stdout/stder
  (no non-empty .cl-asm or .s file produced)
       FAILED (empty compiled-program output)
 t65: atc8kq.zip-shallowCopy                      ok  
-t66: cyh4mw.zip-bound_variables2               FAILED
+t66: cyh4mw.zip-bound_variables2                 ok  
 t67: jch3xf.zip-a                                ok  
 t68: jch3xf.zip-b                                ok  
 t69: jhl4qf.zip-minus                            ok  
@@ -120,4 +120,4 @@ t5: div-by-zero                                  ok
 t6: substring-bad                                ok  
 t7: mjk6zt.zip-bug_maker                         ok  
 t8: mjk6zt.zip-shallow_copy                      ok  
-End Time: Fri Apr 29 17:36:53 2016
+End Time: Fri Apr 29 22:57:53 2016

@@ -541,7 +541,7 @@ Main.main:
 			movq	%rax, %r8
 			movq	$string_1, 24(%r8)
 			## assign
-			movq	%r8, %r11
+			movq	%r8, %r10
 			## default String
 			## push caller-saved regs
 			pushq	%rcx
@@ -573,7 +573,7 @@ Main.main:
 			## storing param [0]
 			pushq	%r8
 			## assign
-			movq	%r11, %r9
+			movq	%r10, %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -603,13 +603,13 @@ Main.main:
 			jnz		.asm_label_1
 			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r11
+			movq	24(%r8), %r11
 			## not
-			movl	%r10d, %r8d
+			movl	%r11d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_2_void
-			test	%r10d, %r10d
+			test	%r11d, %r11d
 			jnz		.dispatch_2_void
 			## branch .dispatch_2_not_void
 			test	%r8d, %r8d
@@ -702,7 +702,7 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r11, %r8
+			movq	%r10, %r8
 			## storing param [0]
 			pushq	%r8
 			## assign
@@ -1098,7 +1098,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl string_2

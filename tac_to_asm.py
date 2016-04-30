@@ -1203,19 +1203,12 @@ def gen_asm_for_internal_abort(cur_asm_list):
 	cur_asm_list.append(custom_asm)
 
 def gen_asm_for_internal_copy(cur_asm_list):
-	cur_asm_list.append(ASMComment("save self reg"))
-	cur_asm_list.append(ASMPushQ(SELF_REG))
-
-	cur_asm_list.append(ASMComment("make new obj to store result (same as doing SELF_TYPE..new)"))
-	# Get vtable ptr
-	cur_asm_list.append(ASMMovQ("16(%rbx)", "%rax"))
-	# Find constructor dynamically
-	cur_asm_list.append(ASMMovQ("8(%rax)", "%rax"))
-	# Call method
-	cur_asm_list.append(ASMCall("*%rax"))
-
-	cur_asm_list.append(ASMComment("restore self reg"))
-	cur_asm_list.append(ASMPopQ(SELF_REG))
+	# Alloc space for the new object
+	cur_asm_list.append(ASMComment("call malloc to make space for the new object"))
+	cur_asm_list.append(ASMComment("use leaq to multiply the size by 8"))
+	cur_asm_list.append(ASMMovQ("8(%rbx)", "%rdi"))
+	cur_asm_list.append(ASMLeaQ("0(,%rdi,8)", "%rdi"))
+	cur_asm_list.append(ASMCall("malloc"))
 
 	# Setup and call memcpy
 	cur_asm_list.append(ASMComment("call memcpy to copy %rbx into %rax"))

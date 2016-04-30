@@ -1008,9 +1008,9 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
+			movq	%rax, %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			## default A
 			movq	$0, %r8
 			## new AWrapper
@@ -1903,7 +1903,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl string_4

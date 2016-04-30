@@ -1483,8 +1483,13 @@ Main.main:
 			subq	$0, %rsp
 			## set receiver_obj (%r10) as self ptr (%rbx)
 			movq	%r10, %rbx
-			## static: call method label explicitly
-			call	A.a
+			## static: lookup method in <static_type>..vtable
+			## get ptr to vtable from static type
+			movq	$A..vtable, %rax
+			## find method ain vtable[9]
+			movq	72(%rax), %rax
+			## call method
+			call	*%rax
 			## removing 0 params from stack with subq
 			addq	$0, %rsp
 			## restore self ptr (%rbx)
@@ -1928,8 +1933,13 @@ Main.main:
 			movq	%rax, 0(%rsp)
 			## set receiver_obj (%r8) as self ptr (%rbx)
 			movq	%r8, %rbx
-			## static: call method label explicitly
-			call	IO.out_string
+			## static: lookup method in <static_type>..vtable
+			## get ptr to vtable from static type
+			movq	$IO..vtable, %rax
+			## find method out_stringin vtable[8]
+			movq	64(%rax), %rax
+			## call method
+			call	*%rax
 			## removing 1 params from stack with subq
 			addq	$8, %rsp
 			## restore self ptr (%rbx)
@@ -2203,10 +2213,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$123456, 24(%r9)
+			movq	%rax, %r8
+			movl	$123456, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## new const Int: 123
 			## push caller-saved regs
 			pushq	%rcx
@@ -2231,10 +2241,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movl	$123, 24(%r8)
+			movq	%rax, %r9
+			movl	$123, 24(%r9)
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -2259,14 +2269,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movl	$1, 24(%r8)
-			## assign
-			movq	%r8, %r9
+			movq	%rax, %r9
+			movl	$1, 24(%r9)
 			## assign
 			movq	%r9, %r8
+			## assign
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r8
+			pushq	%r9
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2581,7 +2591,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl string_6

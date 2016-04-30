@@ -715,14 +715,11 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## save self reg
-			pushq	%rbx
-			## make new obj to store result (same as doing SELF_TYPE..new)
-			movq	16(%rbx), %rax
-			movq	8(%rax), %rax
-			call	*%rax
-			## restore self reg
-			popq	%rbx
+			## call malloc to make space for the new object
+			## use leaq to multiply the size by 8
+			movq	8(%rbx), %rdi
+			leaq	0(,%rdi,8), %rdi
+			call	malloc
 			## call memcpy to copy %rbx into %rax
 			## use leaq to multiply the size by 8
 			movq	8(%rbx), %rdx
@@ -949,7 +946,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl string_1

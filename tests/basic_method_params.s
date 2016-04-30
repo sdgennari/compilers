@@ -535,10 +535,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$1, 24(%r9)
+			movq	%rax, %r8
+			movl	$1, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## new const Int: 2
 			## push caller-saved regs
 			pushq	%rcx
@@ -563,14 +563,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$2, 24(%r9)
+			movq	%rax, %r8
+			movl	$2, 24(%r8)
 			## assign
-			movq	%r9, %r10
+			movq	%r8, %r10
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			## storing param [0]
-			pushq	%r9
+			pushq	%r8
 			## assign
 			movq	%r10, %r8
 			## storing param [1]
@@ -999,7 +999,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl in_int_format_str

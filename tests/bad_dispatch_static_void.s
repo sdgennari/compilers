@@ -579,8 +579,13 @@ Main.main:
 			subq	$0, %rsp
 			## set receiver_obj (%r10) as self ptr (%rbx)
 			movq	%r10, %rbx
-			## static: call method label explicitly
-			call	Object.type_name
+			## static: lookup method in <static_type>..vtable
+			## get ptr to vtable from static type
+			movq	$Object..vtable, %rax
+			## find method type_namein vtable[4]
+			movq	32(%rax), %rax
+			## call method
+			call	*%rax
 			## removing 0 params from stack with subq
 			addq	$0, %rsp
 			## restore self ptr (%rbx)
@@ -861,7 +866,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl string_1

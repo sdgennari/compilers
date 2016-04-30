@@ -534,10 +534,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$777, 24(%r9)
+			movq	%rax, %r8
+			movl	$777, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## new const Int: 9001
 			## push caller-saved regs
 			pushq	%rcx
@@ -562,10 +562,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$9001, 24(%r9)
+			movq	%rax, %r8
+			movl	$9001, 24(%r8)
 			## assign
-			movq	%r9, %r10
+			movq	%r8, %r10
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -590,22 +590,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	$string_1, 24(%r9)
+			movq	%rax, %r8
+			movq	$string_1, 24(%r8)
 			## assign
-			movq	%r9, %r11
+			movq	%r8, %r11
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			## assign
-			movq	%r10, %r8
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			movq	%r10, %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r10d, %r8d
-			addl	%r9d, %r8d
-			## box value of %r8 into %r9
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -629,8 +629,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
 			## assign
 			movq	%r11, %r9
 			## assign
@@ -897,7 +897,7 @@ abort.string:			## abort string for Object.abort
 			.string "abort\n"
 
 .globl error.substr_range
-error.substr_range:			## error string for String.substr
+error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
 .globl string_1
