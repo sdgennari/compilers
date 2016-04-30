@@ -873,32 +873,6 @@ Main.main:
 			movl	$2, 24(%r8)
 			## assign
 			movq	%r8, %r9
-			## default Bool
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	$0, 24(%r8)
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -955,32 +929,6 @@ Main.main:
 			movl	$3, 24(%r8)
 			## assign
 			movq	%r8, %r11
-			## default Bool
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	$0, 24(%r8)
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1320,10 +1268,8 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r11
-			movq	%rax, %r11
-			## assign
-			movq	%r11, %r8
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
 			movq	%r9, %r8
 			## storing param [0]
@@ -1538,10 +1484,8 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
-			## assign
-			movq	%r9, %r8
+			## storing method result in %r8
+			movq	%rax, %r8
 			## load self[3] (i) into %r9
 			movq	24(%rbx), %r9
 			## assign
@@ -1788,8 +1732,6 @@ Main.some_method:
 .Main_some_method_2:
 			## loading param [0] into %r10
 			movq	16(%rbp), %r10
-			## loading param [1] into %r8
-			movq	24(%rbp), %r8
 			## new Int
 			## push caller-saved regs
 			pushq	%rcx
@@ -2032,7 +1974,7 @@ Main.some_method:
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r9, %r11
+			movq	%r9, %r8
 			jmp		.case_3_exit
 .case_3_error_branch:
 			movq	$string_6, %rdi
@@ -2040,8 +1982,6 @@ Main.some_method:
 			movq	$0, %rax
 			call	exit
 .case_3_exit:
-			## assign
-			movq	%r11, %r8
 			## assign
 			movq	%r10, %r8
 			## storing param [0]
@@ -2288,32 +2228,6 @@ Main.some_method:
 			movl	$4, 24(%r9)
 			## assign
 			movq	%r9, %r8
-			## default Bool
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	$0, 24(%r9)
 			## const String
 			## push caller-saved regs
 			pushq	%rcx

@@ -5025,9 +5025,9 @@ Bazz.doh:
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
-			movl	%r11d, %r8d
-			addl	%r9d, %r8d
-			## box value of %r8 into %r9
+			movl	%r11d, %r12d
+			addl	%r9d, %r12d
+			## box value of %r12 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -5051,12 +5051,10 @@ Bazz.doh:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## store %r9 in self[3] (h)
-			movq	%r9, 24(%rbx)
-			## assign
-			movq	%r9, %r8
+			movq	%rax, %r8
+			movq	%r12, 24(%r8)
+			## store %r8 in self[3] (h)
+			movq	%r8, 24(%rbx)
 			## assign
 			movq	%r10, %r9
 			## assign
@@ -5128,7 +5126,7 @@ Foo.doh:
 			## plus
 			movl	%r9d, %r11d
 			addl	%r10d, %r11d
-			## box value of %r11 into %r10
+			## box value of %r11 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -5152,12 +5150,10 @@ Foo.doh:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	%r11, 24(%r10)
-			## store %r10 in self[3] (h)
-			movq	%r10, 24(%rbx)
-			## assign
-			movq	%r10, %r9
+			movq	%rax, %r9
+			movq	%r11, 24(%r9)
+			## store %r9 in self[3] (h)
+			movq	%r9, 24(%rbx)
 			## assign
 			movq	%r8, %r9
 			## assign

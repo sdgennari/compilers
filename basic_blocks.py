@@ -256,9 +256,9 @@ def removeDeadCode(block_list):
 
 		for TAC_instr in reversed(block.instr_list):
 			# Skip control flow or io calls since they cannot be removed
-			if not (isinstance(TAC_instr, TACIOCall) or isinstance(TAC_instr, TACControlFlow)):
+			if not (isinstance(TAC_instr, TACCall) or isinstance(TAC_instr, TACControlFlow)):
 				# If assignee not currently live, instr can be removed
-				if TAC_instr.assignee not in cur_live_set:
+				if hasattr(TAC_instr, 'assignee') and TAC_instr.assignee not in cur_live_set:
 					has_made_changes = True
 					instr_to_remove += [TAC_instr]
 

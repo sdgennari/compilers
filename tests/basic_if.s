@@ -565,8 +565,6 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## assign
-			movq	%r8, %r9
 			jmp		.if_exit_2
 .if_else_2:
 			## const String
@@ -635,8 +633,6 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## assign
-			movq	%r8, %r9
 			jmp		.if_exit_2
 .if_exit_2:
 			## const Bool
@@ -741,10 +737,8 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
-			## assign
-			movq	%r9, %r8
+			## storing method result in %r8
+			movq	%rax, %r8
 			jmp		.if_exit_3
 .if_else_3:
 			## const String
@@ -811,10 +805,8 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
-			## assign
-			movq	%r9, %r8
+			## storing method result in %r8
+			movq	%rax, %r8
 			jmp		.if_exit_3
 .if_exit_3:
 			## new const Int: 5
@@ -1034,8 +1026,6 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## assign
-			movq	%r8, %r9
 			jmp		.if_exit_4
 .if_else_4:
 			## const String
@@ -1104,8 +1094,6 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## assign
-			movq	%r8, %r9
 			jmp		.if_exit_4
 .if_exit_4:
 			## const Bool

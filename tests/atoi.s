@@ -3910,8 +3910,8 @@ A2I.a2i_aux:
 			pushq	%r14
 			pushq	%r15
 .A2I_a2i_aux_34:
-			## loading param [0] into %r11
-			movq	16(%rbp), %r11
+			## loading param [0] into %r13
+			movq	16(%rbp), %r13
 			## new const Int: 0
 			## push caller-saved regs
 			pushq	%rcx
@@ -3939,9 +3939,9 @@ A2I.a2i_aux:
 			movq	%rax, %r8
 			movl	$0, 24(%r8)
 			## assign
-			movq	%r8, %r13
+			movq	%r8, %r14
 			## assign
-			movq	%r11, %r10
+			movq	%r13, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4061,8 +4061,8 @@ A2I.a2i_aux:
 			## assign
 			movq	%r10, %r9
 			## assign
-			movq	%r12, %r14
-			## use lt_helper to compare %r9 < %r14
+			movq	%r12, %r11
+			## use lt_helper to compare %r9 < %r11
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -4073,8 +4073,8 @@ A2I.a2i_aux:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r9) and rhs (%r14)
-			pushq	%r14
+			## push lhs (%r9) and rhs (%r11)
+			pushq	%r11
 			pushq	%r9
 			call	lt_helper
 			addq	$16, %rsp
@@ -4103,7 +4103,7 @@ A2I.a2i_aux:
 			jnz		.loop_exit_36
 .loop_body_36:
 			## assign
-			movq	%r13, %r9
+			movq	%r14, %r9
 			## new const Int: 10
 			## push caller-saved regs
 			pushq	%rcx
@@ -4130,14 +4130,14 @@ A2I.a2i_aux:
 			popq	%rcx
 			movq	%rax, %r8
 			movl	$10, 24(%r8)
-			## unbox value of %r9 into %r13
-			movq	24(%r9), %r13
+			## unbox value of %r9 into %r11
+			movq	24(%r9), %r11
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## mult
-			movl	%r13d, %r8d
+			movl	%r11d, %r8d
 			imull	%r9d, %r8d
-			## box value of %r8 into %r13
+			## box value of %r8 into %r11
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4161,8 +4161,8 @@ A2I.a2i_aux:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r13
-			movq	%r8, 24(%r13)
+			movq	%rax, %r11
+			movq	%r8, 24(%r11)
 			## assign
 			movq	%r10, %r8
 			## storing param [0]
@@ -4196,7 +4196,7 @@ A2I.a2i_aux:
 			## storing param [1]
 			pushq	%r8
 			## assign
-			movq	%r11, %r14
+			movq	%r13, %r14
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4327,8 +4327,8 @@ A2I.a2i_aux:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## unbox value of %r13 into %r14
-			movq	24(%r13), %r14
+			## unbox value of %r11 into %r14
+			movq	24(%r11), %r14
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
@@ -4361,7 +4361,7 @@ A2I.a2i_aux:
 			movq	%rax, %r9
 			movq	%r8, 24(%r9)
 			## assign
-			movq	%r9, %r13
+			movq	%r9, %r14
 			## assign
 			movq	%r10, %r8
 			## new const Int: 1
@@ -4388,15 +4388,15 @@ A2I.a2i_aux:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movl	$1, 24(%r14)
+			movq	%rax, %r10
+			movl	$1, 24(%r10)
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
-			## unbox value of %r14 into %r10
-			movq	24(%r14), %r10
+			## unbox value of %r10 into %r11
+			movq	24(%r10), %r11
 			## plus
 			movl	%r9d, %r8d
-			addl	%r10d, %r8d
+			addl	%r11d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
 			pushq	%rcx
@@ -4427,14 +4427,8 @@ A2I.a2i_aux:
 			movq	%r9, %r10
 			jmp		.loop_start_36
 .loop_exit_36:
-			## default Object
-			movq	$0, %r9
 			## assign
-			movq	%r9, %r8
-			## assign
-			movq	%r8, %r9
-			## assign
-			movq	%r13, %r9
+			movq	%r14, %r9
 			## assign
 			movq	%r9, %r8
 			## move ret val %r8 into %rax

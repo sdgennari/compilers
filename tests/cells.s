@@ -393,8 +393,6 @@ CellularAutomaton.init:
 			movq	%r8, %r9
 			## store %r9 in self[3] (population_map)
 			movq	%r9, 24(%rbx)
-			## assign
-			movq	%r9, %r8
 			## move self ptr into %r9
 			movq	%rbx, %r9
 			## assign
@@ -2605,14 +2603,10 @@ CellularAutomaton.evolve:
 			movq	%r10, %r9
 			jmp		.loop_start_18
 .loop_exit_18:
-			## default Object
-			movq	$0, %r8
 			## assign
 			movq	%r12, %r8
 			## store %r8 in self[3] (population_map)
 			movq	%r8, 24(%rbx)
-			## assign
-			movq	%r8, %r9
 			## move self ptr into %r9
 			movq	%rbx, %r9
 			## assign
@@ -2942,12 +2936,10 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
-			## store %r9 in self[3] (cells)
-			movq	%r9, 24(%rbx)
-			## assign
-			movq	%r9, %r8
+			## storing method result in %r8
+			movq	%rax, %r8
+			## store %r8 in self[3] (cells)
+			movq	%r8, 24(%rbx)
 			## load self[3] (cells) into %r8
 			movq	24(%rbx), %r8
 			## assign
@@ -3375,10 +3367,6 @@ Main.main:
 			movq	%r8, %r11
 			jmp		.loop_start_23
 .loop_exit_23:
-			## default Object
-			movq	$0, %r9
-			## assign
-			movq	%r9, %r8
 			## move self ptr into %r9
 			movq	%rbx, %r9
 			## assign

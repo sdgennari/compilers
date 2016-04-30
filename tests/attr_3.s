@@ -1185,32 +1185,6 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r13
-			movq	$0, 24(%r13)
-			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
 			movq	%rax, %r11
 			movq	$0, 24(%r11)
 			## default Int
@@ -1917,17 +1891,17 @@ Main.main:
 			movq	%rax, %r8
 			movq	%r9, 24(%r8)
 			## assign
-			movq	%r8, %r13
+			movq	%r8, %r14
 			## assign
-			movq	%r13, %r8
+			movq	%r14, %r8
 			## assign
 			movq	%r11, %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## unbox value of %r9 into %r11
 			movq	24(%r9), %r11
 			## minus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			subl	%r11d, %r8d
 			## box value of %r8 into %r11
 			## push caller-saved regs
@@ -2028,7 +2002,7 @@ Main.main:
 			## assign
 			movq	%r8, %r11
 			## assign
-			movq	%r13, %r8
+			movq	%r14, %r8
 			## assign
 			movq	%r11, %r9
 			## unbox value of %r8 into %r11
@@ -2065,7 +2039,7 @@ Main.main:
 			movq	%rax, %r9
 			movq	%r8, 24(%r9)
 			## assign
-			movq	%r9, %r13
+			movq	%r9, %r14
 			## new const Int: 8888
 			## push caller-saved regs
 			pushq	%rcx
@@ -2432,16 +2406,16 @@ Main.main:
 			## assign
 			movq	%r9, %r11
 			## assign
-			movq	%r13, %r8
+			movq	%r14, %r8
 			## assign
 			movq	%r11, %r12
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
-			## unbox value of %r12 into %r14
-			movq	24(%r12), %r14
+			## unbox value of %r12 into %r13
+			movq	24(%r12), %r13
 			## divide
-			## if %r14d not zero, jmp over error
-			cmpl	$0, %r14d
+			## if %r13d not zero, jmp over error
+			cmpl	$0, %r13d
 			jnz		.asm_label_6
 			movq	$string_3, %rdi
 			call	raw_out_string
@@ -2452,7 +2426,7 @@ Main.main:
 			pushq	%rdx
 			pushq	%rax
 			pushq	%rcx
-			movl	%r14d, 24(%rsp)
+			movl	%r13d, 24(%rsp)
 			movl	%r9d, %eax
 			cltd
 			movl	24(%rsp), %ecx
@@ -2774,12 +2748,12 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movl	$8, 24(%r14)
+			movq	%rax, %r13
+			movl	$8, 24(%r13)
 			## unbox value of %r12 into %r8
 			movq	24(%r12), %r8
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
 			## plus
 			movl	%r8d, %r12d
 			addl	%r9d, %r12d
@@ -2845,7 +2819,7 @@ Main.main:
 			movq	%rax, %r8
 			movq	%r9, 24(%r8)
 			## assign
-			movq	%r13, %r9
+			movq	%r14, %r9
 			## unbox value of %r8 into %r12
 			movq	24(%r8), %r12
 			## unbox value of %r9 into %r8
@@ -2917,17 +2891,17 @@ Main.main:
 			## assign
 			movq	%r8, %r12
 			## assign
-			movq	%r13, %r8
+			movq	%r14, %r8
 			## assign
 			movq	%r11, %r15
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
-			## unbox value of %r15 into %r14
-			movq	24(%r15), %r14
+			## unbox value of %r15 into %r13
+			movq	24(%r15), %r13
 			## plus
 			movl	%r9d, %r8d
-			addl	%r14d, %r8d
-			## box value of %r8 into %r14
+			addl	%r13d, %r8d
+			## box value of %r8 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2951,18 +2925,18 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r8, 24(%r14)
+			movq	%rax, %r13
+			movq	%r8, 24(%r13)
 			## assign
 			movq	%r10, %r9
-			## unbox value of %r14 into %r8
-			movq	24(%r14), %r8
+			## unbox value of %r13 into %r8
+			movq	24(%r13), %r8
 			## unbox value of %r9 into %r15
 			movq	24(%r9), %r15
 			## plus
-			movl	%r8d, %r14d
-			addl	%r15d, %r14d
-			## box value of %r14 into %r9
+			movl	%r8d, %r13d
+			addl	%r15d, %r13d
+			## box value of %r13 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2987,17 +2961,17 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r9
-			movq	%r14, 24(%r9)
+			movq	%r13, 24(%r9)
 			## assign
 			movq	%r12, %r8
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
-			## box value of %r8 into %r14
+			## box value of %r8 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3021,19 +2995,19 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r8, 24(%r14)
+			movq	%rax, %r13
+			movq	%r8, 24(%r13)
 			## load self[7] (e) into %r9
 			movq	56(%rbx), %r9
 			## assign
 			movq	%r9, %r8
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## plus
 			movl	%r9d, %r8d
-			addl	%r14d, %r8d
+			addl	%r13d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
 			pushq	%rcx
@@ -3060,16 +3034,16 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r9
 			movq	%r8, 24(%r9)
-			## load self[8] (f) into %r14
-			movq	64(%rbx), %r14
+			## load self[8] (f) into %r13
+			movq	64(%rbx), %r13
 			## assign
-			movq	%r14, %r8
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			movq	%r13, %r8
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -3101,12 +3075,12 @@ Main.main:
 			movq	72(%rbx), %r8
 			## assign
 			movq	%r8, %r15
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r15 into %r9
 			movq	24(%r15), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -3137,11 +3111,11 @@ Main.main:
 			## load self[10] (h) into %r8
 			movq	80(%rbx), %r8
 			## assign
-			movq	%r8, %r14
+			movq	%r8, %r13
 			## unbox value of %r9 into %r15
 			movq	24(%r9), %r15
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
 			## plus
 			movl	%r15d, %r8d
 			addl	%r9d, %r8d
@@ -3174,15 +3148,15 @@ Main.main:
 			## load self[14] (x) into %r8
 			movq	112(%rbx), %r8
 			## assign
-			movq	%r8, %r14
+			movq	%r8, %r13
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
 			## plus
-			movl	%r8d, %r14d
-			addl	%r9d, %r14d
-			## box value of %r14 into %r15
+			movl	%r8d, %r13d
+			addl	%r9d, %r13d
+			## box value of %r13 into %r15
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3207,17 +3181,17 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r15
-			movq	%r14, 24(%r15)
+			movq	%r13, 24(%r15)
 			## load self[15] (y) into %r8
 			movq	120(%rbx), %r8
 			## assign
 			movq	%r8, %r9
-			## unbox value of %r15 into %r14
-			movq	24(%r15), %r14
+			## unbox value of %r15 into %r13
+			movq	24(%r15), %r13
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## plus
-			movl	%r14d, %r9d
+			movl	%r13d, %r9d
 			addl	%r8d, %r9d
 			## box value of %r9 into %r8
 			## push caller-saved regs
@@ -3248,11 +3222,11 @@ Main.main:
 			## load self[16] (z) into %r9
 			movq	128(%rbx), %r9
 			## assign
-			movq	%r9, %r14
+			movq	%r9, %r13
 			## unbox value of %r8 into %r15
 			movq	24(%r8), %r15
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
 			## plus
 			movl	%r15d, %r8d
 			addl	%r9d, %r8d
@@ -3285,19 +3259,17 @@ Main.main:
 			## store %r9 in self[7] (e)
 			movq	%r9, 56(%rbx)
 			## assign
-			movq	%r9, %r8
+			movq	%r14, %r8
 			## assign
-			movq	%r13, %r8
-			## assign
-			movq	%r11, %r14
+			movq	%r11, %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
-			## unbox value of %r14 into %r8
-			movq	24(%r14), %r8
+			## unbox value of %r13 into %r8
+			movq	24(%r13), %r8
 			## mult
-			movl	%r9d, %r14d
-			imull	%r8d, %r14d
-			## box value of %r14 into %r9
+			movl	%r9d, %r13d
+			imull	%r8d, %r13d
+			## box value of %r13 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3322,15 +3294,15 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r9
-			movq	%r14, 24(%r9)
+			movq	%r13, 24(%r9)
 			## assign
 			movq	%r10, %r8
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## minus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			subl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -3360,16 +3332,16 @@ Main.main:
 			movq	%r8, 24(%r9)
 			## assign
 			movq	%r12, %r8
-			## load self[15] (y) into %r14
-			movq	120(%rbx), %r14
+			## load self[15] (y) into %r13
+			movq	120(%rbx), %r13
 			## assign
-			movq	%r14, %r15
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			movq	%r13, %r15
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## unbox value of %r15 into %r8
 			movq	24(%r15), %r8
 			## mult
-			movl	%r14d, %ecx
+			movl	%r13d, %ecx
 			imull	%r8d, %ecx
 			## box value of %rcx into %r15
 			## push caller-saved regs
@@ -3421,12 +3393,12 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movl	$3, 24(%r14)
+			movq	%rax, %r13
+			movl	$3, 24(%r13)
 			## unbox value of %r15 into %r8
 			movq	24(%r15), %r8
-			## unbox value of %r14 into %r15
-			movq	24(%r14), %r15
+			## unbox value of %r13 into %r15
+			movq	24(%r13), %r15
 			## divide
 			## if %r15d not zero, jmp over error
 			cmpl	$0, %r15d
@@ -3449,9 +3421,9 @@ Main.main:
 			popq	%rcx
 			popq	%rax
 			popq	%rdx
-			movl	4(%rsp), %r14d
+			movl	4(%rsp), %r13d
 			addq	$8, %rsp
-			## box value of %r14 into %r8
+			## box value of %r13 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3476,13 +3448,13 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r14, 24(%r8)
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			movq	%r13, 24(%r8)
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %rcx
 			## push caller-saved regs
@@ -3540,8 +3512,8 @@ Main.main:
 			movq	104(%rbx), %r8
 			## assign
 			movq	%r8, %r15
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r15 into %r9
 			movq	24(%r15), %r9
 			## divide
@@ -3558,7 +3530,7 @@ Main.main:
 			pushq	%rax
 			pushq	%rcx
 			movl	%r9d, 24(%rsp)
-			movl	%r14d, %eax
+			movl	%r13d, %eax
 			cltd
 			movl	24(%rsp), %ecx
 			idivl	%ecx
@@ -3594,12 +3566,12 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r15
 			movq	%r8, 24(%r15)
-			## unbox value of %rcx into %r14
-			movq	24(%rcx), %r14
+			## unbox value of %rcx into %r13
+			movq	24(%rcx), %r13
 			## unbox value of %r15 into %r9
 			movq	24(%r15), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -3651,16 +3623,16 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movl	$128371283, 24(%r14)
+			movq	%rax, %r13
+			movl	$128371283, 24(%r13)
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
 			## minus
-			movl	%r8d, %r14d
-			subl	%r9d, %r14d
-			## box value of %r14 into %r8
+			movl	%r8d, %r13d
+			subl	%r9d, %r13d
+			## box value of %r13 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3685,11 +3657,9 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r14, 24(%r8)
+			movq	%r13, 24(%r8)
 			## store %r8 in self[8] (f)
 			movq	%r8, 64(%rbx)
-			## assign
-			movq	%r8, %r9
 			## new const Int: 123
 			## push caller-saved regs
 			pushq	%rcx
@@ -3714,8 +3684,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movl	$123, 24(%r14)
+			movq	%rax, %r13
+			movl	$123, 24(%r13)
 			## new const Int: 111
 			## push caller-saved regs
 			pushq	%rcx
@@ -3742,13 +3712,13 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			movl	$111, 24(%r8)
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## divide
-			## if %r14d not zero, jmp over error
-			cmpl	$0, %r14d
+			## if %r13d not zero, jmp over error
+			cmpl	$0, %r13d
 			jnz		.asm_label_10
 			movq	$string_6, %rdi
 			call	raw_out_string
@@ -3759,7 +3729,7 @@ Main.main:
 			pushq	%rdx
 			pushq	%rax
 			pushq	%rcx
-			movl	%r14d, 24(%rsp)
+			movl	%r13d, 24(%rsp)
 			movl	%r9d, %eax
 			cltd
 			movl	24(%rsp), %ecx
@@ -3820,16 +3790,16 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movl	$222, 24(%r14)
+			movq	%rax, %r13
+			movl	$222, 24(%r13)
 			## unbox value of %r15 into %r9
 			movq	24(%r15), %r9
-			## unbox value of %r14 into %r8
-			movq	24(%r14), %r8
+			## unbox value of %r13 into %r8
+			movq	24(%r13), %r8
 			## mult
-			movl	%r9d, %r14d
-			imull	%r8d, %r14d
-			## box value of %r14 into %r9
+			movl	%r9d, %r13d
+			imull	%r8d, %r13d
+			## box value of %r13 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3853,22 +3823,20 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r14, 24(%r9)
-			## store %r9 in self[9] (g)
-			movq	%r9, 72(%rbx)
+			movq	%rax, %r8
+			movq	%r13, 24(%r8)
+			## store %r8 in self[9] (g)
+			movq	%r8, 72(%rbx)
 			## assign
-			movq	%r9, %r8
-			## assign
-			movq	%r13, %r8
+			movq	%r14, %r8
 			## assign
 			movq	%r11, %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## mult
-			movl	%r14d, %r15d
+			movl	%r13d, %r15d
 			imull	%r8d, %r15d
 			## box value of %r15 into %r9
 			## push caller-saved regs
@@ -3898,12 +3866,12 @@ Main.main:
 			movq	%r15, 24(%r9)
 			## assign
 			movq	%r10, %r8
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## mult
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			imull	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -3933,12 +3901,12 @@ Main.main:
 			movq	%r8, 24(%r9)
 			## assign
 			movq	%r12, %r8
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## mult
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			imull	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -3966,18 +3934,18 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r9
 			movq	%r8, 24(%r9)
-			## load self[7] (e) into %r14
-			movq	56(%rbx), %r14
+			## load self[7] (e) into %r13
+			movq	56(%rbx), %r13
 			## assign
-			movq	%r14, %r8
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			movq	%r13, %r8
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## mult
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			imull	%r9d, %r8d
-			## box value of %r8 into %r14
+			## box value of %r8 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4001,20 +3969,20 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r8, 24(%r14)
+			movq	%rax, %r13
+			movq	%r8, 24(%r13)
 			## load self[8] (f) into %r9
 			movq	64(%rbx), %r9
 			## assign
 			movq	%r9, %r8
-			## unbox value of %r14 into %r15
-			movq	24(%r14), %r15
+			## unbox value of %r13 into %r15
+			movq	24(%r13), %r15
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## mult
-			movl	%r15d, %r14d
-			imull	%r9d, %r14d
-			## box value of %r14 into %r8
+			movl	%r15d, %r13d
+			imull	%r9d, %r13d
+			## box value of %r13 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4039,7 +4007,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r14, 24(%r8)
+			movq	%r13, 24(%r8)
 			## new const Int: 222
 			## push caller-saved regs
 			pushq	%rcx
@@ -4064,12 +4032,12 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movl	$222, 24(%r14)
+			movq	%rax, %r13
+			movl	$222, 24(%r13)
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
-			## unbox value of %r14 into %r15
-			movq	24(%r14), %r15
+			## unbox value of %r13 into %r15
+			movq	24(%r13), %r15
 			## divide
 			## if %r15d not zero, jmp over error
 			cmpl	$0, %r15d
@@ -4146,12 +4114,12 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			movl	$111111, 24(%r8)
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -4181,8 +4149,6 @@ Main.main:
 			movq	%r8, 24(%r9)
 			## store %r9 in self[10] (h)
 			movq	%r9, 80(%rbx)
-			## assign
-			movq	%r9, %r8
 			## load self[16] (z) into %r9
 			movq	128(%rbx), %r9
 			## assign
@@ -4215,14 +4181,14 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %rcx
 			movl	$3918203, 24(%rcx)
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %rcx into %r15
 			movq	24(%rcx), %r15
 			## mult
-			movl	%r14d, %r9d
+			movl	%r13d, %r9d
 			imull	%r15d, %r9d
-			## box value of %r9 into %r14
+			## box value of %r9 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4246,12 +4212,12 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r9, 24(%r14)
+			movq	%rax, %r13
+			movq	%r9, 24(%r13)
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
-			## unbox value of %r14 into %r15
-			movq	24(%r14), %r15
+			## unbox value of %r13 into %r15
+			movq	24(%r13), %r15
 			## minus
 			movl	%r9d, %r8d
 			subl	%r15d, %r8d
@@ -4287,14 +4253,14 @@ Main.main:
 			movq	80(%rbx), %r8
 			## assign
 			movq	%r8, %r9
-			## unbox value of %rcx into %r14
-			movq	24(%rcx), %r14
+			## unbox value of %rcx into %r13
+			movq	24(%rcx), %r13
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## mult
-			movl	%r14d, %r9d
+			movl	%r13d, %r9d
 			imull	%r8d, %r9d
-			## box value of %r9 into %r14
+			## box value of %r9 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4318,16 +4284,16 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r9, 24(%r14)
+			movq	%rax, %r13
+			movq	%r9, 24(%r13)
 			## unbox value of %r15 into %r8
 			movq	24(%r15), %r8
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
 			## plus
-			movl	%r8d, %r14d
-			addl	%r9d, %r14d
-			## box value of %r14 into %r8
+			movl	%r8d, %r13d
+			addl	%r9d, %r13d
+			## box value of %r13 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4352,17 +4318,17 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r14, 24(%r8)
-			## load self[11] (i) into %r14
-			movq	88(%rbx), %r14
+			movq	%r13, 24(%r8)
+			## load self[11] (i) into %r13
+			movq	88(%rbx), %r13
 			## assign
-			movq	%r14, %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			movq	%r13, %r9
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## unbox value of %r9 into %r15
 			movq	24(%r9), %r15
 			## minus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			subl	%r15d, %r8d
 			## box value of %r8 into %r15
 			## push caller-saved regs
@@ -4420,8 +4386,8 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r9
 			movl	$111, 24(%r9)
-			## unbox value of %rcx into %r14
-			movq	24(%rcx), %r14
+			## unbox value of %rcx into %r13
+			movq	24(%rcx), %r13
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## divide
@@ -4438,7 +4404,7 @@ Main.main:
 			pushq	%rax
 			pushq	%rcx
 			movl	%r8d, 24(%rsp)
-			movl	%r14d, %eax
+			movl	%r13d, %eax
 			cltd
 			movl	24(%rsp), %ecx
 			idivl	%ecx
@@ -4474,12 +4440,12 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			movq	%r9, 24(%r8)
-			## unbox value of %r15 into %r14
-			movq	24(%r15), %r14
+			## unbox value of %r15 into %r13
+			movq	24(%r15), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -4509,8 +4475,6 @@ Main.main:
 			movq	%r8, 24(%r9)
 			## store %r9 in self[11] (i)
 			movq	%r9, 88(%rbx)
-			## assign
-			movq	%r9, %r8
 			## load self[16] (z) into %r8
 			movq	128(%rbx), %r8
 			## assign
@@ -4518,15 +4482,15 @@ Main.main:
 			## load self[14] (x) into %r8
 			movq	112(%rbx), %r8
 			## assign
-			movq	%r8, %r14
+			movq	%r8, %r13
 			## unbox value of %r9 into %r15
 			movq	24(%r9), %r15
-			## unbox value of %r14 into %r8
-			movq	24(%r14), %r8
+			## unbox value of %r13 into %r8
+			movq	24(%r13), %r8
 			## mult
-			movl	%r15d, %r9d
-			imull	%r8d, %r9d
-			## box value of %r9 into %r15
+			movl	%r15d, %r13d
+			imull	%r8d, %r13d
+			## box value of %r13 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4550,20 +4514,20 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r15
-			movq	%r9, 24(%r15)
+			movq	%rax, %r9
+			movq	%r13, 24(%r9)
 			## load self[15] (y) into %r8
 			movq	120(%rbx), %r8
 			## assign
-			movq	%r8, %r14
-			## unbox value of %r15 into %r9
-			movq	24(%r15), %r9
-			## unbox value of %r14 into %r8
-			movq	24(%r14), %r8
+			movq	%r8, %r13
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
 			## plus
-			movl	%r9d, %r14d
-			addl	%r8d, %r14d
-			## box value of %r14 into %r15
+			movl	%r8d, %r13d
+			addl	%r9d, %r13d
+			## box value of %r13 into %r15
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4588,16 +4552,16 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r15
-			movq	%r14, 24(%r15)
+			movq	%r13, 24(%r15)
 			## assign
 			movq	%r11, %r8
 			## unbox value of %r15 into %r9
 			movq	24(%r15), %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## minus
 			movl	%r9d, %r15d
-			subl	%r14d, %r15d
+			subl	%r13d, %r15d
 			## box value of %r15 into %r8
 			## push caller-saved regs
 			pushq	%rcx
@@ -4624,18 +4588,18 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			movq	%r15, 24(%r8)
-			## load self[7] (e) into %r14
-			movq	56(%rbx), %r14
+			## load self[7] (e) into %r13
+			movq	56(%rbx), %r13
 			## assign
-			movq	%r14, %r9
+			movq	%r13, %r9
 			## unbox value of %r8 into %r15
 			movq	24(%r8), %r15
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## plus
 			movl	%r15d, %r8d
-			addl	%r14d, %r8d
-			## box value of %r8 into %r14
+			addl	%r13d, %r8d
+			## box value of %r8 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4659,8 +4623,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r8, 24(%r14)
+			movq	%rax, %r13
+			movq	%r8, 24(%r13)
 			## load self[8] (f) into %r8
 			movq	64(%rbx), %r8
 			## assign
@@ -4723,13 +4687,13 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r15
 			movq	%r8, 24(%r15)
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
-			## unbox value of %r15 into %r14
-			movq	24(%r15), %r14
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
+			## unbox value of %r15 into %r13
+			movq	24(%r15), %r13
 			## plus
 			movl	%r9d, %r8d
-			addl	%r14d, %r8d
+			addl	%r13d, %r8d
 			## box value of %r8 into %r15
 			## push caller-saved regs
 			pushq	%rcx
@@ -4759,15 +4723,15 @@ Main.main:
 			## load self[13] (k) into %r8
 			movq	104(%rbx), %r8
 			## assign
-			movq	%r8, %r14
+			movq	%r8, %r13
 			## unbox value of %r15 into %r9
 			movq	24(%r15), %r9
-			## unbox value of %r14 into %r8
-			movq	24(%r14), %r8
+			## unbox value of %r13 into %r8
+			movq	24(%r13), %r8
 			## minus
-			movl	%r9d, %r14d
-			subl	%r8d, %r14d
-			## box value of %r14 into %r15
+			movl	%r9d, %r13d
+			subl	%r8d, %r13d
+			## box value of %r13 into %rcx
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4791,8 +4755,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r15
-			movq	%r14, 24(%r15)
+			movq	%rax, %rcx
+			movq	%r13, 24(%rcx)
 			## load self[11] (i) into %r9
 			movq	88(%rbx), %r9
 			## assign
@@ -4821,48 +4785,15 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$222222, 24(%r9)
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			movq	%rax, %r15
+			movl	$222222, 24(%r15)
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
+			## unbox value of %r15 into %r9
+			movq	24(%r15), %r9
 			## mult
-			movl	%r14d, %r9d
-			imull	%r8d, %r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
-			## unbox value of %r15 into %r14
-			movq	24(%r15), %r14
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
-			## plus
-			movl	%r14d, %r8d
-			addl	%r9d, %r8d
+			movl	%r13d, %r8d
+			imull	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
 			pushq	%rcx
@@ -4889,10 +4820,41 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r9
 			movq	%r8, 24(%r9)
-			## store %r9 in self[12] (j)
-			movq	%r9, 96(%rbx)
-			## assign
-			movq	%r9, %r8
+			## unbox value of %rcx into %r13
+			movq	24(%rcx), %r13
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
+			## plus
+			movl	%r13d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
+			## store %r8 in self[12] (j)
+			movq	%r8, 96(%rbx)
 			## new const Int: 102193
 			## push caller-saved regs
 			pushq	%rcx
@@ -4945,12 +4907,12 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r9
 			movl	$123123, 24(%r9)
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## mult
-			movl	%r14d, %r9d
+			movl	%r13d, %r9d
 			imull	%r8d, %r9d
 			## box value of %r9 into %r8
 			## push caller-saved regs
@@ -5006,11 +4968,11 @@ Main.main:
 			movl	$6359, 24(%r15)
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
-			## unbox value of %r15 into %r14
-			movq	24(%r15), %r14
+			## unbox value of %r15 into %r13
+			movq	24(%r15), %r13
 			## divide
-			## if %r14d not zero, jmp over error
-			cmpl	$0, %r14d
+			## if %r13d not zero, jmp over error
+			cmpl	$0, %r13d
 			jnz		.asm_label_14
 			movq	$string_10, %rdi
 			call	raw_out_string
@@ -5021,7 +4983,7 @@ Main.main:
 			pushq	%rdx
 			pushq	%rax
 			pushq	%rcx
-			movl	%r14d, 24(%rsp)
+			movl	%r13d, 24(%rsp)
 			movl	%r9d, %eax
 			cltd
 			movl	24(%rsp), %ecx
@@ -5084,12 +5046,12 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			movl	$49594, 24(%r8)
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## minus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			subl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -5143,12 +5105,12 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			movl	$3, 24(%r8)
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -5178,8 +5140,6 @@ Main.main:
 			movq	%r8, 24(%r9)
 			## store %r9 in self[13] (k)
 			movq	%r9, 104(%rbx)
-			## assign
-			movq	%r9, %r8
 			## new const Int: 388338
 			## push caller-saved regs
 			pushq	%rcx
@@ -5204,8 +5164,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movl	$388338, 24(%r14)
+			movq	%rax, %r13
+			movl	$388338, 24(%r13)
 			## new const Int: 333
 			## push caller-saved regs
 			pushq	%rcx
@@ -5232,13 +5192,13 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			movl	$333, 24(%r8)
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## divide
-			## if %r14d not zero, jmp over error
-			cmpl	$0, %r14d
+			## if %r13d not zero, jmp over error
+			cmpl	$0, %r13d
 			jnz		.asm_label_15
 			movq	$string_11, %rdi
 			call	raw_out_string
@@ -5249,7 +5209,7 @@ Main.main:
 			pushq	%rdx
 			pushq	%rax
 			pushq	%rcx
-			movl	%r14d, 24(%rsp)
+			movl	%r13d, 24(%rsp)
 			movl	%r9d, %eax
 			cltd
 			movl	24(%rsp), %ecx
@@ -5287,15 +5247,15 @@ Main.main:
 			movq	%rax, %r15
 			movq	%r8, 24(%r15)
 			## assign
-			movq	%r12, %r14
+			movq	%r12, %r13
 			## unbox value of %r15 into %r9
 			movq	24(%r15), %r9
-			## unbox value of %r14 into %r8
-			movq	24(%r14), %r8
+			## unbox value of %r13 into %r8
+			movq	24(%r13), %r8
 			## minus
-			movl	%r9d, %r14d
-			subl	%r8d, %r14d
-			## box value of %r14 into %r9
+			movl	%r9d, %r13d
+			subl	%r8d, %r13d
+			## box value of %r13 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -5319,12 +5279,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r14, 24(%r9)
-			## store %r9 in self[14] (x)
-			movq	%r9, 112(%rbx)
-			## assign
-			movq	%r9, %r8
+			movq	%rax, %r8
+			movq	%r13, 24(%r8)
+			## store %r8 in self[14] (x)
+			movq	%r8, 112(%rbx)
 			## load self[9] (g) into %r8
 			movq	72(%rbx), %r8
 			## assign
@@ -5333,14 +5291,14 @@ Main.main:
 			movq	80(%rbx), %r8
 			## assign
 			movq	%r8, %r9
-			## unbox value of %r15 into %r14
-			movq	24(%r15), %r14
+			## unbox value of %r15 into %r13
+			movq	24(%r15), %r13
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## mult
-			movl	%r14d, %r9d
+			movl	%r13d, %r9d
 			imull	%r8d, %r9d
-			## box value of %r9 into %r14
+			## box value of %r9 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -5364,20 +5322,20 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r9, 24(%r14)
+			movq	%rax, %r13
+			movq	%r9, 24(%r13)
 			## load self[11] (i) into %r9
 			movq	88(%rbx), %r9
 			## assign
 			movq	%r9, %r8
-			## unbox value of %r14 into %r9
-			movq	24(%r14), %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r13 into %r9
+			movq	24(%r13), %r9
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## mult
 			movl	%r9d, %r8d
-			imull	%r14d, %r8d
-			## box value of %r8 into %r14
+			imull	%r13d, %r8d
+			## box value of %r8 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -5401,8 +5359,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r8, 24(%r14)
+			movq	%rax, %r13
+			movq	%r8, 24(%r13)
 			## load self[12] (j) into %r8
 			movq	96(%rbx), %r8
 			## assign
@@ -5524,14 +5482,14 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r9
 			movq	%r15, 24(%r9)
-			## unbox value of %r14 into %r15
-			movq	24(%r14), %r15
+			## unbox value of %r13 into %r15
+			movq	24(%r13), %r15
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## plus
 			movl	%r15d, %r9d
 			addl	%r8d, %r9d
-			## box value of %r9 into %r14
+			## box value of %r9 into %r13
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -5555,17 +5513,17 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r14
-			movq	%r9, 24(%r14)
+			movq	%rax, %r13
+			movq	%r9, 24(%r13)
 			## assign
-			movq	%r13, %r9
-			## unbox value of %r14 into %r8
-			movq	24(%r14), %r8
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			movq	%r14, %r9
+			## unbox value of %r13 into %r8
+			movq	24(%r13), %r8
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## plus
 			movl	%r8d, %r9d
-			addl	%r14d, %r9d
+			addl	%r13d, %r9d
 			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
@@ -5594,12 +5552,12 @@ Main.main:
 			movq	%r9, 24(%r8)
 			## assign
 			movq	%r11, %r9
-			## unbox value of %r8 into %r14
-			movq	24(%r8), %r14
+			## unbox value of %r8 into %r13
+			movq	24(%r8), %r13
 			## unbox value of %r9 into %r15
 			movq	24(%r9), %r15
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r15d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -5629,12 +5587,12 @@ Main.main:
 			movq	%r8, 24(%r9)
 			## assign
 			movq	%r10, %r8
-			## unbox value of %r9 into %r14
-			movq	24(%r9), %r14
+			## unbox value of %r9 into %r13
+			movq	24(%r9), %r13
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## plus
-			movl	%r14d, %r8d
+			movl	%r13d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -5665,9 +5623,7 @@ Main.main:
 			## store %r9 in self[15] (y)
 			movq	%r9, 120(%rbx)
 			## assign
-			movq	%r9, %r8
-			## assign
-			movq	%r13, %r8
+			movq	%r14, %r8
 			## assign
 			movq	%r11, %r13
 			## unbox value of %r8 into %r11

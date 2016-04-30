@@ -435,8 +435,6 @@ A.some_method:
 			cmpq	%rax, %r8
 			je		.case_2_Main
 .case_2_A:
-			## assign
-			movq	%r9, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -507,8 +505,6 @@ A.some_method:
 			movq	%r8, %r9
 			jmp		.case_2_exit
 .case_2_Main:
-			## assign
-			movq	%r9, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx

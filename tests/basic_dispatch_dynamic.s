@@ -344,8 +344,6 @@ A.some_method:
 			pushq	%r14
 			pushq	%r15
 .A_some_method_1:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
 			## new const Int: 123
 			## push caller-saved regs
 			pushq	%rcx

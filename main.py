@@ -466,8 +466,16 @@ def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 	block_list = buildBasicBlocks(cur_tac_list)
 	computeLiveSets(block_list)
 
-	# for block in block_list:
-	# 	print block
+	removeDeadCode(block_list)
+	computeLiveSets(block_list)
+
+	# if (ast_method.ident == "main"):
+	# 	for block in block_list:
+	# 		print block
+	# 		print
+	# 		for live_set in block.live_set_list:
+	# 			print live_set
+	# 		print
 	# sys.exit(1)
 
 	# Allocate registers

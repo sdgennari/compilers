@@ -344,32 +344,6 @@ A.some_method:
 			pushq	%r14
 			pushq	%r15
 .A_some_method_1:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
-			## loading param [1] into %r8
-			movq	24(%rbp), %r8
-			## loading param [2] into %r8
-			movq	32(%rbp), %r8
-			## loading param [3] into %r8
-			movq	40(%rbp), %r8
-			## loading param [4] into %r8
-			movq	48(%rbp), %r8
-			## loading param [5] into %r8
-			movq	56(%rbp), %r8
-			## loading param [6] into %r8
-			movq	64(%rbp), %r8
-			## loading param [7] into %r8
-			movq	72(%rbp), %r8
-			## loading param [8] into %r8
-			movq	80(%rbp), %r8
-			## loading param [9] into %r8
-			movq	88(%rbp), %r8
-			## loading param [10] into %r8
-			movq	96(%rbp), %r8
-			## loading param [11] into %r8
-			movq	104(%rbp), %r8
-			## loading param [12] into %r8
-			movq	112(%rbp), %r8
 			## new const Int: 123
 			## push caller-saved regs
 			pushq	%rcx

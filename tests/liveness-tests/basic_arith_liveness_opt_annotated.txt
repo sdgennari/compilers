@@ -1,0 +1,42 @@
+Label: Main_main_1
+Parents: 
+Children: 
+Live In: set([])
+Live Out: set([])
+0	label Main_main_1
+1	t$14 <- int 3
+2	t$5 <- t$14
+3	t$16 <- int 7
+4	t$6 <- t$16
+5	t$19 <- t$5
+6	t$20 <- t$6
+7	t$21 <- unbox (Int) t$19
+8	t$22 <- unbox (Int) t$20
+9	t$23 <- + t$21 t$22
+10	t$24 <- box (Int) t$23
+11	t$7 <- t$24
+12	t$26 <- t$7
+13	param [0] <- t$26
+14	t$25 <- self_call out_int (ro: self, params: ['t$26'])
+15	t$4 <- t$25
+16	return t$4
+
+
+[]
+[]
+['t$14']
+['t$5']
+['t$16', 't$5']
+['t$6', 't$5']
+['t$19', 't$6']
+['t$19', 't$20']
+['t$20', 't$21']
+['t$22', 't$21']
+['t$23']
+['t$24']
+['t$7']
+['t$26']
+[]
+['t$25']
+['t$4']
+

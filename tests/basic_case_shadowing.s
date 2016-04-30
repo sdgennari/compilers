@@ -516,9 +516,9 @@ Main.main:
 			movq	%rax, %r8
 			movl	$777, 24(%r8)
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -542,22 +542,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			## check if %r8 is void and set result accordingly
-			cmpq	$0, %r8
+			movq	%rax, %r10
+			## check if %r9 is void and set result accordingly
+			cmpq	$0, %r9
 			jnz		.asm_label_1
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r10)
 .asm_label_1:
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r10 into %r8
+			movq	24(%r10), %r8
 			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
+			movl	%r8d, %r10d
+			xorl	$1, %r10d
 			## branch .case_3_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.case_3_void
 			## branch .case_3_not_void
-			test	%r9d, %r9d
+			test	%r10d, %r10d
 			jnz		.case_3_not_void
 .case_3_void:
 			movq	$string_1, %rdi
@@ -566,37 +566,37 @@ Main.main:
 			call	exit
 			jmp		.case_3_not_void
 .case_3_not_void:
-			## move type tag of %r8 into %r9
-			movq	0(%r8), %r9
+			## move type tag of %r9 into %r8
+			movq	0(%r9), %r8
 			## check for type String
 			movq	$4, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 			## check for type Int
 			movq	$1, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_Int
 			## check for type Object
 			movq	$3, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 			## check for type Bool
 			movq	$0, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 			## check for type IO
 			movq	$2, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 			## check for type Main
 			movq	$5, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 .case_2_Int:
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r10
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -730,9 +730,9 @@ Main.main:
 			movq	%rax, %r8
 			movl	$9001, 24(%r8)
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			jmp		.case_2_exit
 .case_2_error_branch:
 			movq	$string_3, %rdi
@@ -740,8 +740,6 @@ Main.main:
 			movq	$0, %rax
 			call	exit
 .case_2_exit:
-			## assign
-			movq	%r8, %r9
 			## assign
 			movq	%r11, %r8
 			## storing param [0]

@@ -462,10 +462,6 @@ Main.main:
 			pushq	%r14
 			pushq	%r15
 .Main_main_1:
-			## move self ptr into %r9
-			movq	%rbx, %r9
-			## assign
-			movq	%r9, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
