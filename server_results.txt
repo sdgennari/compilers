@@ -1,4 +1,4 @@
-Start Time:   Sat Apr 30 01:43:04 2016
+Start Time:   Sat Apr 30 02:35:53 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -69,8 +69,7 @@ t38: nonvoid-comparison                          ok
 t39: not                                         ok  
 t40: numcalls                                    ok  
 t41: old                                         ok  
-t42: one-nested-exp-with-789-arith-ops    (no non-empty .cl-asm or .s file produced)
-      FAILED (empty compiled-program output)
+t42: one-nested-exp-with-789-arith-ops           ok  
 t43: override-builtin-method                     ok  
 t44: primes                                      ok  
 t45: receiver-class-hard-to-determine            ok  
@@ -120,4 +119,4 @@ t5: div-by-zero                                  ok
 t6: substring-bad                                ok  
 t7: mjk6zt.zip-bug_maker                         ok  
 t8: mjk6zt.zip-shallow_copy                      ok  
-End Time: Sat Apr 30 01:44:13 2016
+End Time: Sat Apr 30 02:36:59 2016

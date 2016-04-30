@@ -182,6 +182,8 @@ def build_register_graph(block_list):
 	register_graph = {}
 
 	for block in block_list:
+		# for idx, tac_instr in enumerate(block.instr_list):
+			# live_set = block.live_set_list[idx]
 		for tac_instr, live_set in zip(block.instr_list, block.live_set_list):
 
 			# Check if the current instr has an assignee
@@ -199,7 +201,7 @@ def build_register_graph(block_list):
 
 				# If the register is not in the graph, add it
 				if reg1 not in register_graph:
-						register_graph[reg1] = set()
+					register_graph[reg1] = set()
 
 				# Loop through other registers to add edges
 				for j in range(i+1, len(live_set)):
@@ -211,8 +213,10 @@ def build_register_graph(block_list):
 						register_graph[reg2] = set()
 
 					# Add an edge between the registers in the graph
-					register_graph[reg1].add(reg2)
-					register_graph[reg2].add(reg1)
+					if reg2 not in register_graph[reg1]:
+						register_graph[reg1].add(reg2)
+					if reg1 not in register_graph[reg2]:
+						register_graph[reg2].add(reg1)
 				# -- end j loop
 
 				# Handle assignee explicitly
