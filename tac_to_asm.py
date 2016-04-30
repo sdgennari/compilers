@@ -663,10 +663,26 @@ def gen_asm_for_tac_call(cur_asm_list, tac_call):
 
 	# Get method pointer based on type of call
 	if isinstance(tac_call, TACStaticCall):
-		# Call method label explicitly
-		cur_asm_list.append(ASMComment("static: call method label explicitly"))
-		method_label = tac_call.static_type + "." + tac_call.method_ident
-		cur_asm_list.append(ASMCall(method_label))
+		cur_asm_list.append(ASMComment("static: lookup method in <static_type>..vtable"))
+
+		tup = (tac_call.static_type, tac_call.method_ident)
+		method_idx = vtable_offset_map[tup]
+
+		# Get pointer to vtable explicitly with static type
+		vtable_label = "$" + tac_call.static_type + "..vtable"
+		cur_asm_list.append(ASMComment("get ptr to vtable from static type"))
+		cur_asm_list.append(ASMMovQ(vtable_label, "%rax"))
+
+		# Get pointer to method label from offset in vtable
+		cur_asm_list.append(ASMComment("find method " + tac_call.method_ident + "in vtable[" + str(method_idx) + "]"))
+		vtable_offset = method_idx * 8
+		method_ptr = str(vtable_offset) + "(%rax)"
+		cur_asm_list.append(ASMMovQ(method_ptr, "%rax"))
+
+		# Call method
+		cur_asm_list.append(ASMComment("call method"))
+		cur_asm_list.append(ASMCall("*%rax"))
+
 	elif isinstance(tac_call, TACDynamicCall):
 		# Find method label via vtable
 		# Handle SELF_TYPE explicitly

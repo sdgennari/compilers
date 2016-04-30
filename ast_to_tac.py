@@ -48,14 +48,15 @@ def gen_tac_for_binding(cur_tac_list, ast_binding):
 	# ExpLetBinding (self, ident_line, ident, type_line, binding_type, exp=None)
 	# global tac_list
 
-	assignee_symbol = add_symbol(ast_binding.ident)
-
 	if ast_binding.exp == None:
 		# let_binding_no_init
+		assignee_symbol = add_symbol(ast_binding.ident)
 		cur_tac_list.append(TACDefault(ast_binding.binding_type, assignee_symbol, ast_binding.binding_type))
 	else:
 		# let_binding_init
 		exp_symbol, exp_type_from_ast = gen_tac_for_exp(cur_tac_list, ast_binding.exp)
+		# Note: Add assignee symbol AFTER evaluating the init expression
+		assignee_symbol = add_symbol(ast_binding.ident)
 		cur_tac_list.append(TACAssign(exp_type_from_ast, assignee_symbol, exp_symbol))
 
 	# NOTE: No need to return a symbol since all items are added to symbol table

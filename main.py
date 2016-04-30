@@ -112,7 +112,7 @@ def gen_const_strings():
 		result += label + ":\n"
 
 		# Format string since \\ in assembly becomes a single \
-		formatted_string = string.replace("\\", "\\\\")
+		formatted_string = string.replace("\\", "\\\\").replace("\"", "\\\"").replace("\'", "\\\'")
 
 		result += "\t\t\t.string \"" + formatted_string + "\"\n"
 		result += "\n"
