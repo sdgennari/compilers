@@ -3,8 +3,13 @@
 	.globl	cool_io_in_str
 	.type	cool_io_in_str, @function
 cool_io_in_str:
+.LFB2:
+	.cfi_startproc
 	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
 	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
 	subq	$32, %rsp
 	movl	$20, -16(%rbp)
 	movl	$0, -12(%rbp)
@@ -13,13 +18,13 @@ cool_io_in_str:
 	movq	%rax, %rdi
 	call	malloc
 	movq	%rax, -8(%rbp)
-.in_str_L8:
+.L8:
 	call	getchar
 	movb	%al, -17(%rbp)
 	cmpb	$10, -17(%rbp)
-	je	.in_str_L2
+	je	.L2
 	cmpb	$-1, -17(%rbp)
-	je	.in_str_L2
+	je	.L2
 	movl	-12(%rbp), %eax
 	movslq	%eax, %rdx
 	movq	-8(%rbp), %rax
@@ -28,23 +33,23 @@ cool_io_in_str:
 	movb	%al, (%rdx)
 	addl	$1, -12(%rbp)
 	cmpb	$0, -17(%rbp)
-	jne	.in_str_L3
+	jne	.L3
 	movl	$0, -12(%rbp)
-	jmp	.in_str_L4
-.in_str_L6:
+	jmp	.L4
+.L6:
 	call	getchar
 	movb	%al, -17(%rbp)
-.in_str_L4:
+.L4:
 	cmpb	$10, -17(%rbp)
 	je	.L5
 	cmpb	$-1, -17(%rbp)
-	jne	.in_str_L6
+	jne	.L6
 .L5:
-	jmp	.in_str_L2
-.in_str_L3:
+	jmp	.L2
+.L3:
 	movl	-12(%rbp), %eax
 	cmpl	-16(%rbp), %eax
-	jne	.in_str_L7
+	jne	.L7
 	addl	$20, -16(%rbp)
 	movl	-16(%rbp), %eax
 	movslq	%eax, %rdx
@@ -53,10 +58,10 @@ cool_io_in_str:
 	movq	%rax, %rdi
 	call	realloc
 	movq	%rax, -8(%rbp)
-	jmp	.in_str_L8
-.in_str_L7:
-	jmp	.in_str_L8
-.in_str_L2:
+	jmp	.L8
+.L7:
+	jmp	.L8
+.L2:
 	movl	-12(%rbp), %eax
 	movslq	%eax, %rdx
 	movq	-8(%rbp), %rax
@@ -64,7 +69,9 @@ cool_io_in_str:
 	movq	%rax, %rdi
 	call	strndup
 	leave
+	.cfi_def_cfa 7, 8
 	ret
+	.cfi_endproc
 .LFE2:
 	.size	cool_io_in_str, .-cool_io_in_str
 	.section	.rodata

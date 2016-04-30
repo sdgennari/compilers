@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+char *cool_io_in_str() {
 	char *str, c;
 
 	// Keep track of size of allocated memory
@@ -32,6 +32,10 @@ int main() {
 		if (c == '\0') {
 			// printf("null char in string\n");
 			len = 0;
+			// Read the rest of the input until the next newline or EOF
+			while (c != '\n' && c != EOF) {
+				c = getchar();
+			}
 			break;
 		}
 
@@ -49,10 +53,20 @@ int main() {
 		// printf("Adding %c to str\n", c);
 	}
 
-	str = strndup(str, len);
+	return strndup(str, len);
+}
 
+int main() {
+	char *str;
+
+	str = cool_io_in_str();
 	// printf("len: %d\n", len);
-	// printf("strlen: %lu\n", strlen(str));
-	// printf("str: \"%s\"\n", str);
+	printf("strlen: %lu\n", strlen(str));
+	printf("str: \"%s\"\n", str);
+
+	str = cool_io_in_str();
+	// printf("len: %d\n", len);
+	printf("strlen: %lu\n", strlen(str));
+	printf("str: \"%s\"\n", str);
 	return 0;
 }

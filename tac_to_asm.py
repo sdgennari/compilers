@@ -1223,75 +1223,81 @@ def gen_asm_for_internal_copy(cur_asm_list):
 	cur_asm_list.append(ASMComment("result of mempy in %rax, so good to return"))
 
 def gen_asm_for_internal_in_string(cur_asm_list):
-	cur_asm_list.append(ASMComment("use generated code to get string"))
+	# Call in_string helper
+	cur_asm_list.append(ASMComment("call in_string helper method"))
+	cur_asm_list.append(ASMCall("raw_in_string"))
 
-	custom_asm = ASMCustomString(
-		"\t\t\tsubq	$32, %rsp\n" +
-		"\t\t\tmovl	$20, -16(%rbp)\n" +
-		"\t\t\tmovl	$0, -12(%rbp)\n" +
-		"\t\t\tmovl	-16(%rbp), %eax\n" +
-		"\t\t\tcltq\n" +
-		"\t\t\tmovq	%rax, %rdi\n" +
-		"\t\t\tcall	malloc\n" +
-		"\t\t\tmovq	%rax, -8(%rbp)\n" +
-		".in_string_L5:\n" +
-		"\t\t\tcall	getchar\n" +
-		"\t\t\tmovb	%al, -17(%rbp)\n" +
-		"\t\t\tcmpb	$10, -17(%rbp)\n" +
-		"\t\t\tje	.in_string_L2\n" +
-		"\t\t\tcmpb	$-1, -17(%rbp)\n" +
-		"\t\t\tje	.in_string_L2\n" +
-		"\t\t\tmovl	-12(%rbp), %eax\n" +
-		"\t\t\tmovslq	%eax, %rdx\n" +
-		"\t\t\tmovq	-8(%rbp), %rax\n" +
-		"\t\t\taddq	%rax, %rdx\n" +
-		"\t\t\tmovzbl	-17(%rbp), %eax\n" +
-		"\t\t\tmovb	%al, (%rdx)\n" +
-		"\t\t\taddl	$1, -12(%rbp)\n" +
-		"\t\t\tcmpb	$0, -17(%rbp)\n" +
-		"\t\t\tjne	.in_string_L3\n" +
-		"\t\t\tmovl	$0, -12(%rbp)\n" +
-		"\t\t\tjmp	.in_string_L2\n" +
-		".in_string_L3:\n" +
-		"\t\t\tmovl	-12(%rbp), %eax\n" +
-		"\t\t\tcmpl	-16(%rbp), %eax\n" +
-		"\t\t\tjne	.in_string_L4\n" +
-		"\t\t\taddl	$20, -16(%rbp)\n" +
-		"\t\t\tmovl	-16(%rbp), %eax\n" +
-		"\t\t\tmovslq	%eax, %rdx\n" +
-		"\t\t\tmovq	-8(%rbp), %rax\n" +
-		"\t\t\tmovq	%rdx, %rsi\n" +
-		"\t\t\tmovq	%rax, %rdi\n" +
-		"\t\t\tcall	realloc\n" +
-		"\t\t\tmovq	%rax, -8(%rbp)\n" +
-		"\t\t\tjmp	.in_string_L5\n" +
-		".in_string_L4:\n" +
-		"\t\t\tjmp	.in_string_L5\n" +
-		".in_string_L2:\n" +
-		"\t\t\tmovl	-12(%rbp), %eax\n" +
-		"\t\t\tmovslq	%eax, %rdx\n" +
-		"\t\t\tmovq	-8(%rbp), %rax\n" +
-		"\t\t\tmovq	%rdx, %rsi\n" +
-		"\t\t\tmovq	%rax, %rdi\n" +
-		"\t\t\tcall	strndup\n" +
-		"\t\t\tmovq	%rax, -8(%rbp)\n" #+
-		# "\t\t\t## reset rsp\n" +
-		# "\t\t\taddq 	$32, %rsp\n"
-		)
-	cur_asm_list.append(custom_asm)
-	# Note: the string is now at -8(%rbp)
-	cur_asm_list.append(ASMComment("result is now stored at -8(%rbp)"))
-
-	# Create a new boxed string
-	cur_asm_list.append(ASMComment("make new box in %rax to hold the str val"))
+	# Box result in a new String
+	cur_asm_list.append(ASMComment("make new box to store result (moved into r8 temporarily)"))
+	cur_asm_list.append(ASMMovQ("%rax", "%r8"))
 	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
-
-	# Move the value of the string into the box
-	cur_asm_list.append(ASMComment("use %r8 to move value of str into box"))
-	cur_asm_list.append(ASMPushQ("%r8"))
-	cur_asm_list.append(ASMMovQ("-8(%rbp)", "%r8"))
 	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
-	cur_asm_list.append(ASMPopQ("%r8"))
+
+def get_raw_in_string_helper():
+	result = "raw_in_string:\n" + \
+	"\t\t\tpushq\t%rbp\n" + \
+	"\t\t\tmovq\t%rsp, %rbp\n" + \
+	"\t\t\tsubq\t$32, %rsp\n" + \
+	"\t\t\tmovl\t$20, -16(%rbp)\n" + \
+	"\t\t\tmovl\t$0, -12(%rbp)\n" + \
+	"\t\t\tmovl\t-16(%rbp), %eax\n" + \
+	"\t\t\tcltq\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\tmalloc\n" + \
+	"\t\t\tmovq\t%rax, -8(%rbp)\n" + \
+	".in_str_L8:\n" + \
+	"\t\t\tcall\tgetchar\n" + \
+	"\t\t\tmovb\t%al, -17(%rbp)\n" + \
+	"\t\t\tcmpb\t$10, -17(%rbp)\n" + \
+	"\t\t\tje\t.in_str_L2\n" + \
+	"\t\t\tcmpb\t$-1, -17(%rbp)\n" + \
+	"\t\t\tje\t.in_str_L2\n" + \
+	"\t\t\tmovl\t-12(%rbp), %eax\n" + \
+	"\t\t\tmovslq\t%eax, %rdx\n" + \
+	"\t\t\tmovq\t-8(%rbp), %rax\n" + \
+	"\t\t\taddq\t%rax, %rdx\n" + \
+	"\t\t\tmovzbl\t-17(%rbp), %eax\n" + \
+	"\t\t\tmovb\t%al, (%rdx)\n" + \
+	"\t\t\taddl\t$1, -12(%rbp)\n" + \
+	"\t\t\tcmpb\t$0, -17(%rbp)\n" + \
+	"\t\t\tjne\t.in_str_L3\n" + \
+	"\t\t\tmovl\t$0, -12(%rbp)\n" + \
+	"\t\t\tjmp\t.in_str_L4\n" + \
+	".in_str_L6:\n" + \
+	"\t\t\tcall\tgetchar\n" + \
+	"\t\t\tmovb\t%al, -17(%rbp)\n" + \
+	".in_str_L4:\n" + \
+	"\t\t\tcmpb\t$10, -17(%rbp)\n" + \
+	"\t\t\tje\t.L5\n" + \
+	"\t\t\tcmpb\t$-1, -17(%rbp)\n" + \
+	"\t\t\tjne\t.in_str_L6\n" + \
+	".L5:\n" + \
+	"\t\t\tjmp\t.in_str_L2\n" + \
+	".in_str_L3:\n" + \
+	"\t\t\tmovl\t-12(%rbp), %eax\n" + \
+	"\t\t\tcmpl\t-16(%rbp), %eax\n" + \
+	"\t\t\tjne\t.in_str_L7\n" + \
+	"\t\t\taddl\t$20, -16(%rbp)\n" + \
+	"\t\t\tmovl\t-16(%rbp), %eax\n" + \
+	"\t\t\tmovslq\t%eax, %rdx\n" + \
+	"\t\t\tmovq\t-8(%rbp), %rax\n" + \
+	"\t\t\tmovq\t%rdx, %rsi\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\trealloc\n" + \
+	"\t\t\tmovq\t%rax, -8(%rbp)\n" + \
+	"\t\t\tjmp\t.in_str_L8\n" + \
+	".in_str_L7:\n" + \
+	"\t\t\tjmp\t.in_str_L8\n" + \
+	".in_str_L2:\n" + \
+	"\t\t\tmovl\t-12(%rbp), %eax\n" + \
+	"\t\t\tmovslq\t%eax, %rdx\n" + \
+	"\t\t\tmovq\t-8(%rbp), %rax\n" + \
+	"\t\t\tmovq\t%rdx, %rsi\n" + \
+	"\t\t\tmovq\t%rax, %rdi\n" + \
+	"\t\t\tcall\tstrndup\n" + \
+	"\t\t\tleave\n" + \
+	"\t\t\tret\n"
+	return result
 
 def gen_asm_for_internal_out_string(cur_asm_list):
 	# Unbox string to get raw value

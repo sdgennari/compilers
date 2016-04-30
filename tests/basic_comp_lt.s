@@ -383,59 +383,10 @@ IO.in_int:
 IO.in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## use generated code to get string
-			subq	$32, %rsp
-			movl	$20, -16(%rbp)
-			movl	$0, -12(%rbp)
-			movl	-16(%rbp), %eax
-			cltq
-			movq	%rax, %rdi
-			call	malloc
-			movq	%rax, -8(%rbp)
-.in_string_L5:
-			call	getchar
-			movb	%al, -17(%rbp)
-			cmpb	$10, -17(%rbp)
-			je	.in_string_L2
-			cmpb	$-1, -17(%rbp)
-			je	.in_string_L2
-			movl	-12(%rbp), %eax
-			movslq	%eax, %rdx
-			movq	-8(%rbp), %rax
-			addq	%rax, %rdx
-			movzbl	-17(%rbp), %eax
-			movb	%al, (%rdx)
-			addl	$1, -12(%rbp)
-			cmpb	$0, -17(%rbp)
-			jne	.in_string_L3
-			movl	$0, -12(%rbp)
-			jmp	.in_string_L2
-.in_string_L3:
-			movl	-12(%rbp), %eax
-			cmpl	-16(%rbp), %eax
-			jne	.in_string_L4
-			addl	$20, -16(%rbp)
-			movl	-16(%rbp), %eax
-			movslq	%eax, %rdx
-			movq	-8(%rbp), %rax
-			movq	%rdx, %rsi
-			movq	%rax, %rdi
-			call	realloc
-			movq	%rax, -8(%rbp)
-			jmp	.in_string_L5
-.in_string_L4:
-			jmp	.in_string_L5
-.in_string_L2:
-			movl	-12(%rbp), %eax
-			movslq	%eax, %rdx
-			movq	-8(%rbp), %rax
-			movq	%rdx, %rsi
-			movq	%rax, %rdi
-			call	strndup
-			movq	%rax, -8(%rbp)
-
-			## result is now stored at -8(%rbp)
-			## make new box in %rax to hold the str val
+			## call in_string helper method
+			call	raw_in_string
+			## make new box to store result (moved into r8 temporarily)
+			movq	%rax, %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -460,11 +411,7 @@ IO.in_string:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %rax
-			## use %r8 to move value of str into box
-			pushq	%r8
-			movq	-8(%rbp), %r8
 			movq	%r8, 24(%rax)
-			popq	%r8
 			leave
 			ret
 
@@ -1325,14 +1272,11 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## save self reg
-			pushq	%rbx
-			## make new obj to store result (same as doing SELF_TYPE..new)
-			movq	16(%rbx), %rax
-			movq	8(%rax), %rax
-			call	*%rax
-			## restore self reg
-			popq	%rbx
+			## call malloc to make space for the new object
+			## use leaq to multiply the size by 8
+			movq	8(%rbx), %rdi
+			leaq	0(,%rdi,8), %rdi
+			call	malloc
 			## call memcpy to copy %rbx into %rax
 			## use leaq to multiply the size by 8
 			movq	8(%rbx), %rdx
@@ -1634,6 +1578,69 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+raw_in_string:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			subq	$32, %rsp
+			movl	$20, -16(%rbp)
+			movl	$0, -12(%rbp)
+			movl	-16(%rbp), %eax
+			cltq
+			movq	%rax, %rdi
+			call	malloc
+			movq	%rax, -8(%rbp)
+.in_str_L8:
+			call	getchar
+			movb	%al, -17(%rbp)
+			cmpb	$10, -17(%rbp)
+			je	.in_str_L2
+			cmpb	$-1, -17(%rbp)
+			je	.in_str_L2
+			movl	-12(%rbp), %eax
+			movslq	%eax, %rdx
+			movq	-8(%rbp), %rax
+			addq	%rax, %rdx
+			movzbl	-17(%rbp), %eax
+			movb	%al, (%rdx)
+			addl	$1, -12(%rbp)
+			cmpb	$0, -17(%rbp)
+			jne	.in_str_L3
+			movl	$0, -12(%rbp)
+			jmp	.in_str_L4
+.in_str_L6:
+			call	getchar
+			movb	%al, -17(%rbp)
+.in_str_L4:
+			cmpb	$10, -17(%rbp)
+			je	.L5
+			cmpb	$-1, -17(%rbp)
+			jne	.in_str_L6
+.L5:
+			jmp	.in_str_L2
+.in_str_L3:
+			movl	-12(%rbp), %eax
+			cmpl	-16(%rbp), %eax
+			jne	.in_str_L7
+			addl	$20, -16(%rbp)
+			movl	-16(%rbp), %eax
+			movslq	%eax, %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	realloc
+			movq	%rax, -8(%rbp)
+			jmp	.in_str_L8
+.in_str_L7:
+			jmp	.in_str_L8
+.in_str_L2:
+			movl	-12(%rbp), %eax
+			movslq	%eax, %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	strndup
+			leave
+			ret
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp

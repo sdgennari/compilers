@@ -1,4 +1,4 @@
-Start Time:   Fri Apr 29 22:56:45 2016
+Start Time:   Sat Apr 30 01:43:04 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -54,7 +54,7 @@ t23: in-int-garbage                              ok
 t24: init-order-self                             ok  
 t25: init-order-super                            ok  
 t26: in-string                                   ok  
-t27: in-string-garbage                         FAILED
+t27: in-string-garbage                           ok  
 t28: in-string-huge                              ok  
 t29: lambda-term-cool-code-generator             ok  
 t30: lambda-term-evaluation-simulation           ok  
@@ -120,4 +120,4 @@ t5: div-by-zero                                  ok
 t6: substring-bad                                ok  
 t7: mjk6zt.zip-bug_maker                         ok  
 t8: mjk6zt.zip-shallow_copy                      ok  
-End Time: Fri Apr 29 22:57:53 2016
+End Time: Sat Apr 30 01:44:13 2016
