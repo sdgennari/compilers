@@ -1917,22 +1917,26 @@ Cons.init:
 .Cons_init_20:
 			## loading param [0] into %r8
 			movq	16(%rbp), %r8
-			## loading param [1] into %r9
-			movq	24(%rbp), %r9
-			## assign
-			movq	%r8, %r10
-			## store %r10 in self[3] (xcar)
-			movq	%r10, 24(%rbx)
-			## assign
-			movq	%r9, %r8
-			## store %r8 in self[4] (xcdr)
-			movq	%r8, 32(%rbx)
-			## move self ptr into %r8
-			movq	%rbx, %r8
+			## loading param [1] into %r10
+			movq	24(%rbp), %r10
 			## assign
 			movq	%r8, %r9
-			## move ret val %r9 into %rax
-			movq	%r9, %rax
+			## store %r9 in self[3] (xcar)
+			movq	%r9, 24(%rbx)
+			## assign
+			movq	%r9, %r8
+			## assign
+			movq	%r10, %r9
+			## store %r9 in self[4] (xcdr)
+			movq	%r9, 32(%rbx)
+			## assign
+			movq	%r9, %r8
+			## move self ptr into %r9
+			movq	%rbx, %r9
+			## assign
+			movq	%r9, %r8
+			## move ret val %r8 into %rax
+			movq	%r8, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -2640,6 +2644,8 @@ List.insert:
 			pushq	%r14
 			pushq	%r15
 .List_insert_28:
+			## loading param [0] into %r8
+			movq	16(%rbp), %r8
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2699,6 +2705,8 @@ List.rcons:
 			pushq	%r14
 			pushq	%r15
 .List_rcons_29:
+			## loading param [0] into %r8
+			movq	16(%rbp), %r8
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2843,9 +2851,11 @@ Main.iota:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			## store %r8 in self[3] (l)
-			movq	%r8, 24(%rbx)
+			movq	%rax, %r9
+			## store %r9 in self[3] (l)
+			movq	%r9, 24(%rbx)
+			## assign
+			movq	%r9, %r8
 			## new const Int: 0
 			## push caller-saved regs
 			pushq	%rcx
@@ -3048,6 +3058,8 @@ Main.iota:
 			## store %r8 in self[3] (l)
 			movq	%r8, 24(%rbx)
 			## assign
+			movq	%r8, %r10
+			## assign
 			movq	%r9, %r8
 			## new const Int: 1
 			## push caller-saved regs
@@ -3112,6 +3124,10 @@ Main.iota:
 			movq	%r8, %r9
 			jmp		.loop_start_32
 .loop_exit_32:
+			## default Object
+			movq	$0, %r8
+			## assign
+			movq	%r8, %r9
 			## load self[3] (l) into %r8
 			movq	24(%rbx), %r8
 			## assign

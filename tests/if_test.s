@@ -485,8 +485,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r13
-			movq	$0, 24(%r13)
+			movq	%rax, %r15
+			movq	$0, 24(%r15)
 			## default Int
 			## push caller-saved regs
 			pushq	%rcx
@@ -511,8 +511,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r15
-			movq	$0, 24(%r15)
+			movq	%rax, %rdi
+			movq	$0, 24(%rdi)
 			## default Int
 			## push caller-saved regs
 			pushq	%rcx
@@ -721,11 +721,37 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r12
 			movq	$0, 24(%r12)
+			## default Int
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r13
+			movq	$0, 24(%r13)
 			## assign
-			movq	%r13, %r14
+			movq	%r15, %r14
 			## assign
-			movq	%r15, %rdi
-			## use lt_helper to compare %r14 < %rdi
+			movq	%rdi, %r15
+			## use lt_helper to compare %r14 < %r15
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -736,8 +762,8 @@ Main.main:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r14) and rhs (%rdi)
-			pushq	%rdi
+			## push lhs (%r14) and rhs (%r15)
+			pushq	%r15
 			pushq	%r14
 			call	lt_helper
 			addq	$16, %rsp
@@ -810,19 +836,19 @@ Main.main:
 			jnz		.if_else_3
 .if_then_3:
 			## assign
-			movq	%rdx, %r9
+			movq	%rdx, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r13
 			## assign
-			movq	%r8, %r9
+			movq	%r13, %r9
 			jmp		.if_exit_3
 .if_else_3:
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r9, %r8
+			movq	%r9, %r13
 			## assign
-			movq	%r8, %r9
+			movq	%r13, %r9
 			jmp		.if_exit_3
 .if_exit_3:
 			## assign
@@ -874,19 +900,19 @@ Main.main:
 			jnz		.if_else_4
 .if_then_4:
 			## assign
-			movq	%r11, %r9
+			movq	%r11, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r13
 			## assign
-			movq	%r8, %r9
+			movq	%r13, %r9
 			jmp		.if_exit_4
 .if_else_4:
 			## assign
-			movq	%r12, %r9
+			movq	%r12, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r13
 			## assign
-			movq	%r8, %r9
+			movq	%r13, %r9
 			jmp		.if_exit_4
 .if_exit_4:
 			## assign

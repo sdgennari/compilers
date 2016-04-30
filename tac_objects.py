@@ -8,8 +8,8 @@
 ''' Assignment '''
 # x <- y
 class TACAssign:
-	def __init__(self, type_from_ast, assignee, op1):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 
@@ -19,8 +19,8 @@ class TACAssign:
 ''' Arithmetic '''
 # x <- + y z
 class TACPlus:
-	def __init__(self, type_from_ast, assignee, op1, op2):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1, op2):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2
@@ -30,8 +30,8 @@ class TACPlus:
 
 # x <- - y z
 class TACMinus:
-	def __init__(self, type_from_ast, assignee, op1, op2):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1, op2):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2
@@ -41,8 +41,8 @@ class TACMinus:
 
 # x <- * y z
 class TACMult:
-	def __init__(self, type_from_ast, assignee, op1, op2):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1, op2):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2
@@ -52,8 +52,8 @@ class TACMult:
 
 # x <- / y z
 class TACDiv:
-	def __init__(self, type_from_ast, line, assignee, op1, op2):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, line, assignee, op1, op2):
+		self.cur_exp_type = cur_exp_type
 		self.line = line
 		self.assignee = assignee
 		self.op1 = op1
@@ -65,8 +65,8 @@ class TACDiv:
 ''' Comparisons '''
 # x <- < y z
 class TACCompL:
-	def __init__(self, type_from_ast, assignee, op1, op2):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1, op2):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2
@@ -76,8 +76,8 @@ class TACCompL:
 
 # x <- <= y z
 class TACCompLE:
-	def __init__(self, type_from_ast, assignee, op1, op2):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1, op2):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2
@@ -87,8 +87,8 @@ class TACCompLE:
 
 # x <- = y z
 class TACCompE:
-	def __init__(self, type_from_ast, assignee, op1, op2):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1, op2):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2
@@ -99,8 +99,8 @@ class TACCompE:
 ''' Constants '''
 # x <- int <integer>
 class TACConstInt:
-	def __init__(self, type_from_ast, assignee, val):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, val):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.type = "int"
 		self.val = val
@@ -110,8 +110,8 @@ class TACConstInt:
 
 # x <- bool <boolean>
 class TACConstBool:
-	def __init__(self, type_from_ast, assignee, val):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, val):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.type = "bool"
 		self.val = val
@@ -121,8 +121,8 @@ class TACConstBool:
 
 # x <- string\n<string-on-next-line>
 class TACConstString:
-	def __init__(self, type_from_ast, assignee, val):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, val):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.type = "string"
 		self.val = val
@@ -133,8 +133,8 @@ class TACConstString:
 ''' Negation '''
 # x <- not y
 class TACNegBool:
-	def __init__(self, type_from_ast, assignee, op1):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 
@@ -143,8 +143,8 @@ class TACNegBool:
 
 # x <- ~ y
 class TACNegArith:
-	def __init__(self, type_from_ast, assignee, op1):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 
@@ -154,8 +154,8 @@ class TACNegArith:
 ''' Allocation '''
 # x <- new <type>
 class TACNew:
-	def __init__(self, type_from_ast, assignee, allocType):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, allocType):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.type = allocType
 
@@ -163,8 +163,8 @@ class TACNew:
 		return self.assignee + " <- new " + self.type
 
 class TACNewSelfType:
-	def __init__(self, type_from_ast, assignee):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 
 	def __str__(self):
@@ -173,8 +173,8 @@ class TACNewSelfType:
 ''' Default Value '''
 # x <- default <type>
 class TACDefault:
-	def __init__(self, type_from_ast, assignee, defType):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, defType):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.type = defType
 
@@ -184,8 +184,8 @@ class TACDefault:
 ''' Null Check '''
 # x <- isvoid y
 class TACIsVoid:
-	def __init__(self, type_from_ast, assignee, op1):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 
@@ -198,8 +198,8 @@ class TACIOCall:
 
 # x <- call out_int y
 class TACOutInt(TACIOCall):
-	def __init__(self, type_from_ast, assignee, op1):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 
@@ -208,8 +208,8 @@ class TACOutInt(TACIOCall):
 
 # x <- call out_string y
 class TACOutString(TACIOCall):
-	def __init__(self, type_from_ast, assignee, op1):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, op1):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 
@@ -218,8 +218,8 @@ class TACOutString(TACIOCall):
 
 # x <- call in_int
 class TACInInt(TACIOCall):
-	def __init__(self, type_from_ast, assignee):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 
 	def __str__(self):
@@ -227,8 +227,8 @@ class TACInInt(TACIOCall):
 
 # x <- call in_string
 class TACInString(TACIOCall):
-	def __init__(self, type_from_ast, assignee):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 
 	def __str__(self):
@@ -325,8 +325,8 @@ class TACLoadAttr(TACCustom):
 
 
 class TACStoreAttr(TACCustom):
-	def __init__(self, type_from_ast, ident, op1):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, ident, op1):
+		self.cur_exp_type = cur_exp_type
 		self.ident = ident
 		self.op1 = op1
 
@@ -334,8 +334,8 @@ class TACStoreAttr(TACCustom):
 		return self.ident + " (attr) <- storeAttr " + self.op1
 
 class TACLoadParam(TACCustom):
-	def __init__(self, type_from_ast, assignee, param_idx):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, assignee, param_idx):
+		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.param_idx = param_idx
 
@@ -343,8 +343,8 @@ class TACLoadParam(TACCustom):
 		return self.assignee + " <- param [" + str(self.param_idx) + "]"
 
 class TACStoreParam(TACCustom):
-	def __init__(self, type_from_ast, param_idx, op1):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, param_idx, op1):
+		self.cur_exp_type = cur_exp_type
 		self.param_idx = param_idx
 		self.op1 = op1
 
@@ -355,8 +355,8 @@ class TACCall(TACCustom):
 	pass
 
 class TACStaticCall(TACCall):
-	def __init__(self, type_from_ast, static_type, method_ident, receiver_obj, params_list, assignee):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, static_type, method_ident, receiver_obj, params_list, assignee):
+		self.cur_exp_type = cur_exp_type
 		self.static_type = static_type
 		self.method_ident = method_ident
 		self.receiver_obj = receiver_obj
@@ -371,11 +371,11 @@ class TACStaticCall(TACCall):
 		return result
 
 class TACDynamicCall(TACCall):
-	def __init__(self, type_from_ast, method_ident, receiver_obj, ro_type_from_ast, params_list, assignee):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, method_ident, receiver_obj, ro_cur_exp_type, params_list, assignee):
+		self.cur_exp_type = cur_exp_type
 		self.method_ident = method_ident
 		self.receiver_obj = receiver_obj
-		self.ro_type_from_ast = ro_type_from_ast
+		self.ro_cur_exp_type = ro_cur_exp_type
 		self.params_list = params_list
 		self.assignee = assignee
 
@@ -387,8 +387,8 @@ class TACDynamicCall(TACCall):
 		return result
 
 class TACSelfCall(TACCall):
-	def __init__(self, type_from_ast, method_ident, params_list, assignee):
-		self.type_from_ast = type_from_ast
+	def __init__(self, cur_exp_type, method_ident, params_list, assignee):
+		self.cur_exp_type = cur_exp_type
 		self.method_ident = method_ident
 		self.params_list = params_list
 		self.assignee = assignee

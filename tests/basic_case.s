@@ -659,9 +659,9 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## assign
-			movq	%r10, %r11
+			movq	%r9, %r11
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -691,13 +691,13 @@ Main.main:
 			jnz		.asm_label_1
 			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## not
-			movl	%r9d, %r8d
+			movl	%r10d, %r8d
 			xorl	$1, %r8d
 			## branch .case_3_void
-			test	%r9d, %r9d
+			test	%r10d, %r10d
 			jnz		.case_3_void
 			## branch .case_3_not_void
 			test	%r8d, %r8d
@@ -752,6 +752,10 @@ Main.main:
 			cmpq	%rax, %r8
 			je		.case_2_error_branch
 .case_2_A:
+			## assign
+			movq	%r11, %r8
+			## assign
+			movq	%r8, %r10
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -818,8 +822,12 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r10
 			jmp		.case_2_exit
 .case_2_B:
+			## assign
+			movq	%r11, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -886,8 +894,12 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r10
 			jmp		.case_2_exit
 .case_2_C:
+			## assign
+			movq	%r11, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -954,8 +966,12 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r10
 			jmp		.case_2_exit
 .case_2_Int:
+			## assign
+			movq	%r11, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1022,6 +1038,8 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r10
 			jmp		.case_2_exit
 .case_2_error_branch:
 			movq	$string_6, %rdi
@@ -1030,7 +1048,9 @@ Main.main:
 			call	exit
 .case_2_exit:
 			## assign
-			movq	%r10, %r11
+			movq	%r10, %r8
+			## assign
+			movq	%r9, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1055,8 +1075,8 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r9
-			## check if %r11 is void and set result accordingly
-			cmpq	$0, %r11
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_2
 			movq	$1, 24(%r9)
 .asm_label_2:
@@ -1078,8 +1098,8 @@ Main.main:
 			call	exit
 			jmp		.case_5_not_void
 .case_5_not_void:
-			## move type tag of %r11 into %r8
-			movq	0(%r11), %r8
+			## move type tag of %r10 into %r8
+			movq	0(%r10), %r8
 			## check for type A
 			movq	$6, %rax
 			cmpq	%rax, %r8
@@ -1121,6 +1141,10 @@ Main.main:
 			cmpq	%rax, %r8
 			je		.case_4_error_branch
 .case_4_A:
+			## assign
+			movq	%r10, %r9
+			## assign
+			movq	%r9, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1187,8 +1211,12 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
 			jmp		.case_4_exit
 .case_4_B:
+			## assign
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1255,8 +1283,12 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
 			jmp		.case_4_exit
 .case_4_Int:
+			## assign
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1323,6 +1355,8 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
 			jmp		.case_4_exit
 .case_4_error_branch:
 			movq	$string_8, %rdi
@@ -1330,6 +1364,8 @@ Main.main:
 			movq	$0, %rax
 			call	exit
 .case_4_exit:
+			## assign
+			movq	%r9, %r8
 			## new B
 			## push caller-saved regs
 			pushq	%rcx
@@ -1356,9 +1392,9 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1382,22 +1418,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			## check if %r8 is void and set result accordingly
-			cmpq	$0, %r8
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_3
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_3:
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .case_7_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.case_7_void
 			## branch .case_7_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.case_7_not_void
 .case_7_void:
 			movq	$string_9, %rdi
@@ -1406,49 +1442,53 @@ Main.main:
 			call	exit
 			jmp		.case_7_not_void
 .case_7_not_void:
-			## move type tag of %r8 into %r9
-			movq	0(%r8), %r9
+			## move type tag of %r10 into %r8
+			movq	0(%r10), %r8
 			## check for type A
 			movq	$6, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_A
 			## check for type C
 			movq	$8, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_C
 			## check for type B
 			movq	$7, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_B
 			## check for type D
 			movq	$9, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_C
 			## check for type Int
 			movq	$1, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_Int
 			## check for type Object
 			movq	$3, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_Object
 			## check for type Bool
 			movq	$0, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_Object
 			## check for type IO
 			movq	$2, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_Object
 			## check for type Main
 			movq	$5, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_Object
 			## check for type String
 			movq	$4, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_6_Object
 .case_6_A:
+			## assign
+			movq	%r10, %r9
+			## assign
+			movq	%r9, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1513,12 +1553,14 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.case_6_exit
 .case_6_B:
+			## assign
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1583,12 +1625,14 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.case_6_exit
 .case_6_C:
+			## assign
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1653,12 +1697,14 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.case_6_exit
 .case_6_Int:
+			## assign
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1723,12 +1769,14 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.case_6_exit
 .case_6_Object:
+			## assign
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1793,10 +1841,10 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.case_6_exit
 .case_6_error_branch:
 			movq	$string_11, %rdi
@@ -1805,9 +1853,9 @@ Main.main:
 			call	exit
 .case_6_exit:
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r10
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs

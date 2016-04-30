@@ -415,24 +415,28 @@ Complex.init:
 			pushq	%r14
 			pushq	%r15
 .Complex_init_1:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
-			## loading param [1] into %r9
-			movq	24(%rbp), %r9
-			## assign
-			movq	%r8, %r10
-			## store %r10 in self[3] (x)
-			movq	%r10, 24(%rbx)
+			## loading param [0] into %r9
+			movq	16(%rbp), %r9
+			## loading param [1] into %r10
+			movq	24(%rbp), %r10
 			## assign
 			movq	%r9, %r8
-			## store %r8 in self[4] (y)
-			movq	%r8, 32(%rbx)
-			## move self ptr into %r8
-			movq	%rbx, %r8
+			## store %r8 in self[3] (x)
+			movq	%r8, 24(%rbx)
 			## assign
 			movq	%r8, %r9
-			## move ret val %r9 into %rax
-			movq	%r9, %rax
+			## assign
+			movq	%r10, %r9
+			## store %r9 in self[4] (y)
+			movq	%r9, 32(%rbx)
+			## assign
+			movq	%r9, %r8
+			## move self ptr into %r9
+			movq	%rbx, %r9
+			## assign
+			movq	%r9, %r8
+			## move ret val %r8 into %rax
+			movq	%r8, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -977,6 +981,45 @@ Complex.reflect_0:
 			## negate
 			movl	%r8d, %r9d
 			negl	%r9d
+			## box value of %r9 into %r10
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movq	%r9, 24(%r10)
+			## store %r10 in self[3] (x)
+			movq	%r10, 24(%rbx)
+			## assign
+			movq	%r10, %r8
+			## load self[4] (y) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
+			## negate
+			movl	%r8d, %r9d
+			negl	%r9d
 			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
@@ -1003,45 +1046,10 @@ Complex.reflect_0:
 			popq	%rcx
 			movq	%rax, %r8
 			movq	%r9, 24(%r8)
-			## store %r8 in self[3] (x)
-			movq	%r8, 24(%rbx)
-			## load self[4] (y) into %r9
-			movq	32(%rbx), %r9
-			## assign
-			movq	%r9, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
-			## negate
-			movl	%r9d, %r10d
-			negl	%r10d
-			## box value of %r10 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r10, 24(%r8)
 			## store %r8 in self[4] (y)
 			movq	%r8, 32(%rbx)
+			## assign
+			movq	%r8, %r9
 			## move self ptr into %r8
 			movq	%rbx, %r8
 			## assign
@@ -1107,12 +1115,14 @@ Complex.reflect_X:
 			movq	%r8, 24(%r9)
 			## store %r9 in self[4] (y)
 			movq	%r9, 32(%rbx)
-			## move self ptr into %r9
-			movq	%rbx, %r9
 			## assign
 			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			## move self ptr into %r8
+			movq	%rbx, %r8
+			## assign
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -1144,7 +1154,7 @@ Complex.reflect_Y:
 			## negate
 			movl	%r8d, %r9d
 			negl	%r9d
-			## box value of %r9 into %r8
+			## box value of %r9 into %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1168,10 +1178,12 @@ Complex.reflect_Y:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
-			## store %r8 in self[3] (x)
-			movq	%r8, 24(%rbx)
+			movq	%rax, %r10
+			movq	%r9, 24(%r10)
+			## store %r10 in self[3] (x)
+			movq	%r10, 24(%rbx)
+			## assign
+			movq	%r10, %r8
 			## move self ptr into %r8
 			movq	%rbx, %r8
 			## assign
@@ -2244,6 +2256,8 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
 			jmp		.if_exit_19
 .if_else_19:
 			## const String
@@ -2312,6 +2326,8 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
 			jmp		.if_exit_19
 .if_exit_19:
 			## assign

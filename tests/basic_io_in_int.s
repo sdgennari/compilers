@@ -461,6 +461,58 @@ Main.main:
 			pushq	%r14
 			pushq	%r15
 .Main_main_1:
+			## default Int
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movq	$0, 24(%r8)
+			## default Int
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movq	$0, 24(%r10)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -531,14 +583,14 @@ Main.main:
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r10
-			movq	%rax, %r10
+			## storing method result in %r9
+			movq	%rax, %r9
 			## assign
-			movq	%r10, %r9
+			movq	%r9, %r10
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r10
+			pushq	%r9
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -644,7 +696,7 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx

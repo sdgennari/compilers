@@ -464,7 +464,7 @@ Main.main:
 			## default Object
 			movq	$0, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -488,22 +488,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			## check if %r10 is void and set result accordingly
-			cmpq	$0, %r10
+			movq	%rax, %r8
+			## check if %r9 is void and set result accordingly
+			cmpq	$0, %r9
 			jnz		.asm_label_1
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r10d, %r8d
+			xorl	$1, %r8d
 			## branch .case_3_void
-			test	%r8d, %r8d
+			test	%r10d, %r10d
 			jnz		.case_3_void
 			## branch .case_3_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.case_3_not_void
 .case_3_void:
 			movq	$string_1, %rdi
@@ -512,8 +512,8 @@ Main.main:
 			call	exit
 			jmp		.case_3_not_void
 .case_3_not_void:
-			## move type tag of %r10 into %r8
-			movq	0(%r10), %r8
+			## move type tag of %r9 into %r8
+			movq	0(%r9), %r8
 			## check for type String
 			movq	$4, %rax
 			cmpq	%rax, %r8
@@ -539,6 +539,8 @@ Main.main:
 			cmpq	%rax, %r8
 			je		.case_2_Object
 .case_2_Int:
+			## assign
+			movq	%r9, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -609,6 +611,8 @@ Main.main:
 			movq	%r8, %r10
 			jmp		.case_2_exit
 .case_2_Object:
+			## assign
+			movq	%r9, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx

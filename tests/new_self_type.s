@@ -795,6 +795,8 @@ Main.main:
 			movq	%rax, %r8
 			## assign
 			movq	%r8, %r11
+			## default A
+			movq	$0, %r10
 			## assign
 			movq	%r11, %r9
 			## push caller-saved regs

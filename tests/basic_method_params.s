@@ -591,6 +591,71 @@ Main.some_method:
 			pushq	%r14
 			pushq	%r15
 .Main_some_method_2:
+			## loading param [0] into %r8
+			movq	16(%rbp), %r8
+			## loading param [1] into %r9
+			movq	24(%rbp), %r9
+			## assign
+			movq	%r8, %r9
+			## new const Int: 3
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r10
+			movl	$3, 24(%r10)
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
+			## plus
+			movl	%r8d, %r10d
+			addl	%r9d, %r10d
+			## box value of %r10 into %r8
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movq	%r10, 24(%r8)
 			## new const Int: 9001
 			## push caller-saved regs
 			pushq	%rcx

@@ -686,7 +686,7 @@ def gen_asm_for_tac_call(cur_asm_list, tac_call):
 	elif isinstance(tac_call, TACDynamicCall):
 		# Find method label via vtable
 		# Handle SELF_TYPE explicitly
-		receiver_obj_type = tac_call.ro_type_from_ast
+		receiver_obj_type = tac_call.ro_cur_exp_type
 		if receiver_obj_type == "SELF_TYPE":
 			receiver_obj_type = current_type
 

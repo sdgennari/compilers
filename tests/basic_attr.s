@@ -720,6 +720,8 @@ Main.main:
 			movl	$123, 24(%r8)
 			## store %r8 in self[3] (some_attr)
 			movq	%r8, 24(%rbx)
+			## assign
+			movq	%r8, %r9
 			## load self[3] (some_attr) into %r8
 			movq	24(%rbx), %r8
 			## assign

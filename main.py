@@ -167,36 +167,6 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 
 	gen_asm_for_method_start(cur_asm_list)
 
-	# # Push all callee-saved registers
-	# cur_asm_list.append(ASMComment("push callee-saved regs"))
-	# for reg in callee_saved_registers:
-	# 	cur_asm_list.append(ASMPushQ(reg))
-
-	# # Allocate space for the object based on the size via calloc(obj_size {rdi}, 8 {rsi})
-	# obj_size = calculate_type_size(type_name)
-	# size_str = format_asm_const_string(obj_size)
-	# cur_asm_list += [
-	# 	ASMComment("allocate space for " + type_name),
-	# 	ASMMovQ("$8", "%rsi"),
-	# 	ASMMovQ(size_str, "%rdi"),
-	# 	ASMCall("calloc"),
-	# 	ASMMovQ("%rax", SELF_REG)
-	# ]
-	# # Pointer to object now in SELF_REG
-
-	# # Store type_tag, obj_size, vtable
-	# type_tag = type_tag_map[type_name]
-	# vtable_str = get_vtable_str(type_name)
-	# cur_asm_list += [
-	# 	ASMComment("store type_tag, obj_size, vtable"),
-	# 	ASMMovQ(format_asm_const_string(type_tag), "%rax"),
-	# 	ASMMovQ("%rax", "0("+SELF_REG+")"),
-	# 	ASMMovQ(format_asm_const_string(obj_size), "%rax"),
-	# 	ASMMovQ("%rax", "8("+SELF_REG+")"),
-	# 	ASMMovQ(format_asm_const_string(vtable_str), "%rax"),
-	# 	ASMMovQ("%rax", "16("+SELF_REG+")")
-	# ]
-
 	# Generate TAC
 	cur_tac_list = []
 
@@ -204,6 +174,9 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 	obj_size = calculate_type_size(type_name)
 	type_tag = type_tag_map[type_name]
 	cur_tac_list.append(TACAllocType(type_name, obj_size, type_tag))
+
+	# TODO ADD ATTRS TO SYMBOL TABLE
+	symbol_table_list = []
 
 	# Create default attributes
 	for ast_attr in class_map[type_name]:
@@ -217,7 +190,7 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 		# Check that the attribute has an init exp
 		if isinstance(ast_attr, ASTAttrInit):
 			# Generate the TAC for the expression
-			gen_tac_for_exp(cur_tac_list, ast_attr.exp)
+			gen_tac_for_exp(symbol_table_list, cur_tac_list, ast_attr.exp)
 
 			# Get assignee of last TAC instr and store it in the attr
 			last_tac_instr = cur_tac_list[-1]
@@ -251,86 +224,6 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 
 		# Generate asm for the block list
 		gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_registers, type_name)
-
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# # 1. Store default values for each attribute
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# # Note: Handle RawInt and RawString explicitly
-	# cur_asm_list.append(ASMComment("create default attrs"))
-	# for i, ast_attr in enumerate(class_map[type_name]):
-	# 	# Add 3 to the list index to handle 3 implicit fields
-	# 	idx = i + 3
-	# 	mem_offset = str(8*idx) + "("+SELF_REG+")"
-
-	# 	cur_asm_list.append(ASMComment("self[" + str(idx) + "] holds " + ast_attr.ident + " (" + ast_attr.feature_type +")"))
-	# 	# Only Int and Bool can have a raw.Int attr, always at self[3]
-	# 	if ast_attr.feature_type == "raw.Int":
-	# 		cur_asm_list.append(ASMMovL("$0", mem_offset))
-
-	# 	# Only String can have a raw.String attr, always at self[3]
-	# 	elif ast_attr.feature_type == "raw.String":
-	# 		cur_asm_list.append(ASMMovQ("$empty.string", mem_offset))
-
-	# 	else: 
-	# 		# Call default constructor for attr and assign to correct spot
-	# 		# Handle SELF_TYPE explicitly
-	# 		if ast_attr.feature_type == "SELF_TYPE":
-	# 			# Push all caller-saved regs
-	# 			for reg in caller_saved_registers:
-	# 				cur_asm_list.append(ASMPushQ(reg))
-	# 			cur_asm_list.append(ASMPushQ(SELF_REG))
-
-	# 			cur_asm_list.append(ASMComment("Lookup 'new' in vtable for self"))
-
-	# 			# Get vtable ptr
-	# 			cur_asm_list.append(ASMMovQ("16(%rbx)", "%rax"))
-
-	# 			# Find constructor dynamically
-	# 			cur_asm_list.append(ASMMovQ("8(%rax)", "%rax"))
-
-	# 			# Call method
-	# 			cur_asm_list.append(ASMCall("*%rax"))
-
-	# 			# Pop all caller-saved regs
-	# 			cur_asm_list.append(ASMPopQ(SELF_REG))
-	# 			for reg in reversed(caller_saved_registers):
-	# 				cur_asm_list.append(ASMPopQ(reg))
-	# 		else:
-	# 			constructor = ast_attr.feature_type + "..new"
-
-	# 			# Push all caller-saved regs
-	# 			for reg in caller_saved_registers:
-	# 				cur_asm_list.append(ASMPushQ(reg))
-	# 			cur_asm_list.append(ASMPushQ(SELF_REG))
-
-	# 			# Call constructor
-	# 			cur_asm_list.append(ASMCall(constructor))
-
-	# 			# Pop all caller-saved regs
-	# 			cur_asm_list.append(ASMPopQ(SELF_REG))
-	# 			for reg in reversed(caller_saved_registers):
-	# 				cur_asm_list.append(ASMPopQ(reg))
-
-	# 		# Move result into attr offset
-	# 		cur_asm_list.append(ASMMovQ("%rax", mem_offset))
-
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# # 2. Init each attribute based on expression
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# cur_asm_list.append(ASMComment("initialize attrs"))
-	# for i, ast_attr in enumerate(class_map[type_name]):
-	# 	idx = i + 3;
-	# 	mem_offset = str(8*idx) + "("+SELF_REG+")"
-
-	# 	# Skip attrs without initialization
-	# 	if isinstance(ast_attr, ASTAttrNoInit):
-	# 		continue
-
-	# 	cur_asm_list.append(ASMComment("self[" + str(idx) + "] " + ast_attr.ident + " <- init exp"))
-	# 	# cur_asm_list.append(ASMComment("---- TODO: Generate asm for init exp"))
-	# 	ast_attr_to_asm(cur_asm_list, ast_attr, type_name)
-
-	# # -- end for loop
 
 	# Move the pointer to self into rax to return it
 	cur_asm_list += [
@@ -466,16 +359,19 @@ def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 	block_list = buildBasicBlocks(cur_tac_list)
 	computeLiveSets(block_list)
 
-	removeDeadCode(block_list)
+	# TODO: ADD DEAD CODE BACK IN LATER AFTER AUTOBOXING IS DONE
+	# removeDeadCode(block_list)
 	computeLiveSets(block_list)
 
 	# if (ast_method.ident == "main"):
+	# 	print
 	# 	for block in block_list:
-	# 		print block
-	# 		print
-	# 		for live_set in block.live_set_list:
-	# 			print live_set
-	# 		print
+	# 		for instr in block.instr_list:
+	# 			if hasattr(instr, 'cur_exp_type'):
+	# 				print instr.cur_exp_type + "\t",
+	# 			else:
+	# 				print "\t",
+	# 			print instr
 	# sys.exit(1)
 
 	# Allocate registers
@@ -509,16 +405,6 @@ def ast_attr_to_asm(cur_asm_list, ast_attr, type_name):
 		is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
 	# -- end while loop
 	gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_registers, type_name)
-
-	# # Add final instr to move value to correct offset from self
-	# tup = (type_name, ast_attr.ident)
-	# attr_idx = attr_offset_map[tup]
-	# self_offset = 8 * attr_idx
-	# dest = str(self_offset)+"("+SELF_REG+")"
-	# # Get the last register in the exp since it holds the resulting value
-	# final_virtual_reg = cur_tac_list[-1].assignee
-	# src = get_asm_register(final_virtual_reg, 64)
-	# cur_asm_list.append(ASMMovQ(src, dest))
 
 def get_helper_strings():
 	result = get_header_comment_string("COMPARISONS")

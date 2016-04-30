@@ -551,9 +551,13 @@ Cons.init:
 			## store %r10 in self[3] (car)
 			movq	%r10, 24(%rbx)
 			## assign
-			movq	%r9, %r8
-			## store %r8 in self[4] (cdr)
-			movq	%r8, 32(%rbx)
+			movq	%r10, %r8
+			## assign
+			movq	%r9, %r10
+			## store %r10 in self[4] (cdr)
+			movq	%r10, 32(%rbx)
+			## assign
+			movq	%r10, %r8
 			## move self ptr into %r8
 			movq	%rbx, %r8
 			## assign
@@ -2206,6 +2210,8 @@ Main.main:
 			movq	%rax, %r8
 			## store %r8 in self[3] (mylist)
 			movq	%r8, 24(%rbx)
+			## assign
+			movq	%r8, %r9
 			jmp		.loop_start_21
 .loop_start_21:
 			## load self[3] (mylist) into %r8
@@ -2473,6 +2479,8 @@ Main.main:
 			movq	%rax, %r8
 			## store %r8 in self[3] (mylist)
 			movq	%r8, 24(%rbx)
+			## assign
+			movq	%r8, %r9
 			jmp		.loop_start_21
 .loop_exit_21:
 			## default Object

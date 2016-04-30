@@ -509,22 +509,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
+			movq	%rax, %r9
 			## check if %r8 is void and set result accordingly
 			cmpq	$0, %r8
 			jnz		.asm_label_1
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r9)
 .asm_label_1:
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
+			## unbox value of %r9 into %r10
+			movq	24(%r9), %r10
 			## not
-			movl	%r9d, %r10d
-			xorl	$1, %r10d
+			movl	%r10d, %r9d
+			xorl	$1, %r9d
 			## branch .case_3_void
-			test	%r9d, %r9d
+			test	%r10d, %r10d
 			jnz		.case_3_void
 			## branch .case_3_not_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.case_3_not_void
 .case_3_void:
 			movq	$string_1, %rdi
@@ -560,6 +560,8 @@ Main.main:
 			cmpq	%rax, %r9
 			je		.case_2_error_branch
 .case_2_Int:
+			## assign
+			movq	%r8, %r9
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
