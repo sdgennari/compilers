@@ -12,12 +12,13 @@ NUM_REGISTERS = 12
 register_colors = {}
 spilled_registers = []
 
-def allocate_registers(original_register_graph, block_list, original_combined_live_ranges):
+# def allocate_registers(original_register_graph, block_list, original_combined_live_ranges):
+def allocate_registers(original_register_graph, block_list, combined_live_ranges):
 	global register_colors
 
 	# Make copies of original values to avoid destorying graph
 	register_graph = copy.copy(original_register_graph)
-	combined_live_ranges = copy.copy(original_combined_live_ranges)
+	# combined_live_ranges = copy.copy(original_combined_live_ranges)
 
 	registers_to_color_list = []
 	registers_to_spill_list = []
@@ -124,25 +125,47 @@ def spill_register(block_list, register_to_spill):
 	global spilled_registers
 	# In comments below, let tX = register_to_spill
 
+	# print "spilling register: " + str(register_to_spill)
+
 	spilled_registers.append(register_to_spill)
 
 	# Spill register in all blocks in the list
 	for block in block_list:
-		# Build a new list of instructions with loads and stores added
-		new_instr_list = []
-		for instr in block.instr_list:
+
+		it = enumerate(block.instr_list)
+		for idx, instr in it:
 			# If tX is op1 or op2, add TACLoad immediately before in list
 			if is_operand(instr, register_to_spill):
-				new_instr_list.append(TACLoad(register_to_spill, register_to_spill))
+				block.instr_list.insert(idx, TACLoad(register_to_spill, register_to_spill))
+				next(it)
+				idx = idx + 1
 
-			# Add current instr to list
-			new_instr_list.append(instr)
-
-			# If tX is assignee, add TACStore immediately after in list
 			if is_assignee(instr, register_to_spill):
-				new_instr_list.append(TACStore(register_to_spill))
-		# -- end instr loop
-		block.instr_list = new_instr_list
+				block.instr_list.insert(idx+1, TACStore(register_to_spill))
+				next(it)
+				idx = idx + 1
+
+
+		# # Build a new list of instructions with loads and stores added
+		# new_instr_list = []
+		# for instr in block.instr_list:
+		# 	# If tX is op1 or op2, add TACLoad immediately before in list
+		# 	if is_operand(instr, register_to_spill):
+		# 		new_instr_list.append(TACLoad(register_to_spill, register_to_spill))
+
+		# 	# Add current instr to list
+		# 	new_instr_list.append(instr)
+
+		# 	# If tX is assignee, add TACStore immediately after in list
+		# 	if is_assignee(instr, register_to_spill):
+		# 		new_instr_list.append(TACStore(register_to_spill))
+		# # -- end instr loop
+		# block.instr_list = new_instr_list
+
+		# print
+		# for instr in block.instr_list:
+		# 	print instr
+		# print
 	#-- end block loop
 
 

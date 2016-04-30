@@ -1,22 +1,22 @@
 class Main inherits IO {
 	main() : Object {
 		let
-			a : Int <- in_int(),
-			b : Int <- in_int(),
-			c : Int <- in_int(),
-			d : Int <- in_int(),
-			e : Int <- in_int(),
-			f : Int <- in_int(),
-			g : Int <- in_int(),
-			h : Int <- in_int(),
-			i : Int <- in_int(),
-			j : Int <- in_int(),
-			k : Int <- in_int(),
-			l : Int <- in_int(),
-			m : Int <- in_int(),
-			n : Int <- in_int(),
-			o : Int <- in_int(),
-			p : Int <- in_int()
+			a : Int <- 1,
+			b : Int <- 2,
+			c : Int <- 3,
+			d : Int <- 4,
+			e : Int <- 5,
+			f : Int <- 6,
+			g : Int <- 6,
+			h : Int <- 7,
+			i : Int <- 8,
+			j : Int <- 9,
+			k : Int <- 10,
+			l : Int <- 11,
+			m : Int <- 12,
+			n : Int <- 13,
+			o : Int <- 14,
+			p : Int <- 15
 		in {
 			out_int(a).out_string("\n");
 			out_int(b).out_string("\n");
