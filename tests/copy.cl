@@ -7,28 +7,28 @@ class Main inherits IO {
 			aw1 : AWrapper <- new AWrapper,
 			aw2 : AWrapper
 		in {
-			-- a2 <- a1.copy();
-			-- out_int(a1.get_x());		-- 123
-			-- out_string("\n");
-			-- out_int(a2.get_x()); 		-- 123
-			-- out_string("\n");
+			a2 <- a1.copy();
+			out_int(a1.get_x());		-- 123
+			out_string("\n");
+			out_int(a2.get_x()); 		-- 123
+			out_string("\n");
 
-			-- -- test shallow copy
-			-- a1.set_x(777);
-			-- out_int(a1.get_x()); 		-- 777
-			-- out_string("\n");
-			-- out_int(a2.get_x()); 		-- 123
-			-- out_string("\n");
+			-- test shallow copy
+			a1.set_x(777);
+			out_int(a1.get_x()); 		-- 777
+			out_string("\n");
+			out_int(a2.get_x()); 		-- 123
+			out_string("\n");
 
-			-- out_string("----\n");
+			out_string("----\n");
 		
-			-- -- aw2 is a wrapper around class A,
-			-- -- so changes to attrs of A are shared
-			-- aw2 <- aw1.copy();
-			-- out_int(aw1.get_x()); 		-- 123
-			-- out_string("\n");
-			-- out_int(aw2.get_x()); 		-- 123
-			-- out_string("\n");
+			-- aw2 is a wrapper around class A,
+			-- so changes to attrs of A are shared
+			aw2 <- aw1.copy();
+			out_int(aw1.get_x()); 		-- 123
+			out_string("\n");
+			out_int(aw2.get_x()); 		-- 123
+			out_string("\n");
 
 			aw2 <- aw1.copy();
 			aw1.set_x(9001);

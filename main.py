@@ -63,10 +63,7 @@ def get_constants_string():
 	result += get_substr_error_string()
 	result += gen_const_strings()
 	result += get_io_format_strings()
-	result += get_raw_out_string_helper()
-	result += get_raw_in_string_helper()
-	result += get_string_concat_helper()
-	result += get_string_substr_helper()
+	result += get_asm_internal_helpers_string()
 	# ---- TODO: Get execption strings
 	return result
 
