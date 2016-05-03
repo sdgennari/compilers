@@ -5,13 +5,8 @@ from asm_internals import *
 import sys
 
 # Initialize global vars
-register_color_map = {}
-spilled_register_location_map = {}
 asm_label_counter = 0
 const_string_label_counter = 0
-
-# Keep track of the current type
-current_type = ""
 
 register_names_32 = [
 	"%r8d", "%r9d", "%r10d",
@@ -43,7 +38,7 @@ def next_asm_label():
 	asm_label_counter += 1
 	return ".asm_label_" + str(asm_label_counter)
 
-def get_asm_register(tac_register, size=32):
+def get_asm_register(register_color_map, tac_register, size=32):
 	asm_reg_idx = register_color_map[tac_register]
 
 	# Get different name depending on register size
@@ -57,9 +52,9 @@ def get_asm_register(tac_register, size=32):
 	return register_name
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_const_int(cur_asm_list, tac_const_int):
+def gen_asm_for_tac_const_int(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_const_int):
 	src = "$" + str(tac_const_int.val)
-	dest = get_asm_register(tac_const_int.assignee, 64)
+	dest = get_asm_register(register_color_map, tac_const_int.assignee, 64)
 	dest_reg_offset = "24("+dest+")"
 
 	# Create a new Int and put value into box
@@ -68,13 +63,13 @@ def gen_asm_for_tac_const_int(cur_asm_list, tac_const_int):
 	cur_asm_list.append(ASMMovL(src, dest_reg_offset))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_const_bool(cur_asm_list, tac_const_bool):
+def gen_asm_for_tac_const_bool(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_const_bool):
 	if tac_const_bool.val == "true":
 		src = "$1"
 	else:
 		src = "$0"
 
-	dest = get_asm_register(tac_const_bool.assignee, 64)
+	dest = get_asm_register(register_color_map, tac_const_bool.assignee, 64)
 	dest_reg_offset = "24("+dest+")"
 
 	# Create new Bool and put value into box
@@ -83,9 +78,9 @@ def gen_asm_for_tac_const_bool(cur_asm_list, tac_const_bool):
 	cur_asm_list.append(ASMMovL(src, dest_reg_offset))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_const_string(cur_asm_list, tac_const_string):
+def gen_asm_for_tac_const_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_const_string):
 	src = "$" + get_const_string_label(tac_const_string.val)
-	dest = get_asm_register(tac_const_string.assignee, 64)
+	dest = get_asm_register(register_color_map, tac_const_string.assignee, 64)
 	dest_reg_offset = "24("+dest+")"
 
 	# Create new String and put raw string ptr into box
@@ -94,14 +89,14 @@ def gen_asm_for_tac_const_string(cur_asm_list, tac_const_string):
 	cur_asm_list.append(ASMMovQ(src, dest_reg_offset))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_default(cur_asm_list, tac_default):
+def gen_asm_for_tac_default(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_default):
 	# Set default value to $0
 	src = "$0"
 
 	# Change default value for Strings and raw Strings
 	if tac_default.type == "String" or tac_default.type == "raw.String":
 		src = "$empty.string"
-	dest = get_asm_register(tac_default.assignee, 64)
+	dest = get_asm_register(register_color_map, tac_default.assignee, 64)
 
 	# Check for Ints, Strings, and Bools
 	cur_asm_list.append(ASMComment("default " + tac_default.type))
@@ -125,48 +120,48 @@ def gen_asm_for_tac_default(cur_asm_list, tac_default):
 		cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_label(cur_asm_list, tac_label):
+def gen_asm_for_tac_label(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_label):
 	asm_label = "." + tac_label.label
 
 	cur_asm_list.append(ASMLabel(asm_label))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_not(cur_asm_list, tac_neg_bool):
+def gen_asm_for_tac_not(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_neg_bool):
 	# Uses unboxed values, so have 32-bit registers
-	src = get_asm_register(tac_neg_bool.op1)
-	dest = get_asm_register(tac_neg_bool.assignee)
+	src = get_asm_register(register_color_map, tac_neg_bool.op1)
+	dest = get_asm_register(register_color_map, tac_neg_bool.assignee)
 
 	cur_asm_list.append(ASMComment("not"))
 	cur_asm_list.append(ASMMovL(src, dest))
 	cur_asm_list.append(ASMXorL("$1", dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_negate(cur_asm_list, tac_neg_arith):
+def gen_asm_for_tac_negate(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_neg_arith):
 	# Uses unboxed values, so have 32-bit registers
-	src = get_asm_register(tac_neg_arith.op1)
-	dest = get_asm_register(tac_neg_arith.assignee)
+	src = get_asm_register(register_color_map, tac_neg_arith.op1)
+	dest = get_asm_register(register_color_map, tac_neg_arith.assignee)
 
 	cur_asm_list.append(ASMComment("negate"))
 	cur_asm_list.append(ASMMovL(src, dest))
 	cur_asm_list.append(ASMNegL(dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_assign(cur_asm_list, tac_assign):
-	src = get_asm_register(tac_assign.op1, 64)
-	dest = get_asm_register(tac_assign.assignee, 64)
+def gen_asm_for_tac_assign(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_assign):
+	src = get_asm_register(register_color_map, tac_assign.op1, 64)
+	dest = get_asm_register(register_color_map, tac_assign.assignee, 64)
 
 	cur_asm_list.append(ASMComment("assign"))
 	cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_new(cur_asm_list, tac_new):
-	dest = get_asm_register(tac_new.assignee, 64)
+def gen_asm_for_tac_new(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_new):
+	dest = get_asm_register(register_color_map, tac_new.assignee, 64)
 	cur_asm_list.append(ASMComment("new " + tac_new.type))
 	gen_asm_for_new_boxed_type(cur_asm_list, tac_new.type, dest)
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_new_self_type(cur_asm_list, tac_instr):
-	dest = get_asm_register(tac_instr.assignee, 64)
+def gen_asm_for_tac_new_self_type(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
+	dest = get_asm_register(register_color_map, tac_instr.assignee, 64)
 
 	cur_asm_list.append(ASMComment("Lookup 'new' in vtable for self"))
 	# Get vtable ptr
@@ -182,22 +177,22 @@ def gen_asm_for_tac_new_self_type(cur_asm_list, tac_instr):
 	cur_asm_list.append(ASMMovQ("%rax", dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_return(cur_asm_list, tac_return):
-	src = get_asm_register(tac_return.op1, 64)
+def gen_asm_for_tac_return(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_return):
+	src = get_asm_register(register_color_map, tac_return.op1, 64)
 	dest = "%rax"
 
 	cur_asm_list.append(ASMComment("move ret val " + src + " into " + dest))
 	cur_asm_list.append(ASMMovQ(src, dest));
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_jmp(cur_asm_list, tac_jmp):
+def gen_asm_for_tac_jmp(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_jmp):
 	label = "." + str(tac_jmp.label)
 
 	cur_asm_list.append(ASMJmp(label))
 
-def gen_asm_for_tac_bt(cur_asm_list, tac_bt):
+def gen_asm_for_tac_bt(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_bt):
 	label = "." + str(tac_bt.label)
-	reg = get_asm_register(tac_bt.op1)
+	reg = get_asm_register(register_color_map, tac_bt.op1)
 
 	# cur_asm_list.append(ASMCmpL("$1", reg))
 	# cur_asm_list.append(ASMJmpEq(label))
@@ -208,10 +203,10 @@ def gen_asm_for_tac_bt(cur_asm_list, tac_bt):
 	# raise NotImplementedError("branch not yet implemented")
 
 # ---- TODO Update for boxing + unboxing
-def gen_asm_for_tac_store(cur_asm_list, tac_store):
+def gen_asm_for_tac_store(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_store):
 	# raise NotImplementedError("tac_store not yet implemented")
-	src = get_asm_register(tac_store.op1, 64)
-	offset = spilled_register_location_map[tac_store.op1]
+	src = get_asm_register(register_color_map, tac_store.op1, 64)
+	offset = spilled_reg_loc_map[tac_store.op1]
 
 	dest = str(offset) + "(%rbp)"
 
@@ -219,22 +214,22 @@ def gen_asm_for_tac_store(cur_asm_list, tac_store):
 	cur_asm_list.append(ASMMovQ(src, dest))
 
 # ---- TODO Update for boxing + unboxing
-def gen_asm_for_tac_load(cur_asm_list, tac_load):
+def gen_asm_for_tac_load(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_load):
 	# raise NotImplementedError("tac_load not yet implemented")
-	dest = get_asm_register(tac_load.assignee, 64)
+	dest = get_asm_register(register_color_map, tac_load.assignee, 64)
 
-	offset = spilled_register_location_map[tac_load.location]
+	offset = spilled_reg_loc_map[tac_load.location]
 	src = str(offset) + "(%rbp)"
 
 	cur_asm_list.append(ASMComment("load"))
 	cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_plus(cur_asm_list, tac_plus):
+def gen_asm_for_tac_plus(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_plus):
 	# Uses unboxed values, so have 32-bit registers
-	op1_reg = get_asm_register(tac_plus.op1, 32)
-	op2_reg = get_asm_register(tac_plus.op2, 32)
-	dest = get_asm_register(tac_plus.assignee, 32)
+	op1_reg = get_asm_register(register_color_map, tac_plus.op1, 32)
+	op2_reg = get_asm_register(register_color_map, tac_plus.op2, 32)
+	dest = get_asm_register(register_color_map, tac_plus.assignee, 32)
 
 	cur_asm_list.append(ASMComment("plus"))
 	
@@ -245,11 +240,11 @@ def gen_asm_for_tac_plus(cur_asm_list, tac_plus):
 		cur_asm_list.append(ASMAddL(op2_reg, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_minus(cur_asm_list, tac_minus):
+def gen_asm_for_tac_minus(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_minus):
 	# Uses unboxed values, so have 32-bit registers
-	op1_reg = get_asm_register(tac_minus.op1, 32)
-	op2_reg = get_asm_register(tac_minus.op2, 32)
-	dest = get_asm_register(tac_minus.assignee, 32)
+	op1_reg = get_asm_register(register_color_map, tac_minus.op1, 32)
+	op2_reg = get_asm_register(register_color_map, tac_minus.op2, 32)
+	dest = get_asm_register(register_color_map, tac_minus.assignee, 32)
 
 	cur_asm_list.append(ASMComment("minus"))
 
@@ -261,11 +256,11 @@ def gen_asm_for_tac_minus(cur_asm_list, tac_minus):
 		cur_asm_list.append(ASMSubL(op2_reg, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_mult(cur_asm_list, tac_mult):
+def gen_asm_for_tac_mult(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_mult):
 	# Uses unboxed values, so have 32-bit registers
-	op1_reg = get_asm_register(tac_mult.op1, 32)
-	op2_reg = get_asm_register(tac_mult.op2, 32)
-	dest = get_asm_register(tac_mult.assignee, 32)
+	op1_reg = get_asm_register(register_color_map, tac_mult.op1, 32)
+	op2_reg = get_asm_register(register_color_map, tac_mult.op2, 32)
+	dest = get_asm_register(register_color_map, tac_mult.assignee, 32)
 
 	cur_asm_list.append(ASMComment("mult"))
 
@@ -276,12 +271,12 @@ def gen_asm_for_tac_mult(cur_asm_list, tac_mult):
 		cur_asm_list.append(ASMImulL(op2_reg, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_div(cur_asm_list, tac_div):
+def gen_asm_for_tac_div(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_div):
 	# Uses unboxed values, so have 32-bit registers
 	#rX = rY / rZ
-	op1_reg = get_asm_register(tac_div.op1, 32)
-	op2_reg = get_asm_register(tac_div.op2, 32)
-	dest = get_asm_register(tac_div.assignee, 32)
+	op1_reg = get_asm_register(register_color_map, tac_div.op1, 32)
+	op2_reg = get_asm_register(register_color_map, tac_div.op2, 32)
+	dest = get_asm_register(register_color_map, tac_div.assignee, 32)
 
 	cur_asm_list.append(ASMComment("divide"))
 
@@ -289,7 +284,7 @@ def gen_asm_for_tac_div(cur_asm_list, tac_div):
 	div_label = next_asm_label()
 	cur_asm_list.append(ASMCmpL("$0", op2_reg))
 	cur_asm_list.append(ASMJmpNz(div_label))
-	gen_asm_for_error(cur_asm_list, tac_div.line, "division by zero")
+	gen_asm_for_error(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_div.line, "division by zero")
 	cur_asm_list.append(ASMLabel(div_label))
 
 	# Alloc temp stack space
@@ -329,11 +324,11 @@ def gen_asm_for_tac_div(cur_asm_list, tac_div):
 	# Dealloc temp stack space
 	cur_asm_list.append(ASMAddQ("$8", "%rsp"))
 
-def gen_asm_for_tac_comp_l(cur_asm_list, tac_comp_l):
+def gen_asm_for_tac_comp_l(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_l):
 	# Get lhs_reg, rhs_reg, and dest
-	op1_reg = get_asm_register(tac_comp_l.op1, 64)
-	op2_reg = get_asm_register(tac_comp_l.op2, 64)
-	dest = get_asm_register(tac_comp_l.assignee, 64)
+	op1_reg = get_asm_register(register_color_map, tac_comp_l.op1, 64)
+	op2_reg = get_asm_register(register_color_map, tac_comp_l.op2, 64)
+	dest = get_asm_register(register_color_map, tac_comp_l.assignee, 64)
 
 	cur_asm_list.append(ASMComment("use lt_helper to compare " + op1_reg + " < " + op2_reg))
 
@@ -364,11 +359,11 @@ def gen_asm_for_tac_comp_l(cur_asm_list, tac_comp_l):
 	cur_asm_list.append(ASMComment("move comparison result into " + dest))
 	cur_asm_list.append(ASMMovQ("%rax", dest))
 
-def gen_asm_for_tac_comp_le(cur_asm_list, tac_comp_le):
+def gen_asm_for_tac_comp_le(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_le):
 	# Get lhs_reg, rhs_reg, and dest
-	op1_reg = get_asm_register(tac_comp_le.op1, 64)
-	op2_reg = get_asm_register(tac_comp_le.op2, 64)
-	dest = get_asm_register(tac_comp_le.assignee, 64)
+	op1_reg = get_asm_register(register_color_map, tac_comp_le.op1, 64)
+	op2_reg = get_asm_register(register_color_map, tac_comp_le.op2, 64)
+	dest = get_asm_register(register_color_map, tac_comp_le.assignee, 64)
 
 	cur_asm_list.append(ASMComment("use le_helper to compare " + op1_reg + " <= " + op2_reg))
 
@@ -399,11 +394,11 @@ def gen_asm_for_tac_comp_le(cur_asm_list, tac_comp_le):
 	cur_asm_list.append(ASMComment("move comparison result into " + dest))
 	cur_asm_list.append(ASMMovQ("%rax", dest))
 
-def gen_asm_for_tac_comp_e(cur_asm_list, tac_comp_eq):
+def gen_asm_for_tac_comp_e(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_eq):
 	# Get lhs_reg, rhs_reg, and dest
-	op1_reg = get_asm_register(tac_comp_eq.op1, 64)
-	op2_reg = get_asm_register(tac_comp_eq.op2, 64)
-	dest = get_asm_register(tac_comp_eq.assignee, 64)
+	op1_reg = get_asm_register(register_color_map, tac_comp_eq.op1, 64)
+	op2_reg = get_asm_register(register_color_map, tac_comp_eq.op2, 64)
+	dest = get_asm_register(register_color_map, tac_comp_eq.assignee, 64)
 
 	cur_asm_list.append(ASMComment("use eq_helper to compare " + op1_reg + " = " + op2_reg))
 
@@ -435,9 +430,9 @@ def gen_asm_for_tac_comp_e(cur_asm_list, tac_comp_eq):
 	cur_asm_list.append(ASMMovQ("%rax", dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_box(cur_asm_list, tac_box):
-	op1_reg = get_asm_register(tac_box.op1, 64)
-	dest = get_asm_register(tac_box.assignee, 64)
+def gen_asm_for_tac_box(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_box):
+	op1_reg = get_asm_register(register_color_map, tac_box.op1, 64)
+	dest = get_asm_register(register_color_map, tac_box.assignee, 64)
 
 	constructor_method = tac_box.exp_type + "..new"
 	dest_reg_offset = "24(" + dest + ")"
@@ -467,22 +462,22 @@ def gen_asm_for_new_boxed_type(cur_asm_list, type_name, dest_reg):
 	cur_asm_list.append(ASMMovQ("%rax", dest_reg))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_unbox(cur_asm_list, tac_unbox):
-	op1_reg = get_asm_register(tac_unbox.op1, 64)
-	dest = get_asm_register(tac_unbox.assignee, 64)
+def gen_asm_for_tac_unbox(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_unbox):
+	op1_reg = get_asm_register(register_color_map, tac_unbox.op1, 64)
+	dest = get_asm_register(register_color_map, tac_unbox.assignee, 64)
 
 	cur_asm_list.append(ASMComment("unbox value of " + op1_reg + " into " + dest))
 	op1_reg_offset = "24(" + op1_reg + ")"
 	cur_asm_list.append(ASMMovQ(op1_reg_offset, dest))
 
 # BOXED + UNBOXED
-def gen_asm_for_tac_load_attr(cur_asm_list, tac_load_attr):
-	global attr_offset_map, current_type
+def gen_asm_for_tac_load_attr(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_load_attr):
+	global attr_offset_map
 
 	# Handle self explicitly
 	# Note: Up to this point self was treated as an attribute
 	if tac_load_attr.ident == "self":
-		dest = get_asm_register(tac_load_attr.assignee, 64)
+		dest = get_asm_register(register_color_map, tac_load_attr.assignee, 64)
 		cur_asm_list.append(ASMComment("move self ptr into " + dest))
 		cur_asm_list.append(ASMMovQ(SELF_REG, dest))
 
@@ -494,13 +489,13 @@ def gen_asm_for_tac_load_attr(cur_asm_list, tac_load_attr):
 
 		# Move the contents of the attr into assignee
 		src = str(self_offset)+"("+SELF_REG+")"
-		dest = get_asm_register(tac_load_attr.assignee, 64)
+		dest = get_asm_register(register_color_map, tac_load_attr.assignee, 64)
 		cur_asm_list.append(ASMComment("load self[" + str(attr_idx) + "] (" + \
 			tac_load_attr.ident + ") into " + dest))
 		cur_asm_list.append(ASMMovQ(src, dest))
 
-def gen_asm_for_tac_store_attr(cur_asm_list, tac_store_attr):
-	global attr_offset_map, current_type
+def gen_asm_for_tac_store_attr(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_store_attr):
+	global attr_offset_map
 
 	# Get the offset from the self ptr
 	tup = (current_type, tac_store_attr.ident)
@@ -508,13 +503,13 @@ def gen_asm_for_tac_store_attr(cur_asm_list, tac_store_attr):
 	self_offset = 8 * attr_idx
 
 	# Move the value into the attr
-	src = get_asm_register(tac_store_attr.op1, 64)
+	src = get_asm_register(register_color_map, tac_store_attr.op1, 64)
 	dest = str(self_offset)+"("+SELF_REG+")"
 	cur_asm_list.append(ASMComment("store " + src + " in self[" + str(attr_idx) + \
 		"] (" + tac_store_attr.ident + ")"))
 	cur_asm_list.append(ASMMovQ(src, dest))
 
-def gen_asm_for_tac_alloc_type(cur_asm_list, tac_instr):
+def gen_asm_for_tac_alloc_type(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
 	# Allocate space for the object based on the size via calloc(obj_size {rdi}, 8 {rsi})
 	type_size = "$" + str(tac_instr.obj_size)
 	type_name = tac_instr.type_name
@@ -540,7 +535,7 @@ def gen_asm_for_tac_alloc_type(cur_asm_list, tac_instr):
 
 
 
-def gen_asm_for_tac_call(cur_asm_list, tac_call):
+def gen_asm_for_tac_call(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_call):
 	# Note: This function assumes that all params and the receiver object
 	# 	have already been evaluated and stored (done via TAC instructions)
 	global vtable_offset_map
@@ -583,7 +578,7 @@ def gen_asm_for_tac_call(cur_asm_list, tac_call):
 
 	# Set receiver object as self pointer (unless self dispatch)
 	if hasattr(tac_call, "receiver_obj"):
-		ro_reg = get_asm_register(tac_call.receiver_obj, 64)
+		ro_reg = get_asm_register(register_color_map, tac_call.receiver_obj, 64)
 		cur_asm_list.append(ASMComment("set receiver_obj (" + ro_reg + ") as self ptr (" + SELF_REG + ")"))
 		cur_asm_list.append(ASMMovQ(ro_reg, SELF_REG))
 
@@ -682,17 +677,17 @@ def gen_asm_for_tac_call(cur_asm_list, tac_call):
 	cur_asm_list.append(ASMAddQ(offset_str, "%rsp"))
 
 	# Move result into dest
-	dest = get_asm_register(tac_call.assignee, 64)
+	dest = get_asm_register(register_color_map, tac_call.assignee, 64)
 	cur_asm_list.append(ASMComment("storing method result in " + dest))
 	cur_asm_list.append(ASMMovQ("%rax", dest))
 
-def gen_asm_for_tac_store_param(cur_asm_list, tac_store_param):
-	op1_reg = get_asm_register(tac_store_param.op1, 64)
+def gen_asm_for_tac_store_param(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_store_param):
+	op1_reg = get_asm_register(register_color_map, tac_store_param.op1, 64)
 	cur_asm_list.append(ASMComment("storing param [" + str(tac_store_param.param_idx) + "]"))
 	cur_asm_list.append(ASMPushQ(op1_reg))
 
-def gen_asm_for_tac_load_param(cur_asm_list, tac_load_param):
-	dest = get_asm_register(tac_load_param.assignee, 64)
+def gen_asm_for_tac_load_param(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_load_param):
+	dest = get_asm_register(register_color_map, tac_load_param.assignee, 64)
 
 	# Calculate the offset from rbp, taking into account ret addr and saved rbp (+2)
 	offset = 8 * (tac_load_param.param_idx + 2)
@@ -701,9 +696,9 @@ def gen_asm_for_tac_load_param(cur_asm_list, tac_load_param):
 	cur_asm_list.append(ASMComment("loading param [" + str(tac_load_param.param_idx) + "] into " + dest))
 	cur_asm_list.append(ASMMovQ(rbp_offset, dest))
 
-def gen_asm_for_tac_is_void(cur_asm_list, tac_instr):
-	op1_reg = get_asm_register(tac_instr.op1, 64)
-	dest = get_asm_register(tac_instr.assignee, 64)
+def gen_asm_for_tac_is_void(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
+	op1_reg = get_asm_register(register_color_map, tac_instr.op1, 64)
+	dest = get_asm_register(register_color_map, tac_instr.assignee, 64)
 	false_label = next_asm_label()
 
 	# Make a new Bool to hold the result
@@ -717,11 +712,11 @@ def gen_asm_for_tac_is_void(cur_asm_list, tac_instr):
 	cur_asm_list.append(ASMMovQ("$1", dest_reg_offset))
 	cur_asm_list.append(ASMLabel(false_label))
 
-def gen_asm_for_tac_error(cur_asm_list, tac_instr):
+def gen_asm_for_tac_error(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
 	# Call helper function to generate asm
-	gen_asm_for_error(cur_asm_list, tac_instr.line, tac_instr.error_msg)
+	gen_asm_for_error(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr.line, tac_instr.error_msg)
 
-def gen_asm_for_error(cur_asm_list, line, error_msg):
+def gen_asm_for_error(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, line, error_msg):
 	# Create a string of the form:
 	# ERROR: 3: Exception: case without matching branch: String()
 	error_string = "ERROR: " + str(line) + ": Exception: "
@@ -738,8 +733,8 @@ def gen_asm_for_error(cur_asm_list, line, error_msg):
 	cur_asm_list.append(ASMMovQ("$0", "%rax"))
 	cur_asm_list.append(ASMCall("exit"))
 
-def gen_asm_for_tac_case_type_cmp(cur_asm_list, tac_instr):
-	op1_reg = get_asm_register(tac_instr.op1, 64)
+def gen_asm_for_tac_case_type_cmp(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
+	op1_reg = get_asm_register(register_color_map, tac_instr.op1, 64)
 	# Get type tag from map
 	type_tag_num = "$" + str(type_tag_map[tac_instr.type_name])
 
@@ -748,15 +743,15 @@ def gen_asm_for_tac_case_type_cmp(cur_asm_list, tac_instr):
 	cur_asm_list.append(ASMCmpQ("%rax", op1_reg))
 	cur_asm_list.append(ASMJmpEq("." + tac_instr.type_case_label))
 
-def gen_asm_for_tac_get_type_tag(cur_asm_list, tac_instr):
-	op1_reg = get_asm_register(tac_instr.op1, 64)
-	dest = get_asm_register(tac_instr.assignee, 64)
+def gen_asm_for_tac_get_type_tag(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
+	op1_reg = get_asm_register(register_color_map, tac_instr.op1, 64)
+	dest = get_asm_register(register_color_map, tac_instr.assignee, 64)
 
 	op1_reg_offset = "0(" + op1_reg + ")"
 	cur_asm_list.append(ASMComment("move type tag of " + op1_reg + " into " + dest))
 	cur_asm_list.append(ASMMovQ(op1_reg_offset, dest))
 
-def gen_asm_for_tac_instr(cur_asm_list, tac_instr):
+def gen_asm_for_tac_instr(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
 	# Skip instructions whose assignees do not have colors
 	# This will only skip instructions that are never live (dead code)
 	if not isinstance(tac_instr, TACIOCall) and hasattr(tac_instr, "assignee"):
@@ -765,118 +760,118 @@ def gen_asm_for_tac_instr(cur_asm_list, tac_instr):
 
 	# Check each type of TAC instruction and handle accordingly
 	if isinstance(tac_instr, TACConstInt):
-		gen_asm_for_tac_const_int(cur_asm_list, tac_instr)
+		gen_asm_for_tac_const_int(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACConstBool):
-		gen_asm_for_tac_const_bool(cur_asm_list, tac_instr)
+		gen_asm_for_tac_const_bool(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACConstString):
-		gen_asm_for_tac_const_string(cur_asm_list, tac_instr)
+		gen_asm_for_tac_const_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLabel):
-		gen_asm_for_tac_label(cur_asm_list, tac_instr)
+		gen_asm_for_tac_label(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACDefault):
-		gen_asm_for_tac_default(cur_asm_list, tac_instr)
+		gen_asm_for_tac_default(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACNegBool):
-		gen_asm_for_tac_not(cur_asm_list, tac_instr)
+		gen_asm_for_tac_not(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACNegArith):
-		gen_asm_for_tac_negate(cur_asm_list, tac_instr)
+		gen_asm_for_tac_negate(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACAssign):
-		gen_asm_for_tac_assign(cur_asm_list, tac_instr)
+		gen_asm_for_tac_assign(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACReturn):
-		gen_asm_for_tac_return(cur_asm_list, tac_instr)
+		gen_asm_for_tac_return(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACJmp):
-		gen_asm_for_tac_jmp(cur_asm_list, tac_instr)
+		gen_asm_for_tac_jmp(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACBt):
-		gen_asm_for_tac_bt(cur_asm_list, tac_instr)
+		gen_asm_for_tac_bt(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACStore):
-		gen_asm_for_tac_store(cur_asm_list, tac_instr)
+		gen_asm_for_tac_store(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLoad):
-		gen_asm_for_tac_load(cur_asm_list, tac_instr)
+		gen_asm_for_tac_load(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACPlus):
-		gen_asm_for_tac_plus(cur_asm_list, tac_instr)
+		gen_asm_for_tac_plus(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACMinus):
-		gen_asm_for_tac_minus(cur_asm_list, tac_instr)
+		gen_asm_for_tac_minus(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACMult):
-		gen_asm_for_tac_mult(cur_asm_list, tac_instr)
+		gen_asm_for_tac_mult(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACDiv):
-		gen_asm_for_tac_div(cur_asm_list, tac_instr)
+		gen_asm_for_tac_div(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACCompL):
-		gen_asm_for_tac_comp_l(cur_asm_list, tac_instr)
+		gen_asm_for_tac_comp_l(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACCompLE):
-		gen_asm_for_tac_comp_le(cur_asm_list, tac_instr)
+		gen_asm_for_tac_comp_le(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACCompE):
-		gen_asm_for_tac_comp_e(cur_asm_list, tac_instr)
+		gen_asm_for_tac_comp_e(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACBox):
-		gen_asm_for_tac_box(cur_asm_list, tac_instr)
+		gen_asm_for_tac_box(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACUnbox):
-		gen_asm_for_tac_unbox(cur_asm_list, tac_instr)
+		gen_asm_for_tac_unbox(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACNew):
-		gen_asm_for_tac_new(cur_asm_list, tac_instr)
+		gen_asm_for_tac_new(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLoadAttr):
-		gen_asm_for_tac_load_attr(cur_asm_list, tac_instr)
+		gen_asm_for_tac_load_attr(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACStoreAttr):
-		gen_asm_for_tac_store_attr(cur_asm_list, tac_instr)
+		gen_asm_for_tac_store_attr(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACIsVoid):
-		gen_asm_for_tac_is_void(cur_asm_list, tac_instr)
+		gen_asm_for_tac_is_void(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACNewSelfType):
-		gen_asm_for_tac_new_self_type(cur_asm_list, tac_instr)
+		gen_asm_for_tac_new_self_type(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACCaseCmpTypesAndJe):
-		gen_asm_for_tac_case_type_cmp(cur_asm_list, tac_instr)
+		gen_asm_for_tac_case_type_cmp(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACGetTypeTag):
-		gen_asm_for_tac_get_type_tag(cur_asm_list, tac_instr)
+		gen_asm_for_tac_get_type_tag(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACError):
-		gen_asm_for_tac_error(cur_asm_list, tac_instr)
+		gen_asm_for_tac_error(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACAllocType):
-		gen_asm_for_tac_alloc_type(cur_asm_list, tac_instr)
+		gen_asm_for_tac_alloc_type(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	# ========================================
 	# 				DISPATCH
 	# ========================================
 	elif isinstance(tac_instr, TACCall):
-		gen_asm_for_tac_call(cur_asm_list, tac_instr)
+		gen_asm_for_tac_call(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	# elif isinstance(tac_instr, TACMakeParamSpace):
-	# 	gen_asm_for_tac_make_param_space(cur_asm_list, tac_instr)
+	# 	gen_asm_for_tac_make_param_space(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	# elif isinstance(tac_instr, TACRemoveParamSpace):
-	# 	gen_asm_for_tac_remove_param_space(cur_asm_list, tac_instr)
+	# 	gen_asm_for_tac_remove_param_space(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACStoreParam):
-		gen_asm_for_tac_store_param(cur_asm_list, tac_instr)
+		gen_asm_for_tac_store_param(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACLoadParam):
-		gen_asm_for_tac_load_param(cur_asm_list, tac_instr)
+		gen_asm_for_tac_load_param(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	# elif isinstance(tac_instr, TACCall):
-	# 	gen_asm_for_tac_call(cur_asm_list, tac_instr)
+	# 	gen_asm_for_tac_call(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	else:
 		raise NotImplementedError(str(tac_instr.__class__.__name__) + " not yet implemented")
@@ -889,20 +884,12 @@ def add_initial_method_setup(stack_offset):
 	dest = "%rsp"
 	cur_asm_list.insert(3, ASMSubQ(src, dest))
 
-def gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_registers, type_name):
-	global register_color_map, spilled_register_location_map, current_type
-
-	# Set the current type
-	current_type = type_name
-
-	# Initalize global register color map
-	register_color_map = register_colors
-
+def gen_asm_for_block_list(cur_asm_list, block_list, register_color_map, spilled_registers, current_type):
 	# For now, assume everything has an offset of 8 bytes on the stack
-	spilled_register_location_map = {}
+	spilled_reg_loc_map = {}
 	stack_offset = 0
 	for idx, register in enumerate(spilled_registers):
-		spilled_register_location_map[register] = (idx+1) * -8
+		spilled_reg_loc_map[register] = (idx+1) * -8
 		stack_offset += 8
 
 	# Allocate space on stack for spilled regs
@@ -918,7 +905,7 @@ def gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_re
 	# Generate the asm instructions for each tac instr
 	for block in block_list:
 		for tac_instr in block.instr_list:
-			gen_asm_for_tac_instr(cur_asm_list, tac_instr)
+			gen_asm_for_tac_instr(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	# Pop all callee-saved registers
 	cur_asm_list.append(ASMComment("pop callee-saved regs"))

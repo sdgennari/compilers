@@ -9,11 +9,10 @@ import re
 import sys
 
 NUM_REGISTERS = 12
-register_colors = {}
 
 # def allocate_registers(original_register_graph, block_list, original_combined_live_ranges):
 def allocate_registers(original_register_graph, block_list, combined_live_ranges, spilled_reg_list):
-	global register_colors
+	register_colors = {}
 
 	# Make copies of original values to avoid destorying graph
 	register_graph = copy.copy(original_register_graph)
@@ -86,7 +85,7 @@ def allocate_registers(original_register_graph, block_list, combined_live_ranges
 
 	# If registers had to be spilled, do not compute colors since the liveness will change
 	if registers_to_spill_list:
-		return False
+		return None
 
 	# If nothing was spilled, color the graph
 	colors = [0]
@@ -124,7 +123,7 @@ def allocate_registers(original_register_graph, block_list, combined_live_ranges
 	# 	print register,":",register_colors[register]
 	# print
 
-	return True
+	return register_colors
 
 
 def spill_register(block_list, register_to_spill):

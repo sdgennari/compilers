@@ -27,7 +27,7 @@ caller_saved_registers = [
 	"%r10",	"%r11",
 ]
 
-# Note: explicitly exlcude ebx, ebp, esp
+# Note: explicitly exclude ebx, ebp, esp
 callee_saved_registers = [
 	"%r12", "%r13", "%r14",
 	"%r15",
