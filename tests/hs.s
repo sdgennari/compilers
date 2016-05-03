@@ -308,7 +308,7 @@ Bar..new:		## Constructor for Bar
 			## move self ptr into %r8
 			movq	%rbx, %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -333,18 +333,18 @@ Bar..new:		## Constructor for Bar
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_1
 			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .case_2_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.case_2_void
 			## branch .case_2_not_void
 			test	%r8d, %r8d
@@ -356,8 +356,8 @@ Bar..new:		## Constructor for Bar
 			call	exit
 			jmp		.case_2_not_void
 .case_2_not_void:
-			## move type tag of %r9 into %r8
-			movq	0(%r9), %r8
+			## move type tag of %r10 into %r8
+			movq	0(%r10), %r8
 			## check for type Razz
 			movq	$9, %rax
 			cmpq	%rax, %r8
@@ -400,7 +400,7 @@ Bar..new:		## Constructor for Bar
 			je		.case_1_error_branch
 .case_1_Bazz:
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## new Foo
 			## push caller-saved regs
 			pushq	%rcx
@@ -427,11 +427,11 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_1_exit
 .case_1_Razz:
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## new Bar
 			## push caller-saved regs
 			pushq	%rcx
@@ -458,11 +458,11 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_1_exit
 .case_1_Foo:
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## new Razz
 			## push caller-saved regs
 			pushq	%rcx
@@ -489,15 +489,15 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_1_exit
 .case_1_Bar:
+			## assign
+			movq	%r10, %r9
 			## assign
 			movq	%r9, %r8
 			## assign
 			movq	%r8, %r9
-			## assign
-			movq	%r9, %r10
 			jmp		.case_1_exit
 .case_1_error_branch:
 			movq	$string_2, %rdi
@@ -506,7 +506,7 @@ Bar..new:		## Constructor for Bar
 			call	exit
 .case_1_exit:
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r8
 			## store %r8 in self[4] (g)
 			movq	%r8, 32(%rbx)
 			pushq	%rcx
@@ -573,22 +573,22 @@ Bar..new:		## Constructor for Bar
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_2
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_2:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .case_4_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.case_4_void
 			## branch .case_4_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.case_4_not_void
 .case_4_void:
 			movq	$string_3, %rdi
@@ -805,12 +805,12 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## load self[4] (g) into %r9
-			movq	32(%rbx), %r9
+			## storing method result in %r11
+			movq	%rax, %r11
+			## load self[4] (g) into %r8
+			movq	32(%rbx), %r8
 			## assign
-			movq	%r9, %r11
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -834,22 +834,22 @@ Bar..new:		## Constructor for Bar
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			## check if %r11 is void and set result accordingly
-			cmpq	$0, %r11
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_4
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_4:
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_6_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_6_void
 			## branch .dispatch_6_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_6_not_void
 .dispatch_6_void:
 			movq	$string_5, %rdi
@@ -870,11 +870,11 @@ Bar..new:		## Constructor for Bar
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r11) as self ptr (%rbx)
-			movq	%r11, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r11), %rax
+			movq	16(%r10), %rax
 			## find method doh in vtable[10]
 			movq	80(%rax), %rax
 			## call method dynamically
@@ -895,14 +895,14 @@ Bar..new:		## Constructor for Bar
 			addq	$0, %rsp
 			## storing method result in %r9
 			movq	%rax, %r9
-			## unbox value of %r8 into %r11
-			movq	24(%r8), %r11
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## plus
-			movl	%r11d, %r10d
-			addl	%r8d, %r10d
-			## box value of %r10 into %r9
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -926,8 +926,8 @@ Bar..new:		## Constructor for Bar
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r10, 24(%r9)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -961,16 +961,16 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## storing method result in %r9
+			movq	%rax, %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r10d, %r11d
-			addl	%r9d, %r11d
-			## box value of %r11 into %r8
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -995,7 +995,7 @@ Bar..new:		## Constructor for Bar
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r11, 24(%r8)
+			movq	%r9, 24(%r8)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1029,16 +1029,16 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r10
-			movq	%rax, %r10
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			## storing method result in %r9
+			movq	%rax, %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r9d, %r10d
-			addl	%r8d, %r10d
-			## box value of %r10 into %r8
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1063,13 +1063,13 @@ Bar..new:		## Constructor for Bar
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r10, 24(%r8)
+			movq	%r9, 24(%r8)
 			## store %r8 in self[7] (b)
 			movq	%r8, 56(%rbx)
 			## move self ptr into %r8
 			movq	%rbx, %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1094,18 +1094,18 @@ Bar..new:		## Constructor for Bar
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_5
 			movq	$1, 24(%r8)
 .asm_label_5:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .case_8_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.case_8_void
 			## branch .case_8_not_void
 			test	%r8d, %r8d
@@ -1117,8 +1117,8 @@ Bar..new:		## Constructor for Bar
 			call	exit
 			jmp		.case_8_not_void
 .case_8_not_void:
-			## move type tag of %r9 into %r8
-			movq	0(%r9), %r8
+			## move type tag of %r10 into %r8
+			movq	0(%r10), %r8
 			## check for type Razz
 			movq	$9, %rax
 			cmpq	%rax, %r8
@@ -1161,7 +1161,7 @@ Bar..new:		## Constructor for Bar
 			je		.case_7_error_branch
 .case_7_Razz:
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## new Bar
 			## push caller-saved regs
 			pushq	%rcx
@@ -1192,9 +1192,9 @@ Bar..new:		## Constructor for Bar
 			jmp		.case_7_exit
 .case_7_Bar:
 			## assign
-			movq	%r9, %r10
+			movq	%r10, %r9
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r8
 			## assign
 			movq	%r8, %r9
 			jmp		.case_7_exit
@@ -1211,7 +1211,7 @@ Bar..new:		## Constructor for Bar
 			## load self[6] (a) into %r8
 			movq	48(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1236,18 +1236,18 @@ Bar..new:		## Constructor for Bar
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_6
 			movq	$1, 24(%r8)
 .asm_label_6:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_9_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_9_void
 			## branch .dispatch_9_not_void
 			test	%r8d, %r8d
@@ -1271,8 +1271,8 @@ Bar..new:		## Constructor for Bar
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## static: lookup method in <static_type>..vtable
 			## get ptr to vtable from static type
 			movq	$Bazz..vtable, %rax
@@ -1294,12 +1294,12 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## load self[4] (g) into %r9
-			movq	32(%rbx), %r9
+			## storing method result in %r11
+			movq	%rax, %r11
+			## load self[4] (g) into %r8
+			movq	32(%rbx), %r8
 			## assign
-			movq	%r9, %r10
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1323,22 +1323,22 @@ Bar..new:		## Constructor for Bar
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_7
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_7:
-			## unbox value of %r9 into %r11
-			movq	24(%r9), %r11
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r11d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_10_void
-			test	%r11d, %r11d
+			test	%r9d, %r9d
 			jnz		.dispatch_10_void
 			## branch .dispatch_10_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_10_not_void
 .dispatch_10_void:
 			movq	$string_9, %rdi
@@ -1382,16 +1382,16 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r11
-			movq	%rax, %r11
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
-			## unbox value of %r11 into %r9
-			movq	24(%r11), %r9
+			## storing method result in %r8
+			movq	%rax, %r8
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## plus
 			movl	%r10d, %r8d
 			addl	%r9d, %r8d
-			## box value of %r8 into %r12
+			## box value of %r8 into %r11
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1415,12 +1415,12 @@ Bar..new:		## Constructor for Bar
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r12
-			movq	%r8, 24(%r12)
+			movq	%rax, %r11
+			movq	%r8, 24(%r11)
 			## load self[8] (e) into %r8
 			movq	64(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1444,22 +1444,22 @@ Bar..new:		## Constructor for Bar
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_8
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_8:
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_11_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_11_void
 			## branch .dispatch_11_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.dispatch_11_not_void
 .dispatch_11_void:
 			movq	$string_9, %rdi
@@ -1480,11 +1480,11 @@ Bar..new:		## Constructor for Bar
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method doh in vtable[10]
 			movq	80(%rax), %rax
 			## call method dynamically
@@ -1503,12 +1503,12 @@ Bar..new:		## Constructor for Bar
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r11
-			movq	%rax, %r11
-			## unbox value of %r12 into %r10
-			movq	24(%r12), %r10
-			## unbox value of %r11 into %r8
-			movq	24(%r11), %r8
+			## storing method result in %r9
+			movq	%rax, %r9
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
 			movl	%r10d, %r9d
 			addl	%r8d, %r9d
@@ -1643,12 +1643,12 @@ Bar..new:		## Constructor for Bar
 			movq	%rax, %r9
 			## unbox value of %r8 into %r10
 			movq	24(%r8), %r10
-			## unbox value of %r9 into %r11
-			movq	24(%r9), %r11
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r10d, %r8d
-			addl	%r11d, %r8d
-			## box value of %r8 into %r9
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1672,10 +1672,10 @@ Bar..new:		## Constructor for Bar
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## store %r9 in self[9] (f)
-			movq	%r9, 72(%rbx)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
+			## store %r8 in self[9] (f)
+			movq	%r8, 72(%rbx)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1969,9 +1969,9 @@ Bazz..new:		## Constructor for Bazz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.case_12_exit
 .case_12_Razz:
 			## assign
@@ -2000,9 +2000,9 @@ Bazz..new:		## Constructor for Bazz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.case_12_exit
 .case_12_Foo:
 			## assign
@@ -2031,17 +2031,17 @@ Bazz..new:		## Constructor for Bazz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.case_12_exit
 .case_12_Bar:
 			## assign
-			movq	%r10, %r8
-			## assign
-			movq	%r8, %r9
+			movq	%r10, %r9
 			## assign
 			movq	%r9, %r8
+			## assign
+			movq	%r8, %r9
 			jmp		.case_12_exit
 .case_12_error_branch:
 			movq	$string_2, %rdi
@@ -2050,9 +2050,9 @@ Bazz..new:		## Constructor for Bazz
 			call	exit
 .case_12_exit:
 			## assign
-			movq	%r8, %r9
-			## store %r9 in self[4] (g)
-			movq	%r9, 32(%rbx)
+			movq	%r9, %r8
+			## store %r8 in self[4] (g)
+			movq	%r8, 32(%rbx)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2287,22 +2287,22 @@ Foo..new:		## Constructor for Foo
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_10
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_10:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .case_15_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.case_15_void
 			## branch .case_15_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.case_15_not_void
 .case_15_void:
 			movq	$string_1, %rdi
@@ -2528,22 +2528,22 @@ Foo..new:		## Constructor for Foo
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_11
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_11:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .case_17_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.case_17_void
 			## branch .case_17_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.case_17_not_void
 .case_17_void:
 			movq	$string_3, %rdi
@@ -2765,7 +2765,7 @@ Foo..new:		## Constructor for Foo
 			## load self[4] (g) into %r8
 			movq	32(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2790,18 +2790,18 @@ Foo..new:		## Constructor for Foo
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_13
 			movq	$1, 24(%r8)
 .asm_label_13:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_19_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_19_void
 			## branch .dispatch_19_not_void
 			test	%r8d, %r8d
@@ -2825,11 +2825,11 @@ Foo..new:		## Constructor for Foo
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method doh in vtable[10]
 			movq	80(%rax), %rax
 			## call method dynamically
@@ -2848,16 +2848,16 @@ Foo..new:		## Constructor for Foo
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r10
-			movq	%rax, %r10
-			## unbox value of %r11 into %r8
-			movq	24(%r11), %r8
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
+			## storing method result in %r9
+			movq	%rax, %r9
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r8d, %r10d
-			addl	%r9d, %r10d
-			## box value of %r10 into %r9
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2881,8 +2881,8 @@ Foo..new:		## Constructor for Foo
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r10, 24(%r9)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2916,16 +2916,16 @@ Foo..new:		## Constructor for Foo
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r10
-			movq	%rax, %r10
+			## storing method result in %r9
+			movq	%rax, %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
 			## plus
-			movl	%r8d, %r10d
-			addl	%r9d, %r10d
-			## box value of %r10 into %r9
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2949,8 +2949,8 @@ Foo..new:		## Constructor for Foo
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r10, 24(%r9)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2984,15 +2984,15 @@ Foo..new:		## Constructor for Foo
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## unbox value of %r9 into %r11
-			movq	24(%r9), %r11
+			## storing method result in %r9
+			movq	%rax, %r9
 			## unbox value of %r8 into %r10
 			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r11d, %r9d
-			addl	%r10d, %r9d
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
 			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
@@ -3574,7 +3574,7 @@ Razz..new:		## Constructor for Razz
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_20_exit
 .case_20_Razz:
 			## assign
@@ -3605,7 +3605,7 @@ Razz..new:		## Constructor for Razz
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_20_exit
 .case_20_Foo:
 			## assign
@@ -3636,15 +3636,15 @@ Razz..new:		## Constructor for Razz
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_20_exit
 .case_20_Bar:
 			## assign
-			movq	%r10, %r8
+			movq	%r10, %r9
+			## assign
+			movq	%r9, %r8
 			## assign
 			movq	%r8, %r9
-			## assign
-			movq	%r9, %r10
 			jmp		.case_20_exit
 .case_20_error_branch:
 			movq	$string_2, %rdi
@@ -3653,7 +3653,7 @@ Razz..new:		## Constructor for Razz
 			call	exit
 .case_20_exit:
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r8
 			## store %r8 in self[4] (g)
 			movq	%r8, 32(%rbx)
 			pushq	%rcx
@@ -3813,9 +3813,9 @@ Razz..new:		## Constructor for Razz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
+			movq	%rax, %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			jmp		.case_22_exit
 .case_22_Foo:
 			## assign
@@ -3844,17 +3844,17 @@ Razz..new:		## Constructor for Razz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
+			movq	%rax, %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			jmp		.case_22_exit
 .case_22_Bar:
 			## assign
 			movq	%r10, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## assign
-			movq	%r10, %r9
+			movq	%r9, %r8
 			jmp		.case_22_exit
 .case_22_error_branch:
 			movq	$string_4, %rdi
@@ -3863,13 +3863,13 @@ Razz..new:		## Constructor for Razz
 			call	exit
 .case_22_exit:
 			## assign
-			movq	%r9, %r8
-			## store %r8 in self[6] (a)
-			movq	%r8, 48(%rbx)
+			movq	%r8, %r9
+			## store %r9 in self[6] (a)
+			movq	%r9, 48(%rbx)
 			## load self[6] (a) into %r8
 			movq	48(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3894,18 +3894,18 @@ Razz..new:		## Constructor for Razz
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_16
 			movq	$1, 24(%r8)
 .asm_label_16:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_24_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_24_void
 			## branch .dispatch_24_not_void
 			test	%r8d, %r8d
@@ -3929,11 +3929,11 @@ Razz..new:		## Constructor for Razz
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method doh in vtable[10]
 			movq	80(%rax), %rax
 			## call method dynamically
@@ -3954,10 +3954,10 @@ Razz..new:		## Constructor for Razz
 			addq	$0, %rsp
 			## storing method result in %r11
 			movq	%rax, %r11
-			## load self[4] (g) into %r9
-			movq	32(%rbx), %r9
+			## load self[4] (g) into %r8
+			movq	32(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3981,22 +3981,22 @@ Razz..new:		## Constructor for Razz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			## check if %r8 is void and set result accordingly
-			cmpq	$0, %r8
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_17
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_17:
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_25_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_25_void
 			## branch .dispatch_25_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_25_not_void
 .dispatch_25_void:
 			movq	$string_5, %rdi
@@ -4017,11 +4017,11 @@ Razz..new:		## Constructor for Razz
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r8) as self ptr (%rbx)
-			movq	%r8, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r8), %rax
+			movq	16(%r10), %rax
 			## find method doh in vtable[10]
 			movq	80(%rax), %rax
 			## call method dynamically
@@ -4180,12 +4180,12 @@ Razz..new:		## Constructor for Razz
 			movq	%rax, %r9
 			## unbox value of %r8 into %r10
 			movq	24(%r8), %r10
-			## unbox value of %r9 into %r11
-			movq	24(%r9), %r11
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r10d, %r8d
-			addl	%r11d, %r8d
-			## box value of %r8 into %r9
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4209,14 +4209,14 @@ Razz..new:		## Constructor for Razz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## store %r9 in self[7] (b)
-			movq	%r9, 56(%rbx)
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
+			## store %r8 in self[7] (b)
+			movq	%r8, 56(%rbx)
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4240,22 +4240,22 @@ Razz..new:		## Constructor for Razz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			## check if %r8 is void and set result accordingly
-			cmpq	$0, %r8
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_18
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_18:
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .case_27_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.case_27_void
 			## branch .case_27_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.case_27_not_void
 .case_27_void:
 			movq	$string_6, %rdi
@@ -4264,51 +4264,51 @@ Razz..new:		## Constructor for Razz
 			call	exit
 			jmp		.case_27_not_void
 .case_27_not_void:
-			## move type tag of %r8 into %r9
-			movq	0(%r8), %r9
+			## move type tag of %r10 into %r8
+			movq	0(%r10), %r8
 			## check for type Razz
 			movq	$9, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_Razz
 			## check for type Bar
 			movq	$6, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_Bar
 			## check for type String
 			movq	$4, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_error_branch
 			## check for type Int
 			movq	$1, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_error_branch
 			## check for type Foo
 			movq	$8, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_error_branch
 			## check for type Object
 			movq	$3, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_error_branch
 			## check for type Bazz
 			movq	$7, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_error_branch
 			## check for type Bool
 			movq	$0, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_error_branch
 			## check for type IO
 			movq	$2, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_error_branch
 			## check for type Main
 			movq	$5, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_26_error_branch
 .case_26_Razz:
 			## assign
-			movq	%r8, %r9
+			movq	%r10, %r8
 			## new Bar
 			## push caller-saved regs
 			pushq	%rcx
@@ -4339,7 +4339,7 @@ Razz..new:		## Constructor for Razz
 			jmp		.case_26_exit
 .case_26_Bar:
 			## assign
-			movq	%r8, %r9
+			movq	%r10, %r9
 			## assign
 			movq	%r9, %r8
 			## assign
@@ -4358,7 +4358,7 @@ Razz..new:		## Constructor for Razz
 			## load self[6] (a) into %r8
 			movq	48(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4383,18 +4383,18 @@ Razz..new:		## Constructor for Razz
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_19
 			movq	$1, 24(%r8)
 .asm_label_19:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_28_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_28_void
 			## branch .dispatch_28_not_void
 			test	%r8d, %r8d
@@ -4418,8 +4418,8 @@ Razz..new:		## Constructor for Razz
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## static: lookup method in <static_type>..vtable
 			## get ptr to vtable from static type
 			movq	$Bazz..vtable, %rax
@@ -4441,12 +4441,12 @@ Razz..new:		## Constructor for Razz
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## load self[4] (g) into %r10
-			movq	32(%rbx), %r10
+			## storing method result in %r11
+			movq	%rax, %r11
+			## load self[4] (g) into %r8
+			movq	32(%rbx), %r8
 			## assign
-			movq	%r10, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4470,22 +4470,22 @@ Razz..new:		## Constructor for Razz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_20
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_20:
-			## unbox value of %r10 into %r11
-			movq	24(%r10), %r11
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r11d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_29_void
-			test	%r11d, %r11d
+			test	%r9d, %r9d
 			jnz		.dispatch_29_void
 			## branch .dispatch_29_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.dispatch_29_not_void
 .dispatch_29_void:
 			movq	$string_9, %rdi
@@ -4506,11 +4506,11 @@ Razz..new:		## Constructor for Razz
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method doh in vtable[10]
 			movq	80(%rax), %rax
 			## call method dynamically
@@ -4529,16 +4529,16 @@ Razz..new:		## Constructor for Razz
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r10
-			movq	%rax, %r10
+			## storing method result in %r8
+			movq	%rax, %r8
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
 			## plus
-			movl	%r9d, %r10d
-			addl	%r8d, %r10d
-			## box value of %r10 into %r12
+			movl	%r10d, %r8d
+			addl	%r9d, %r8d
+			## box value of %r8 into %r11
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4562,8 +4562,8 @@ Razz..new:		## Constructor for Razz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r12
-			movq	%r10, 24(%r12)
+			movq	%rax, %r11
+			movq	%r8, 24(%r11)
 			## load self[8] (e) into %r8
 			movq	64(%rbx), %r8
 			## assign
@@ -4591,22 +4591,22 @@ Razz..new:		## Constructor for Razz
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_21
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_21:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_30_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_30_void
 			## branch .dispatch_30_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_30_not_void
 .dispatch_30_void:
 			movq	$string_9, %rdi
@@ -4650,16 +4650,16 @@ Razz..new:		## Constructor for Razz
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r11
-			movq	%rax, %r11
-			## unbox value of %r12 into %r9
-			movq	24(%r12), %r9
-			## unbox value of %r11 into %r8
-			movq	24(%r11), %r8
+			## storing method result in %r9
+			movq	%rax, %r9
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r9d, %r10d
-			addl	%r8d, %r10d
-			## box value of %r10 into %r8
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -4684,7 +4684,7 @@ Razz..new:		## Constructor for Razz
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r10, 24(%r8)
+			movq	%r9, 24(%r8)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -4890,12 +4890,12 @@ Bazz.printh:
 			pushq	%r14
 			pushq	%r15
 .Bazz_printh_31:
-			## load self[3] (h) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (h) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r8
+			pushq	%r9
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -4989,11 +4989,11 @@ Bazz.doh:
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r9, %r10
-			## load self[3] (h) into %r8
-			movq	24(%rbx), %r8
+			movq	%r9, %r8
+			## load self[3] (h) into %r9
+			movq	24(%rbx), %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r12
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -5018,16 +5018,16 @@ Bazz.doh:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movl	$1, 24(%r8)
-			## unbox value of %r9 into %r11
-			movq	24(%r9), %r11
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			movq	%rax, %r10
+			movl	$1, 24(%r10)
+			## unbox value of %r12 into %r11
+			movq	24(%r12), %r11
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## plus
-			movl	%r11d, %r8d
-			addl	%r9d, %r8d
-			## box value of %r8 into %r9
+			movl	%r11d, %r10d
+			addl	%r9d, %r10d
+			## box value of %r10 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -5052,13 +5052,13 @@ Bazz.doh:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r9
-			movq	%r8, 24(%r9)
+			movq	%r10, 24(%r9)
 			## store %r9 in self[3] (h)
 			movq	%r9, 24(%rbx)
 			## assign
-			movq	%r9, %r8
+			movq	%r9, %r10
 			## assign
-			movq	%r10, %r9
+			movq	%r8, %r9
 			## assign
 			movq	%r9, %r8
 			## move ret val %r8 into %rax
@@ -5090,11 +5090,11 @@ Foo.doh:
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r9, %r8
-			## load self[3] (h) into %r9
-			movq	24(%rbx), %r9
+			movq	%r9, %r12
+			## load self[3] (h) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r10
+			movq	%r8, %r11
 			## new const Int: 2
 			## push caller-saved regs
 			pushq	%rcx
@@ -5119,16 +5119,16 @@ Foo.doh:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r11
-			movl	$2, 24(%r11)
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
+			movq	%rax, %r9
+			movl	$2, 24(%r9)
 			## unbox value of %r11 into %r10
 			movq	24(%r11), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r9d, %r11d
-			addl	%r10d, %r11d
-			## box value of %r11 into %r10
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -5152,18 +5152,18 @@ Foo.doh:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	%r11, 24(%r10)
-			## store %r10 in self[3] (h)
-			movq	%r10, 24(%rbx)
-			## assign
-			movq	%r10, %r9
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
+			## store %r8 in self[3] (h)
+			movq	%r8, 24(%rbx)
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r12, %r8
+			## assign
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -5235,6 +5235,7 @@ IO.in_int:
 			movq	$0, -16(%rbp)
 .in_int_7:
 			movq	-16(%rbp), %r8
+
 
 			## push caller-saved regs
 			pushq	%rcx
@@ -5817,6 +5818,7 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+
 raw_in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -5880,6 +5882,7 @@ raw_in_string:
 			call	strndup
 			leave
 			ret
+
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -5915,6 +5918,7 @@ cool_str_concat:
 			movq	-8(%rbp), %rax
 			leave
 			ret
+
 cool_str_substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -5953,6 +5957,7 @@ cool_str_substr:
 			popq	%rbx
 			popq	%rbp
 			ret
+
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

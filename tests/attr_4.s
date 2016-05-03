@@ -266,12 +266,12 @@ Main..new:		## Constructor for Main
 			movl	$777, 24(%r8)
 			## store %r8 in self[3] (i)
 			movq	%r8, 24(%rbx)
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
-			## store %r8 in self[5] (s)
-			movq	%r8, 40(%rbx)
+			movq	%r8, %r9
+			## store %r9 in self[5] (s)
+			movq	%r9, 40(%rbx)
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -424,6 +424,7 @@ IO.in_int:
 .in_int_7:
 			movq	-16(%rbp), %r8
 
+
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -575,16 +576,16 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## load self[3] (i) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (i) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r8
+			pushq	%r9
 			## load self[5] (s) into %r8
 			movq	40(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -608,22 +609,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_1
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_2_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_2_void
 			## branch .dispatch_2_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.dispatch_2_not_void
 .dispatch_2_void:
 			movq	$string_1, %rdi
@@ -647,11 +648,11 @@ Main.main:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method out_int in vtable[7]
 			movq	56(%rax), %rax
 			## call method dynamically
@@ -998,6 +999,7 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+
 raw_in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1061,6 +1063,7 @@ raw_in_string:
 			call	strndup
 			leave
 			ret
+
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1096,6 +1099,7 @@ cool_str_concat:
 			movq	-8(%rbp), %rax
 			leave
 			ret
+
 cool_str_substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1134,6 +1138,7 @@ cool_str_substr:
 			popq	%rbx
 			popq	%rbp
 			ret
+
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

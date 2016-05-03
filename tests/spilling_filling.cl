@@ -18,22 +18,22 @@ class Main inherits IO {
 			o : Int <- 14,
 			p : Int <- 15
 		in {
-			out_int(a).out_string("\n");
-			out_int(b).out_string("\n");
-			out_int(c).out_string("\n");
-			out_int(d).out_string("\n");
-			out_int(e).out_string("\n");
-			out_int(f).out_string("\n");
-			out_int(g).out_string("\n");
-			out_int(h).out_string("\n");
-			out_int(i).out_string("\n");
-			out_int(j).out_string("\n");
-			out_int(k).out_string("\n");
-			out_int(l).out_string("\n");
-			out_int(m).out_string("\n");
-			out_int(n).out_string("\n");
-			out_int(o).out_string("\n");
-			out_int(p).out_string("\n");
+			a;
+			b;
+			c;
+			d;
+			e;
+			f;
+			g;
+			h;
+			i;
+			j;
+			k;
+			l;
+			m;
+			n;
+			o;
+			p;
 		}
 	};
 };

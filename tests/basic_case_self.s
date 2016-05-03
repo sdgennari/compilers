@@ -356,7 +356,7 @@ A.some_method:
 			## move self ptr into %r8
 			movq	%rbx, %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -380,22 +380,22 @@ A.some_method:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_1
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .case_3_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.case_3_void
 			## branch .case_3_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.case_3_not_void
 .case_3_void:
 			movq	$string_1, %rdi
@@ -404,8 +404,8 @@ A.some_method:
 			call	exit
 			jmp		.case_3_not_void
 .case_3_not_void:
-			## move type tag of %r9 into %r8
-			movq	0(%r9), %r8
+			## move type tag of %r10 into %r8
+			movq	0(%r10), %r8
 			## check for type A
 			movq	$6, %rax
 			cmpq	%rax, %r8
@@ -436,7 +436,7 @@ A.some_method:
 			je		.case_2_Main
 .case_2_A:
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -508,7 +508,7 @@ A.some_method:
 			jmp		.case_2_exit
 .case_2_Main:
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx

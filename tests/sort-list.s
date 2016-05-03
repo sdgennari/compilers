@@ -560,12 +560,12 @@ Cons.car:
 			pushq	%r14
 			pushq	%r15
 .Cons_car_2:
-			## load self[3] (xcar) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (xcar) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -588,12 +588,12 @@ Cons.cdr:
 			pushq	%r14
 			pushq	%r15
 .Cons_cdr_3:
-			## load self[4] (xcdr) into %r9
-			movq	32(%rbx), %r9
+			## load self[4] (xcdr) into %r8
+			movq	32(%rbx), %r8
 			## assign
-			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -616,12 +616,12 @@ Cons.rev:
 			pushq	%r14
 			pushq	%r15
 .Cons_rev_4:
-			## load self[3] (xcar) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (xcar) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r8
+			pushq	%r9
 			## load self[4] (xcdr) into %r8
 			movq	32(%rbx), %r8
 			## assign
@@ -821,12 +821,12 @@ Cons.sort:
 			pushq	%r14
 			pushq	%r15
 .Cons_sort_7:
-			## load self[3] (xcar) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (xcar) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r8
+			pushq	%r9
 			## load self[4] (xcdr) into %r8
 			movq	32(%rbx), %r8
 			## assign
@@ -854,22 +854,22 @@ Cons.sort:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
+			movq	%rax, %r9
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_3
-			movq	$1, 24(%r8)
+			movq	$1, 24(%r9)
 .asm_label_3:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## not
-			movl	%r9d, %r8d
-			xorl	$1, %r8d
+			movl	%r8d, %r9d
+			xorl	$1, %r9d
 			## branch .dispatch_8_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_8_void
 			## branch .dispatch_8_not_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_8_not_void
 .dispatch_8_void:
 			movq	$string_2, %rdi
@@ -913,8 +913,8 @@ Cons.sort:
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -938,22 +938,22 @@ Cons.sort:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r9
+			## check if %r8 is void and set result accordingly
+			cmpq	$0, %r8
 			jnz		.asm_label_4
-			movq	$1, 24(%r8)
+			movq	$1, 24(%r9)
 .asm_label_4:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r9 into %r10
+			movq	24(%r9), %r10
 			## not
-			movl	%r10d, %r8d
-			xorl	$1, %r8d
+			movl	%r10d, %r9d
+			xorl	$1, %r9d
 			## branch .dispatch_9_void
 			test	%r10d, %r10d
 			jnz		.dispatch_9_void
 			## branch .dispatch_9_not_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_9_not_void
 .dispatch_9_void:
 			movq	$string_2, %rdi
@@ -977,11 +977,11 @@ Cons.sort:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r8) as self ptr (%rbx)
+			movq	%r8, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r8), %rax
 			## find method insert in vtable[15]
 			movq	120(%rax), %rax
 			## call method dynamically
@@ -1000,10 +1000,10 @@ Cons.sort:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			## storing method result in %r9
+			movq	%rax, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -1026,15 +1026,15 @@ Cons.insert:
 			pushq	%r14
 			pushq	%r15
 .Cons_insert_10:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
+			## loading param [0] into %r11
+			movq	16(%rbp), %r11
 			## assign
-			movq	%r8, %r11
-			## load self[3] (xcar) into %r9
-			movq	24(%rbx), %r9
+			movq	%r11, %r10
+			## load self[3] (xcar) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r10
-			## use lt_helper to compare %r11 < %r10
+			movq	%r8, %r9
+			## use lt_helper to compare %r10 < %r9
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -1045,9 +1045,9 @@ Cons.insert:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r11) and rhs (%r10)
+			## push lhs (%r10) and rhs (%r9)
+			pushq	%r9
 			pushq	%r10
-			pushq	%r11
 			call	lt_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -1060,24 +1060,24 @@ Cons.insert:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## move comparison result into %r8
+			movq	%rax, %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .if_then_11
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.if_then_11
 			## branch .if_else_11
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.if_else_11
 .if_then_11:
 			## assign
-			movq	%r8, %r9
+			movq	%r11, %r8
 			## storing param [0]
-			pushq	%r9
+			pushq	%r8
 			## move self ptr into %r8
 			movq	%rbx, %r8
 			## assign
@@ -1108,7 +1108,7 @@ Cons.insert:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1133,18 +1133,18 @@ Cons.insert:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_5
 			movq	$1, 24(%r8)
 .asm_label_5:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_12_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_12_void
 			## branch .dispatch_12_not_void
 			test	%r8d, %r8d
@@ -1174,11 +1174,11 @@ Cons.insert:
 			## moving rsp[88] to rsp[8]
 			movq	88(%rsp), %rax
 			movq	%rax, 8(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method init in vtable[18]
 			movq	144(%rax), %rax
 			## call method dynamically
@@ -1203,20 +1203,20 @@ Cons.insert:
 			movq	%r8, %r9
 			jmp		.if_exit_11
 .if_else_11:
-			## load self[3] (xcar) into %r9
-			movq	24(%rbx), %r9
-			## assign
-			movq	%r9, %r10
-			## storing param [0]
-			pushq	%r10
+			## load self[3] (xcar) into %r8
+			movq	24(%rbx), %r8
 			## assign
 			movq	%r8, %r9
 			## storing param [0]
 			pushq	%r9
+			## assign
+			movq	%r11, %r8
+			## storing param [0]
+			pushq	%r8
 			## load self[4] (xcdr) into %r8
 			movq	32(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1241,18 +1241,18 @@ Cons.insert:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_6
 			movq	$1, 24(%r8)
 .asm_label_6:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_13_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_13_void
 			## branch .dispatch_13_not_void
 			test	%r8d, %r8d
@@ -1279,11 +1279,11 @@ Cons.insert:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method insert in vtable[15]
 			movq	120(%rax), %rax
 			## call method dynamically
@@ -1449,16 +1449,16 @@ Cons.rcons:
 			pushq	%r14
 			pushq	%r15
 .Cons_rcons_15:
-			## loading param [0] into %r9
-			movq	16(%rbp), %r9
+			## loading param [0] into %r10
+			movq	16(%rbp), %r10
 			## load self[3] (xcar) into %r8
 			movq	24(%rbx), %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r10
+			pushq	%r9
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## storing param [0]
 			pushq	%r8
 			## load self[4] (xcdr) into %r8
@@ -1578,7 +1578,7 @@ Cons.rcons:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1603,18 +1603,18 @@ Cons.rcons:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_9
 			movq	$1, 24(%r8)
 .asm_label_9:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_17_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_17_void
 			## branch .dispatch_17_not_void
 			test	%r8d, %r8d
@@ -1644,11 +1644,11 @@ Cons.rcons:
 			## moving rsp[88] to rsp[8]
 			movq	88(%rsp), %rax
 			movq	%rax, 8(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method init in vtable[18]
 			movq	144(%rax), %rax
 			## call method dynamically
@@ -1693,12 +1693,12 @@ Cons.print_list:
 			pushq	%r14
 			pushq	%r15
 .Cons_print_list_18:
-			## load self[3] (xcar) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (xcar) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r8
+			pushq	%r9
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1806,7 +1806,7 @@ Cons.print_list:
 			## load self[4] (xcdr) into %r8
 			movq	32(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1831,18 +1831,18 @@ Cons.print_list:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_10
 			movq	$1, 24(%r8)
 .asm_label_10:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_19_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_19_void
 			## branch .dispatch_19_not_void
 			test	%r8d, %r8d
@@ -1866,11 +1866,11 @@ Cons.print_list:
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method print_list in vtable[17]
 			movq	136(%rax), %rax
 			## call method dynamically
@@ -1915,28 +1915,28 @@ Cons.init:
 			pushq	%r14
 			pushq	%r15
 .Cons_init_20:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
-			## loading param [1] into %r10
-			movq	24(%rbp), %r10
+			## loading param [0] into %r9
+			movq	16(%rbp), %r9
+			## loading param [1] into %r8
+			movq	24(%rbp), %r8
 			## assign
-			movq	%r8, %r9
-			## store %r9 in self[3] (xcar)
-			movq	%r9, 24(%rbx)
-			## assign
-			movq	%r9, %r8
+			movq	%r9, %r10
+			## store %r10 in self[3] (xcar)
+			movq	%r10, 24(%rbx)
 			## assign
 			movq	%r10, %r9
+			## assign
+			movq	%r8, %r9
 			## store %r9 in self[4] (xcdr)
 			movq	%r9, 32(%rbx)
 			## assign
 			movq	%r9, %r8
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -2008,6 +2008,7 @@ IO.in_int:
 			movq	$0, -16(%rbp)
 .in_int_7:
 			movq	-16(%rbp), %r8
+
 
 			## push caller-saved regs
 			pushq	%rcx
@@ -2234,12 +2235,12 @@ List.cons:
 			movq	%r9, %r8
 			## storing param [0]
 			pushq	%r8
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## storing param [1]
-			pushq	%r8
+			pushq	%r9
 			## assign
 			movq	%r11, %r10
 			## push caller-saved regs
@@ -2851,11 +2852,11 @@ Main.iota:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			## store %r9 in self[3] (l)
-			movq	%r9, 24(%rbx)
+			movq	%rax, %r8
+			## store %r8 in self[3] (l)
+			movq	%r8, 24(%rbx)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## new const Int: 0
 			## push caller-saved regs
 			pushq	%rcx
@@ -2883,14 +2884,14 @@ Main.iota:
 			movq	%rax, %r8
 			movl	$0, 24(%r8)
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r12
 			jmp		.loop_start_32
 .loop_start_32:
 			## assign
-			movq	%r9, %r10
+			movq	%r12, %r9
 			## assign
-			movq	%r11, %r12
-			## use lt_helper to compare %r10 < %r12
+			movq	%r11, %r8
+			## use lt_helper to compare %r9 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -2901,9 +2902,9 @@ Main.iota:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r10) and rhs (%r12)
-			pushq	%r12
-			pushq	%r10
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
+			pushq	%r9
 			call	lt_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -2916,30 +2917,30 @@ Main.iota:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .loop_body_32
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.loop_body_32
 			## branch .loop_exit_32
 			test	%r8d, %r8d
 			jnz		.loop_exit_32
 .loop_body_32:
 			## assign
-			movq	%r9, %r8
+			movq	%r12, %r8
 			## storing param [0]
 			pushq	%r8
-			## load self[3] (l) into %r10
-			movq	24(%rbx), %r10
+			## load self[3] (l) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r10, %r8
+			movq	%r8, %r9
 			## storing param [1]
-			pushq	%r8
+			pushq	%r9
 			## new Cons
 			## push caller-saved regs
 			pushq	%rcx
@@ -2964,7 +2965,7 @@ Main.iota:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r12
+			movq	%rax, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2989,18 +2990,18 @@ Main.iota:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r12 is void and set result accordingly
-			cmpq	$0, %r12
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_12
 			movq	$1, 24(%r8)
 .asm_label_12:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_33_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_33_void
 			## branch .dispatch_33_not_void
 			test	%r8d, %r8d
@@ -3030,11 +3031,11 @@ Main.iota:
 			## moving rsp[88] to rsp[8]
 			movq	88(%rsp), %rax
 			movq	%rax, 8(%rsp)
-			## set receiver_obj (%r12) as self ptr (%rbx)
-			movq	%r12, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r12), %rax
+			movq	16(%r10), %rax
 			## find method init in vtable[18]
 			movq	144(%rax), %rax
 			## call method dynamically
@@ -3058,9 +3059,9 @@ Main.iota:
 			## store %r8 in self[3] (l)
 			movq	%r8, 24(%rbx)
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## assign
-			movq	%r9, %r8
+			movq	%r12, %r8
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -3121,7 +3122,7 @@ Main.iota:
 			movq	%rax, %r8
 			movq	%r9, 24(%r8)
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r12
 			jmp		.loop_start_32
 .loop_exit_32:
 			## default Object
@@ -3295,8 +3296,8 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
+			## storing method result in %r10
+			movq	%rax, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3320,22 +3321,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r8 is void and set result accordingly
-			cmpq	$0, %r8
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_13
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_13:
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r9d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_35_void
 			test	%r9d, %r9d
 			jnz		.dispatch_35_void
 			## branch .dispatch_35_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.dispatch_35_not_void
 .dispatch_35_void:
 			movq	$string_11, %rdi
@@ -3356,13 +3357,97 @@ Main.main:
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r8) as self ptr (%rbx)
-			movq	%r8, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r8), %rax
+			movq	16(%r10), %rax
 			## find method rev in vtable[13]
 			movq	104(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 0 params from stack with subq
+			addq	$0, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 0 stored params from stack (2nd time)
+			addq	$0, %rsp
+			## storing method result in %r11
+			movq	%rax, %r11
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Bool..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			## check if %r11 is void and set result accordingly
+			cmpq	$0, %r11
+			jnz		.asm_label_14
+			movq	$1, 24(%r8)
+.asm_label_14:
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .dispatch_36_void
+			test	%r9d, %r9d
+			jnz		.dispatch_36_void
+			## branch .dispatch_36_not_void
+			test	%r8d, %r8d
+			jnz		.dispatch_36_not_void
+.dispatch_36_void:
+			movq	$string_11, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+			jmp		.dispatch_36_not_void
+.dispatch_36_not_void:
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 0 params to the stack
+			subq	$0, %rsp
+			## set receiver_obj (%r11) as self ptr (%rbx)
+			movq	%r11, %rbx
+			## dynamic: lookup method in vtable
+			## get ptr to vtable from receiver obj
+			movq	16(%r11), %rax
+			## find method sort in vtable[14]
+			movq	112(%rax), %rax
 			## call method dynamically
 			call	*%rax
 			## removing 0 params from stack with subq
@@ -3407,100 +3492,16 @@ Main.main:
 			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
-			jnz		.asm_label_14
+			jnz		.asm_label_15
 			movq	$1, 24(%r8)
-.asm_label_14:
+.asm_label_15:
 			## unbox value of %r8 into %r9
 			movq	24(%r8), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
-			## branch .dispatch_36_void
-			test	%r9d, %r9d
-			jnz		.dispatch_36_void
-			## branch .dispatch_36_not_void
-			test	%r8d, %r8d
-			jnz		.dispatch_36_not_void
-.dispatch_36_void:
-			movq	$string_11, %rdi
-			call	raw_out_string
-			movq	$0, %rax
-			call	exit
-			jmp		.dispatch_36_not_void
-.dispatch_36_not_void:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 0 params to the stack
-			subq	$0, %rsp
-			## set receiver_obj (%r10) as self ptr (%rbx)
-			movq	%r10, %rbx
-			## dynamic: lookup method in vtable
-			## get ptr to vtable from receiver obj
-			movq	16(%r10), %rax
-			## find method sort in vtable[14]
-			movq	112(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 0 params from stack with subq
-			addq	$0, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 0 stored params from stack (2nd time)
-			addq	$0, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
-			jnz		.asm_label_15
-			movq	$1, 24(%r8)
-.asm_label_15:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
-			## not
-			movl	%r10d, %r8d
-			xorl	$1, %r8d
 			## branch .dispatch_37_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_37_void
 			## branch .dispatch_37_not_void
 			test	%r8d, %r8d
@@ -3524,11 +3525,11 @@ Main.main:
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method print_list in vtable[17]
 			movq	136(%rax), %rax
 			## call method dynamically
@@ -3747,12 +3748,12 @@ Nil.rcons:
 			pushq	%r14
 			pushq	%r15
 .Nil_rcons_42:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
+			## loading param [0] into %r9
+			movq	16(%rbp), %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			## storing param [0]
-			pushq	%r9
+			pushq	%r8
 			## move self ptr into %r9
 			movq	%rbx, %r9
 			## assign
@@ -4306,6 +4307,7 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+
 raw_in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -4369,6 +4371,7 @@ raw_in_string:
 			call	strndup
 			leave
 			ret
+
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -4404,6 +4407,7 @@ cool_str_concat:
 			movq	-8(%rbp), %rax
 			leave
 			ret
+
 cool_str_substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -4442,6 +4446,7 @@ cool_str_substr:
 			popq	%rbx
 			popq	%rbp
 			ret
+
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

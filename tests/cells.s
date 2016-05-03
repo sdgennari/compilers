@@ -395,12 +395,12 @@ CellularAutomaton.init:
 			movq	%r9, 24(%rbx)
 			## assign
 			movq	%r9, %r8
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -454,7 +454,7 @@ CellularAutomaton.print:
 			## load self[3] (population_map) into %r8
 			movq	24(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -479,18 +479,18 @@ CellularAutomaton.print:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_1
 			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_3_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_3_void
 			## branch .dispatch_3_not_void
 			test	%r8d, %r8d
@@ -517,11 +517,11 @@ CellularAutomaton.print:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method concat in vtable[5]
 			movq	40(%rax), %rax
 			## call method dynamically
@@ -582,12 +582,12 @@ CellularAutomaton.print:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -613,7 +613,7 @@ CellularAutomaton.num_cells:
 			## load self[3] (population_map) into %r8
 			movq	24(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -637,22 +637,22 @@ CellularAutomaton.num_cells:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_2
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_2:
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_5_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_5_void
 			## branch .dispatch_5_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.dispatch_5_not_void
 .dispatch_5_void:
 			movq	$string_3, %rdi
@@ -673,11 +673,11 @@ CellularAutomaton.num_cells:
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method length in vtable[6]
 			movq	48(%rax), %rax
 			## call method dynamically
@@ -722,12 +722,12 @@ CellularAutomaton.cell:
 			pushq	%r14
 			pushq	%r15
 .CellularAutomaton_cell_6:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
+			## loading param [0] into %r9
+			movq	16(%rbp), %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			## storing param [0]
-			pushq	%r9
+			pushq	%r8
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -756,10 +756,10 @@ CellularAutomaton.cell:
 			movl	$1, 24(%r8)
 			## storing param [1]
 			pushq	%r8
-			## load self[3] (population_map) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (population_map) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -783,22 +783,22 @@ CellularAutomaton.cell:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r8 is void and set result accordingly
-			cmpq	$0, %r8
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_3
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_3:
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r9d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_7_void
 			test	%r9d, %r9d
 			jnz		.dispatch_7_void
 			## branch .dispatch_7_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.dispatch_7_not_void
 .dispatch_7_void:
 			movq	$string_4, %rdi
@@ -825,11 +825,11 @@ CellularAutomaton.cell:
 			## moving rsp[88] to rsp[8]
 			movq	88(%rsp), %rax
 			movq	%rax, 8(%rsp)
-			## set receiver_obj (%r8) as self ptr (%rbx)
-			movq	%r8, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r8), %rax
+			movq	16(%r10), %rax
 			## find method substr in vtable[7]
 			movq	56(%rax), %rax
 			## call method dynamically
@@ -848,10 +848,10 @@ CellularAutomaton.cell:
 			popq	%rcx
 			## removing 2 stored params from stack (2nd time)
 			addq	$16, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
-			## move ret val %r9 into %rax
-			movq	%r9, %rax
+			## storing method result in %r8
+			movq	%rax, %r8
+			## move ret val %r8 into %rax
+			movq	%r8, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -874,10 +874,10 @@ CellularAutomaton.cell_left_neighbor:
 			pushq	%r14
 			pushq	%r15
 .CellularAutomaton_cell_left_neighbor_8:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
+			## loading param [0] into %r11
+			movq	16(%rbp), %r11
 			## assign
-			movq	%r8, %r10
+			movq	%r11, %r9
 			## new const Int: 0
 			## push caller-saved regs
 			pushq	%rcx
@@ -902,9 +902,9 @@ CellularAutomaton.cell_left_neighbor:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$0, 24(%r9)
-			## use eq_helper to compare %r10 = %r9
+			movq	%rax, %r8
+			movl	$0, 24(%r8)
+			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -915,9 +915,9 @@ CellularAutomaton.cell_left_neighbor:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r10) and rhs (%r9)
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
 			pushq	%r9
-			pushq	%r10
 			call	eq_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -930,18 +930,18 @@ CellularAutomaton.cell_left_neighbor:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r11
-			movq	%rax, %r11
-			## unbox value of %r11 into %r10
-			movq	24(%r11), %r10
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .if_then_9
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.if_then_9
 			## branch .if_else_9
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.if_else_9
 .if_then_9:
 			pushq	%rcx
@@ -977,8 +977,8 @@ CellularAutomaton.cell_left_neighbor:
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r10
-			movq	%rax, %r10
+			## storing method result in %r8
+			movq	%rax, %r8
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -1005,117 +1005,12 @@ CellularAutomaton.cell_left_neighbor:
 			popq	%rcx
 			movq	%rax, %r9
 			movl	$1, 24(%r9)
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## minus
-			movl	%r8d, %r9d
-			subl	%r10d, %r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
-			## storing param [0]
-			pushq	%r8
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 1 params to the stack
-			subq	$8, %rsp
-			## moving rsp[80] to rsp[0]
-			movq	80(%rsp), %rax
-			movq	%rax, 0(%rsp)
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method cell in vtable[12]
-			movq	96(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 1 params from stack with subq
-			addq	$8, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 1 stored params from stack (2nd time)
-			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
-			## assign
-			movq	%r9, %r8
-			jmp		.if_exit_9
-.if_else_9:
-			## assign
-			movq	%r8, %r9
-			## new const Int: 1
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r10
-			movl	$1, 24(%r10)
-			## unbox value of %r9 into %r11
-			movq	24(%r9), %r11
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
-			## minus
-			movl	%r11d, %r9d
+			movl	%r10d, %r9d
 			subl	%r8d, %r9d
 			## box value of %r9 into %r8
 			## push caller-saved regs
@@ -1181,14 +1076,119 @@ CellularAutomaton.cell_left_neighbor:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
+			jmp		.if_exit_9
+.if_else_9:
+			## assign
+			movq	%r11, %r8
+			## new const Int: 1
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r9
+			movl	$1, 24(%r9)
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
+			## minus
+			movl	%r10d, %r9d
+			subl	%r8d, %r9d
+			## box value of %r9 into %r8
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method cell in vtable[12]
+			movq	96(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
 			jmp		.if_exit_9
 .if_exit_9:
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -1211,10 +1211,10 @@ CellularAutomaton.cell_right_neighbor:
 			pushq	%r14
 			pushq	%r15
 .CellularAutomaton_cell_right_neighbor_10:
-			## loading param [0] into %r10
-			movq	16(%rbp), %r10
+			## loading param [0] into %r9
+			movq	16(%rbp), %r9
 			## assign
-			movq	%r10, %r11
+			movq	%r9, %r12
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1248,8 +1248,8 @@ CellularAutomaton.cell_right_neighbor:
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r10
+			movq	%rax, %r10
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -1276,14 +1276,14 @@ CellularAutomaton.cell_right_neighbor:
 			popq	%rcx
 			movq	%rax, %r8
 			movl	$1, 24(%r8)
-			## unbox value of %r9 into %r12
-			movq	24(%r9), %r12
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r10 into %r11
+			movq	24(%r10), %r11
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## minus
-			movl	%r12d, %r8d
-			subl	%r9d, %r8d
-			## box value of %r8 into %r9
+			movl	%r11d, %r8d
+			subl	%r10d, %r8d
+			## box value of %r8 into %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1307,9 +1307,9 @@ CellularAutomaton.cell_right_neighbor:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## use eq_helper to compare %r11 = %r9
+			movq	%rax, %r10
+			movq	%r8, 24(%r10)
+			## use eq_helper to compare %r12 = %r10
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -1320,9 +1320,9 @@ CellularAutomaton.cell_right_neighbor:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r11) and rhs (%r9)
-			pushq	%r9
-			pushq	%r11
+			## push lhs (%r12) and rhs (%r10)
+			pushq	%r10
+			pushq	%r12
 			call	eq_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -1337,13 +1337,13 @@ CellularAutomaton.cell_right_neighbor:
 			popq	%rcx
 			## move comparison result into %r8
 			movq	%rax, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## not
-			movl	%r9d, %r8d
+			movl	%r10d, %r8d
 			xorl	$1, %r8d
 			## branch .if_then_11
-			test	%r9d, %r9d
+			test	%r10d, %r10d
 			jnz		.if_then_11
 			## branch .if_else_11
 			test	%r8d, %r8d
@@ -1413,14 +1413,14 @@ CellularAutomaton.cell_right_neighbor:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
+			## storing method result in %r9
+			movq	%rax, %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			jmp		.if_exit_11
 .if_else_11:
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r8
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -1518,14 +1518,14 @@ CellularAutomaton.cell_right_neighbor:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
+			## storing method result in %r9
+			movq	%rax, %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			jmp		.if_exit_11
 .if_exit_11:
-			## move ret val %r9 into %rax
-			movq	%r9, %rax
+			## move ret val %r8 into %rax
+			movq	%r8, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -1616,9 +1616,9 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	$string_5, 24(%r10)
-			## use eq_helper to compare %r9 = %r10
+			movq	%rax, %r8
+			movq	$string_5, 24(%r8)
+			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -1629,8 +1629,8 @@ CellularAutomaton.cell_at_next_evolution:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r9) and rhs (%r10)
-			pushq	%r10
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
 			pushq	%r9
 			call	eq_helper
 			addq	$16, %rsp
@@ -1644,10 +1644,10 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -1685,7 +1685,7 @@ CellularAutomaton.cell_at_next_evolution:
 			movq	%rax, %r8
 			movl	$1, 24(%r8)
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r13
 			jmp		.if_exit_14
 .if_else_14:
 			## new const Int: 0
@@ -1715,7 +1715,7 @@ CellularAutomaton.cell_at_next_evolution:
 			movq	%rax, %r8
 			movl	$0, 24(%r8)
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r13
 			jmp		.if_exit_14
 .if_exit_14:
 			## assign
@@ -1758,8 +1758,8 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
+			## storing method result in %r9
+			movq	%rax, %r9
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1784,9 +1784,9 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	$string_5, 24(%r10)
-			## use eq_helper to compare %r8 = %r10
+			movq	%rax, %r8
+			movq	$string_5, 24(%r8)
+			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -1797,9 +1797,9 @@ CellularAutomaton.cell_at_next_evolution:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r8) and rhs (%r10)
-			pushq	%r10
+			## push lhs (%r9) and rhs (%r8)
 			pushq	%r8
+			pushq	%r9
 			call	eq_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -1812,18 +1812,18 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r12
-			movq	%rax, %r12
-			## unbox value of %r12 into %r8
-			movq	24(%r12), %r8
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
-			movl	%r8d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .if_then_15
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.if_then_15
 			## branch .if_else_15
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.if_else_15
 .if_then_15:
 			## new const Int: 1
@@ -1886,14 +1886,14 @@ CellularAutomaton.cell_at_next_evolution:
 			movq	%r8, %r12
 			jmp		.if_exit_15
 .if_exit_15:
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r13 into %r10
+			movq	24(%r13), %r10
 			## unbox value of %r12 into %r9
 			movq	24(%r12), %r9
 			## plus
 			movl	%r10d, %r8d
 			addl	%r9d, %r8d
-			## box value of %r8 into %r10
+			## box value of %r8 into %r12
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1917,8 +1917,8 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	%r8, 24(%r10)
+			movq	%rax, %r12
+			movq	%r8, 24(%r12)
 			## assign
 			movq	%r11, %r8
 			## storing param [0]
@@ -1959,8 +1959,8 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r11
-			movq	%rax, %r11
+			## storing method result in %r9
+			movq	%rax, %r9
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1987,7 +1987,7 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rcx
 			movq	%rax, %r8
 			movq	$string_5, 24(%r8)
-			## use eq_helper to compare %r11 = %r8
+			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -1998,9 +1998,9 @@ CellularAutomaton.cell_at_next_evolution:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r11) and rhs (%r8)
+			## push lhs (%r9) and rhs (%r8)
 			pushq	%r8
-			pushq	%r11
+			pushq	%r9
 			call	eq_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -2013,18 +2013,18 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .if_then_16
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.if_then_16
 			## branch .if_else_16
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.if_else_16
 .if_then_16:
 			## new const Int: 1
@@ -2051,10 +2051,10 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$1, 24(%r9)
+			movq	%rax, %r8
+			movl	$1, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r11
 			jmp		.if_exit_16
 .if_else_16:
 			## new const Int: 0
@@ -2081,18 +2081,18 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$0, 24(%r9)
+			movq	%rax, %r8
+			movl	$0, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r11
 			jmp		.if_exit_16
 .if_exit_16:
-			## unbox value of %r10 into %r11
-			movq	24(%r10), %r11
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r12 into %r10
+			movq	24(%r12), %r10
+			## unbox value of %r11 into %r9
+			movq	24(%r11), %r9
 			## plus
-			movl	%r11d, %r8d
+			movl	%r10d, %r8d
 			addl	%r9d, %r8d
 			## box value of %r8 into %r9
 			## push caller-saved regs
@@ -2144,9 +2144,9 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movl	$1, 24(%r10)
-			## use eq_helper to compare %r9 = %r10
+			movq	%rax, %r8
+			movl	$1, 24(%r8)
+			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -2157,8 +2157,8 @@ CellularAutomaton.cell_at_next_evolution:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r9) and rhs (%r10)
-			pushq	%r10
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
 			pushq	%r9
 			call	eq_helper
 			addq	$16, %rsp
@@ -2172,10 +2172,10 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -2210,10 +2210,10 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	$string_5, 24(%r9)
+			movq	%rax, %r8
+			movq	$string_5, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.if_exit_13
 .if_else_13:
 			## const String
@@ -2240,14 +2240,14 @@ CellularAutomaton.cell_at_next_evolution:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	$string_6, 24(%r9)
+			movq	%rax, %r8
+			movq	$string_6, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.if_exit_13
 .if_exit_13:
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -2294,8 +2294,8 @@ CellularAutomaton.evolve:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	$0, 24(%r9)
+			movq	%rax, %r13
+			movq	$0, 24(%r13)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -2362,10 +2362,10 @@ CellularAutomaton.evolve:
 			jmp		.loop_start_18
 .loop_start_18:
 			## assign
-			movq	%r9, %r10
+			movq	%r13, %r9
 			## assign
-			movq	%r11, %r13
-			## use lt_helper to compare %r10 < %r13
+			movq	%r11, %r8
+			## use lt_helper to compare %r9 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -2376,9 +2376,9 @@ CellularAutomaton.evolve:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r10) and rhs (%r13)
-			pushq	%r13
-			pushq	%r10
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
+			pushq	%r9
 			call	lt_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -2391,22 +2391,22 @@ CellularAutomaton.evolve:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .loop_body_18
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.loop_body_18
 			## branch .loop_exit_18
 			test	%r8d, %r8d
 			jnz		.loop_exit_18
 .loop_body_18:
 			## assign
-			movq	%r9, %r8
+			movq	%r13, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -2450,7 +2450,7 @@ CellularAutomaton.evolve:
 			## storing param [0]
 			pushq	%r8
 			## assign
-			movq	%r12, %r13
+			movq	%r12, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2474,22 +2474,22 @@ CellularAutomaton.evolve:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r13 is void and set result accordingly
-			cmpq	$0, %r13
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_4
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_4:
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_19_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_19_void
 			## branch .dispatch_19_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.dispatch_19_not_void
 .dispatch_19_void:
 			movq	$string_7, %rdi
@@ -2513,11 +2513,11 @@ CellularAutomaton.evolve:
 			## moving rsp[80] to rsp[0]
 			movq	80(%rsp), %rax
 			movq	%rax, 0(%rsp)
-			## set receiver_obj (%r13) as self ptr (%rbx)
-			movq	%r13, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r13), %rax
+			movq	16(%r10), %rax
 			## find method concat in vtable[5]
 			movq	40(%rax), %rax
 			## call method dynamically
@@ -2541,7 +2541,7 @@ CellularAutomaton.evolve:
 			## assign
 			movq	%r8, %r12
 			## assign
-			movq	%r9, %r10
+			movq	%r13, %r8
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -2566,16 +2566,16 @@ CellularAutomaton.evolve:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movl	$1, 24(%r8)
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
+			movq	%rax, %r9
+			movl	$1, 24(%r9)
 			## unbox value of %r8 into %r10
 			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r9d, %r8d
-			addl	%r10d, %r8d
-			## box value of %r8 into %r10
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2599,10 +2599,10 @@ CellularAutomaton.evolve:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	%r8, 24(%r10)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
 			## assign
-			movq	%r10, %r9
+			movq	%r8, %r13
 			jmp		.loop_start_18
 .loop_exit_18:
 			## default Object
@@ -2613,18 +2613,18 @@ CellularAutomaton.evolve:
 			movq	%r8, 24(%rbx)
 			## assign
 			movq	%r8, %r9
-			## move self ptr into %r9
-			movq	%rbx, %r9
-			## assign
-			movq	%r9, %r8
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
 			movq	%r8, %r9
 			## assign
 			movq	%r9, %r8
 			## assign
 			movq	%r8, %r9
-			## move ret val %r9 into %rax
-			movq	%r9, %rax
+			## assign
+			movq	%r9, %r8
+			## move ret val %r8 into %rax
+			movq	%r8, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -2696,6 +2696,7 @@ IO.in_int:
 			movq	$0, -16(%rbp)
 .in_int_7:
 			movq	-16(%rbp), %r8
+
 
 			## push caller-saved regs
 			pushq	%rcx
@@ -2880,22 +2881,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_5
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_5:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_21_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_21_void
 			## branch .dispatch_21_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_21_not_void
 .dispatch_21_void:
 			movq	$string_9, %rdi
@@ -2942,12 +2943,12 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
-			## store %r9 in self[3] (cells)
-			movq	%r9, 24(%rbx)
+			## storing method result in %r8
+			movq	%rax, %r8
+			## store %r8 in self[3] (cells)
+			movq	%r8, 24(%rbx)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## load self[3] (cells) into %r8
 			movq	24(%rbx), %r8
 			## assign
@@ -2975,22 +2976,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_6
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_6:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_22_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_22_void
 			## branch .dispatch_22_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_22_not_void
 .dispatch_22_void:
 			movq	$string_10, %rdi
@@ -3090,11 +3091,11 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movl	$0, 24(%r8)
+			movq	%rax, %r9
+			movl	$0, 24(%r9)
 			## assign
-			movq	%r11, %r10
-			## use lt_helper to compare %r8 < %r10
+			movq	%r11, %r8
+			## use lt_helper to compare %r9 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -3105,9 +3106,9 @@ Main.main:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r8) and rhs (%r10)
-			pushq	%r10
+			## push lhs (%r9) and rhs (%r8)
 			pushq	%r8
+			pushq	%r9
 			call	lt_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -3120,15 +3121,15 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r9
-			movq	%rax, %r9
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .loop_body_23
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.loop_body_23
 			## branch .loop_exit_23
 			test	%r8d, %r8d
@@ -3249,22 +3250,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_8
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_8:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_25_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_25_void
 			## branch .dispatch_25_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_25_not_void
 .dispatch_25_void:
 			movq	$string_12, %rdi
@@ -3311,7 +3312,7 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r11, %r9
+			movq	%r11, %r8
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -3336,16 +3337,16 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movl	$1, 24(%r10)
+			movq	%rax, %r9
+			movl	$1, 24(%r9)
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
 			## minus
-			movl	%r8d, %r10d
-			subl	%r9d, %r10d
-			## box value of %r10 into %r8
+			movl	%r10d, %r9d
+			subl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3370,21 +3371,21 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r10, 24(%r8)
+			movq	%r9, 24(%r8)
 			## assign
 			movq	%r8, %r11
 			jmp		.loop_start_23
 .loop_exit_23:
 			## default Object
-			movq	$0, %r9
+			movq	$0, %r8
 			## assign
-			movq	%r9, %r8
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			movq	%r8, %r9
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -3757,6 +3758,7 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+
 raw_in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -3820,6 +3822,7 @@ raw_in_string:
 			call	strndup
 			leave
 			ret
+
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -3855,6 +3858,7 @@ cool_str_concat:
 			movq	-8(%rbp), %rax
 			leave
 			ret
+
 cool_str_substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -3893,6 +3897,7 @@ cool_str_substr:
 			popq	%rbx
 			popq	%rbp
 			ret
+
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

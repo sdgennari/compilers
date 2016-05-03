@@ -14,7 +14,7 @@ class TACAssign:
 		self.op1 = op1
 
 	def __str__(self):
-		return self.assignee + " <- " + self.op1
+		return str(self.assignee) + " <- " + str(self.op1)
 
 ''' Arithmetic '''
 # x <- + y z
@@ -26,7 +26,7 @@ class TACPlus:
 		self.op2 = op2
 
 	def __str__(self):
-		return self.assignee + " <- + " + self.op1 + " " + self.op2
+		return str(self.assignee) + " <- + " + str(self.op1) + " " + str(self.op2)
 
 # x <- - y z
 class TACMinus:
@@ -37,7 +37,7 @@ class TACMinus:
 		self.op2 = op2
 
 	def __str__(self):
-		return self.assignee + " <- - " + self.op1 + " " + self.op2
+		return str(self.assignee) + " <- - " + str(self.op1) + " " + str(self.op2)
 
 # x <- * y z
 class TACMult:
@@ -48,7 +48,7 @@ class TACMult:
 		self.op2 = op2
 
 	def __str__(self):
-		return self.assignee + " <- * " + self.op1 + " " + self.op2
+		return str(self.assignee) + " <- * " + str(self.op1) + " " + str(self.op2)
 
 # x <- / y z
 class TACDiv:
@@ -60,7 +60,7 @@ class TACDiv:
 		self.op2 = op2
 
 	def __str__(self):
-		return self.assignee + " <- / " + self.op1 + " " + self.op2
+		return str(self.assignee) + " <- / " + str(self.op1) + " " + str(self.op2)
 
 ''' Comparisons '''
 # x <- < y z
@@ -72,7 +72,7 @@ class TACCompL:
 		self.op2 = op2
 
 	def __str__(self):
-		return self.assignee + " <- < " + self.op1 + " " + self.op2
+		return str(self.assignee) + " <- < " + str(self.op1) + " " + str(self.op2)
 
 # x <- <= y z
 class TACCompLE:
@@ -83,7 +83,7 @@ class TACCompLE:
 		self.op2 = op2
 
 	def __str__(self):
-		return self.assignee + " <- <= " + self.op1 + " " + self.op2
+		return str(self.assignee) + " <- <= " + str(self.op1) + " " + str(self.op2)
 
 # x <- = y z
 class TACCompE:
@@ -94,7 +94,7 @@ class TACCompE:
 		self.op2 = op2
 
 	def __str__(self):
-		return self.assignee + " <- = " + self.op1 + " " + self.op2
+		return str(self.assignee) + " <- = " + str(self.op1) + " " + str(self.op2)
 
 ''' Constants '''
 # x <- int <integer>
@@ -106,7 +106,7 @@ class TACConstInt:
 		self.val = val
 
 	def __str__(self):
-		return self.assignee + " <- " + self.type + " " + self.val
+		return str(self.assignee) + " <- " + str(self.type) + " " + str(self.val)
 
 # x <- bool <boolean>
 class TACConstBool:
@@ -117,7 +117,7 @@ class TACConstBool:
 		self.val = val
 
 	def __str__(self):
-		return self.assignee + " <- " + self.type + " " + self.val
+		return str(self.assignee) + " <- " + str(self.type) + " " + str(self.val)
 
 # x <- string\n<string-on-next-line>
 class TACConstString:
@@ -128,7 +128,7 @@ class TACConstString:
 		self.val = val
 
 	def __str__(self):
-		return self.assignee + " <- " + self.type + "\n" + self.val
+		return str(self.assignee) + " <- " + str(self.type) + "\n" + str(self.val)
 
 ''' Negation '''
 # x <- not y
@@ -139,7 +139,7 @@ class TACNegBool:
 		self.op1 = op1
 
 	def __str__(self):
-		return self.assignee + " <- not " + self.op1
+		return str(self.assignee) + " <- not " + str(self.op1)
 
 # x <- ~ y
 class TACNegArith:
@@ -149,7 +149,7 @@ class TACNegArith:
 		self.op1 = op1
 
 	def __str__(self):
-		return self.assignee + " <- ~ " + self.op1
+		return str(self.assignee) + " <- ~ " + str(self.op1)
 
 ''' Allocation '''
 # x <- new <type>
@@ -160,7 +160,7 @@ class TACNew:
 		self.type = allocType
 
 	def __str__(self):
-		return self.assignee + " <- new " + self.type
+		return str(self.assignee) + " <- new " + str(self.type)
 
 class TACNewSelfType:
 	def __init__(self, cur_exp_type, assignee):
@@ -168,7 +168,7 @@ class TACNewSelfType:
 		self.assignee = assignee
 
 	def __str__(self):
-		return self.assignee + " <- new SELF_TYPE"
+		return str(self.assignee) + " <- new SELF_TYPE"
 
 ''' Default Value '''
 # x <- default <type>
@@ -179,7 +179,7 @@ class TACDefault:
 		self.type = defType
 
 	def __str__(self):
-		return self.assignee + " <- default " + self.type
+		return str(self.assignee) + " <- default " + str(self.type)
 
 ''' Null Check '''
 # x <- isvoid y
@@ -190,7 +190,7 @@ class TACIsVoid:
 		self.op1 = op1
 
 	def __str__(self):
-		return self.assignee + " <- isvoid " + self.op1
+		return str(self.assignee) + " <- isvoid " + str(self.op1)
 
 ''' Function Calls '''
 class TACIOCall:
@@ -204,7 +204,7 @@ class TACOutInt(TACIOCall):
 		self.op1 = op1
 
 	def __str__(self):
-		return self.assignee + " <- call out_int " + self.op1
+		return str(self.assignee) + " <- call out_int " + str(self.op1)
 
 # x <- call out_string y
 class TACOutString(TACIOCall):
@@ -214,7 +214,7 @@ class TACOutString(TACIOCall):
 		self.op1 = op1
 
 	def __str__(self):
-		return self.assignee + " <- call out_string " + self.op1
+		return str(self.assignee) + " <- call out_string " + str(self.op1)
 
 # x <- call in_int
 class TACInInt(TACIOCall):
@@ -223,7 +223,7 @@ class TACInInt(TACIOCall):
 		self.assignee = assignee
 
 	def __str__(self):
-		return self.assignee + " <- call in_int"
+		return str(self.assignee) + " <- call in_int"
 
 # x <- call in_string
 class TACInString(TACIOCall):
@@ -232,7 +232,7 @@ class TACInString(TACIOCall):
 		self.assignee = assignee
 
 	def __str__(self):
-		return self.assignee + " <- call in_string"
+		return str(self.assignee) + " <- call in_string"
 
 ''' Control Flow '''
 class TACControlFlow:
@@ -260,7 +260,7 @@ class TACReturn(TACControlFlow):
 		self.op1 = op1
 
 	def __str__(self):
-		return "return " + self.op1
+		return "return " + str(self.op1)
 
 # comment <comment>
 class TACComment(TACControlFlow):
@@ -277,7 +277,7 @@ class TACBt(TACControlFlow):
 		self.label = label
 
 	def __str__(self):
-		return "bt " + self.op1 + " " + self.label
+		return "bt " + str(self.op1) + " " + self.label
 
 ''' Custom TAC Commands '''
 class TACCustom:
@@ -287,7 +287,7 @@ class TACStore(TACCustom):
 	def __init__(self, op1):
 		self.op1 = op1
 	def __str__(self):
-		return "store " + self.op1
+		return "store " + str(self.op1)
 
 class TACLoad(TACCustom):
 	def __init__(self, assignee, location):
@@ -295,7 +295,7 @@ class TACLoad(TACCustom):
 		self.location = location
 
 	def __str__(self):
-		return self.assignee + " <- load loc["+self.location+"]"
+		return str(self.assignee) + " <- load loc["+str(self.location)+"]"
 
 class TACBox(TACCustom):
 	def __init__(self, assignee, op1, exp_type):
@@ -304,7 +304,7 @@ class TACBox(TACCustom):
 		self.exp_type = exp_type
 
 	def __str__(self):
-		return self.assignee + " <- box (" + self.exp_type + ") " + self.op1
+		return str(self.assignee) + " <- box (" + str(self.exp_type) + ") " + str(self.op1)
 
 class TACUnbox(TACCustom):
 	def __init__(self, assignee, op1, exp_type):
@@ -313,7 +313,7 @@ class TACUnbox(TACCustom):
 		self.exp_type = exp_type
 
 	def __str__(self):
-		return self.assignee + " <- unbox (" + self.exp_type + ") " + self.op1
+		return str(self.assignee) + " <- unbox (" + str(self.exp_type) + ") " + str(self.op1)
 
 class TACLoadAttr(TACCustom):
 	def __init__(self, assignee, ident):
@@ -321,7 +321,7 @@ class TACLoadAttr(TACCustom):
 		self.ident = ident
 
 	def __str__(self):
-		return self.assignee + " <- loadAttr " + self.ident + " (attr)"
+		return str(self.assignee) + " <- loadAttr " + str(self.ident) + " (attr)"
 
 
 class TACStoreAttr(TACCustom):
@@ -331,7 +331,7 @@ class TACStoreAttr(TACCustom):
 		self.op1 = op1
 
 	def __str__(self):
-		return self.ident + " (attr) <- storeAttr " + self.op1
+		return str(self.ident) + " (attr) <- storeAttr " + str(self.op1)
 
 class TACLoadParam(TACCustom):
 	def __init__(self, cur_exp_type, assignee, param_idx):
@@ -340,7 +340,7 @@ class TACLoadParam(TACCustom):
 		self.param_idx = param_idx
 
 	def __str__(self):
-		return self.assignee + " <- param [" + str(self.param_idx) + "]"
+		return str(self.assignee) + " <- param [" + str(self.param_idx) + "]"
 
 class TACStoreParam(TACCustom):
 	def __init__(self, cur_exp_type, param_idx, op1):
@@ -349,7 +349,7 @@ class TACStoreParam(TACCustom):
 		self.op1 = op1
 
 	def __str__(self):
-		return "param [" + str(self.param_idx) + "] <- " + self.op1
+		return "param [" + str(self.param_idx) + "] <- " + str(self.op1)
 
 class TACCall(TACCustom):
 	pass
@@ -364,10 +364,10 @@ class TACStaticCall(TACCall):
 		self.assignee = assignee
 
 	def __str__(self):
-		result = self.assignee
+		result = str(self.assignee)
 		result += " <- static_call "
 		result += self.static_type + "." + self.method_ident
-		result += " (ro: " + self.receiver_obj + ", params: " + str(self.params_list) + ")"
+		result += " (ro: " + str(self.receiver_obj) + ", params: " + str(self.params_list) + ")"
 		return result
 
 class TACDynamicCall(TACCall):
@@ -380,10 +380,10 @@ class TACDynamicCall(TACCall):
 		self.assignee = assignee
 
 	def __str__(self):
-		result = self.assignee
+		result = str(self.assignee)
 		result += " <- dynamic_call "
 		result += self.method_ident
-		result += " (ro: " + self.receiver_obj + ", params: " + str(self.params_list) + ")"
+		result += " (ro: " + str(self.receiver_obj) + ", params: " + str(self.params_list) + ")"
 		return result
 
 class TACSelfCall(TACCall):
@@ -394,7 +394,7 @@ class TACSelfCall(TACCall):
 		self.assignee = assignee
 
 	def __str__(self):
-		result = self.assignee
+		result = str(self.assignee)
 		result += " <- self_call "
 		result += self.method_ident
 		result += " (ro: self, params: " + str(self.params_list) + ")"
@@ -408,7 +408,7 @@ class TACCaseCmpTypesAndJe(TACCustom):
 		self.type_case_label = type_case_label
 
 	def __str__(self):
-		return "compare " + self.op1 + " to " + self.type_name + " and je to " + self.type_case_label
+		return "compare " + str(self.op1) + " to " + self.type_name + " and je to " + self.type_case_label
 
 class TACGetTypeTag(TACCustom):
 	def __init__(self, assignee, op1):
@@ -416,7 +416,7 @@ class TACGetTypeTag(TACCustom):
 		self.op1 = op1
 
 	def __str__(self):
-		return self.assignee + " <- type_of(" + self.op1 + ")"
+		return str(self.assignee) + " <- type_of(" + str(self.op1) + ")"
 
 class TACError(TACCustom):
 	def __init__(self, line, error_msg):

@@ -18,7 +18,6 @@ class TACBasicBlock:
 		self.liveness_sets_ready = False
 
 		# Keep a list of all live sets and live ranges
-		self.live_set_list = []
 		self.live_ranges = {}
 
 		# First item in instr_list will always be TACLabel, so get label for the block
@@ -192,8 +191,8 @@ def computeLiveSets(block_list):
 		has_live_in_changed = False
 
 		for block in block_list:
-			# Reset the current live_set_list
-			block.live_set_list = []
+			# Reset live ranges
+			block.live_ranges = {}
 
 			# Compute live_in for that block
 			cur_live_in = copy.copy(block.live_out)
@@ -216,8 +215,11 @@ def computeLiveSets(block_list):
 				if hasattr(TAC_instr, 'op2'):
 					cur_live_in.add(TAC_instr.op2)
 
-				# Add current live set to live set list
-				block.live_set_list.insert(0, copy.copy(list(cur_live_in)))
+				for virtual_reg in cur_live_in:
+					if virtual_reg in block.live_ranges:
+						block.live_ranges[virtual_reg] += 1
+					else:
+						block.live_ranges[virtual_reg] = 1
 			# -- end TAC instr loop
 
 			# Check if live in changed
@@ -225,16 +227,6 @@ def computeLiveSets(block_list):
 				has_live_in_changed = True
 			block.live_in = cur_live_in
 
-			# Compute live ranges based on live set list
-			block.live_ranges = {}
-			for live_set in block.live_set_list:
-				for virtual_reg in live_set:
-					if block.live_ranges.has_key(virtual_reg):
-						block.live_ranges[virtual_reg] += 1
-					else:
-						block.live_ranges[virtual_reg] = 1
-				# -- end virtual reg loop
-			# -- end live set loop
 		# -- end loop to compute new live in sets
 
 		# Compute live out for parent

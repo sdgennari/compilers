@@ -618,16 +618,16 @@ Main.some_method:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$2, 24(%r9)
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			movq	%rax, %r10
+			movl	$2, 24(%r10)
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
+			## unbox value of %r10 into %r8
+			movq	24(%r10), %r8
 			## plus
-			movl	%r10d, %r9d
-			addl	%r8d, %r9d
-			## box value of %r9 into %r8
+			movl	%r9d, %r10d
+			addl	%r8d, %r10d
+			## box value of %r10 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -652,7 +652,7 @@ Main.some_method:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r9, 24(%r8)
+			movq	%r10, 24(%r8)
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs

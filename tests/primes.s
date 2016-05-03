@@ -412,12 +412,12 @@ Main..new:		## Constructor for Main
 			movl	$2, 24(%r8)
 			## store %r8 in self[3] (out)
 			movq	%r8, 24(%rbx)
-			## load self[3] (out) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (out) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
-			## store %r8 in self[4] (testee)
-			movq	%r8, 32(%rbx)
+			movq	%r8, %r9
+			## store %r9 in self[4] (testee)
+			movq	%r9, 32(%rbx)
 			## new const Int: 500
 			## push caller-saved regs
 			pushq	%rcx
@@ -489,7 +489,7 @@ Main..new:		## Constructor for Main
 			## load self[4] (testee) into %r8
 			movq	32(%rbx), %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r11
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -516,14 +516,14 @@ Main..new:		## Constructor for Main
 			popq	%rcx
 			movq	%rax, %r9
 			movl	$1, 24(%r9)
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r8d, %r9d
-			addl	%r10d, %r9d
-			## box value of %r9 into %r10
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -547,12 +547,12 @@ Main..new:		## Constructor for Main
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	%r9, 24(%r10)
-			## store %r10 in self[4] (testee)
-			movq	%r10, 32(%rbx)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
+			## store %r8 in self[4] (testee)
+			movq	%r8, 32(%rbx)
 			## assign
-			movq	%r10, %r8
+			movq	%r8, %r9
 			## new const Int: 2
 			## push caller-saved regs
 			pushq	%rcx
@@ -588,23 +588,23 @@ Main..new:		## Constructor for Main
 			## load self[4] (testee) into %r8
 			movq	32(%rbx), %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r12
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
+			movq	%r8, %r11
 			## load self[5] (divisor) into %r8
 			movq	40(%rbx), %r8
 			## assign
 			movq	%r8, %r9
-			## load self[5] (divisor) into %r11
-			movq	40(%rbx), %r11
-			## assign
-			movq	%r11, %r8
-			## unbox value of %r9 into %r11
-			movq	24(%r9), %r11
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## mult
-			movl	%r11d, %r8d
-			imull	%r9d, %r8d
-			## box value of %r8 into %r9
+			movl	%r10d, %r9d
+			imull	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -628,9 +628,9 @@ Main..new:		## Constructor for Main
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## use lt_helper to compare %r10 < %r9
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
+			## use lt_helper to compare %r12 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -641,9 +641,9 @@ Main..new:		## Constructor for Main
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r10) and rhs (%r9)
-			pushq	%r9
-			pushq	%r10
+			## push lhs (%r12) and rhs (%r8)
+			pushq	%r8
+			pushq	%r12
 			call	lt_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -656,10 +656,10 @@ Main..new:		## Constructor for Main
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -694,10 +694,10 @@ Main..new:		## Constructor for Main
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$0, 24(%r9)
+			movq	%rax, %r8
+			movl	$0, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r10
 			jmp		.if_exit_3
 .if_else_3:
 			## load self[4] (testee) into %r8
@@ -707,22 +707,22 @@ Main..new:		## Constructor for Main
 			## load self[5] (divisor) into %r8
 			movq	40(%rbx), %r8
 			## assign
-			movq	%r8, %r11
+			movq	%r8, %r13
 			## load self[4] (testee) into %r8
 			movq	32(%rbx), %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## load self[5] (divisor) into %r8
 			movq	40(%rbx), %r8
 			## assign
-			movq	%r8, %r9
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			movq	%r8, %r11
 			## unbox value of %r9 into %r10
 			movq	24(%r9), %r10
+			## unbox value of %r11 into %r9
+			movq	24(%r11), %r9
 			## divide
-			## if %r10d not zero, jmp over error
-			cmpl	$0, %r10d
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
 			jnz		.asm_label_1
 			movq	$string_2, %rdi
 			call	raw_out_string
@@ -733,8 +733,8 @@ Main..new:		## Constructor for Main
 			pushq	%rdx
 			pushq	%rax
 			pushq	%rcx
-			movl	%r10d, 24(%rsp)
-			movl	%r8d, %eax
+			movl	%r9d, 24(%rsp)
+			movl	%r10d, %eax
 			cltd
 			movl	24(%rsp), %ecx
 			idivl	%ecx
@@ -742,9 +742,9 @@ Main..new:		## Constructor for Main
 			popq	%rcx
 			popq	%rax
 			popq	%rdx
-			movl	4(%rsp), %r9d
+			movl	4(%rsp), %r8d
 			addq	$8, %rsp
-			## box value of %r9 into %r10
+			## box value of %r8 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -768,48 +768,15 @@ Main..new:		## Constructor for Main
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	%r9, 24(%r10)
-			## unbox value of %r11 into %r8
-			movq	24(%r11), %r8
-			## unbox value of %r10 into %r11
-			movq	24(%r10), %r11
+			movq	%rax, %r9
+			movq	%r8, 24(%r9)
+			## unbox value of %r13 into %r10
+			movq	24(%r13), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## mult
-			movl	%r8d, %r9d
-			imull	%r11d, %r9d
-			## box value of %r9 into %r11
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r11
-			movq	%r9, 24(%r11)
-			## unbox value of %r12 into %r10
-			movq	24(%r12), %r10
-			## unbox value of %r11 into %r8
-			movq	24(%r11), %r8
-			## minus
 			movl	%r10d, %r9d
-			subl	%r8d, %r9d
+			imull	%r8d, %r9d
 			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
@@ -836,7 +803,14 @@ Main..new:		## Constructor for Main
 			popq	%rcx
 			movq	%rax, %r8
 			movq	%r9, 24(%r8)
-			## new const Int: 0
+			## unbox value of %r12 into %r10
+			movq	24(%r12), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
+			## minus
+			movl	%r10d, %r8d
+			subl	%r9d, %r8d
+			## box value of %r8 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -861,8 +835,34 @@ Main..new:		## Constructor for Main
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r9
-			movl	$0, 24(%r9)
-			## use eq_helper to compare %r8 = %r9
+			movq	%r8, 24(%r9)
+			## new const Int: 0
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movl	$0, 24(%r8)
+			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -873,9 +873,9 @@ Main..new:		## Constructor for Main
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r8) and rhs (%r9)
-			pushq	%r9
+			## push lhs (%r9) and rhs (%r8)
 			pushq	%r8
+			pushq	%r9
 			call	eq_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -890,16 +890,16 @@ Main..new:		## Constructor for Main
 			popq	%rcx
 			## move comparison result into %r10
 			movq	%rax, %r10
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .if_then_4
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.if_then_4
 			## branch .if_else_4
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.if_else_4
 .if_then_4:
 			## const Bool
@@ -963,11 +963,11 @@ Main..new:		## Constructor for Main
 			jmp		.if_exit_4
 .if_exit_4:
 			## assign
-			movq	%r9, %r8
+			movq	%r9, %r10
 			jmp		.if_exit_3
 .if_exit_3:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -981,7 +981,7 @@ Main..new:		## Constructor for Main
 			## load self[5] (divisor) into %r8
 			movq	40(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r11
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -1006,12 +1006,12 @@ Main..new:		## Constructor for Main
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r11
-			movl	$1, 24(%r11)
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
-			## unbox value of %r11 into %r8
-			movq	24(%r11), %r8
+			movq	%rax, %r9
+			movl	$1, 24(%r9)
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
 			movl	%r10d, %r9d
 			addl	%r8d, %r9d
@@ -1052,23 +1052,23 @@ Main..new:		## Constructor for Main
 			## load self[4] (testee) into %r8
 			movq	32(%rbx), %r8
 			## assign
+			movq	%r8, %r12
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
 			movq	%r8, %r11
 			## load self[5] (divisor) into %r8
 			movq	40(%rbx), %r8
 			## assign
 			movq	%r8, %r9
-			## load self[5] (divisor) into %r8
-			movq	40(%rbx), %r8
-			## assign
-			movq	%r8, %r10
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
 			## mult
-			movl	%r8d, %r10d
-			imull	%r9d, %r10d
-			## box value of %r10 into %r8
+			movl	%r10d, %r9d
+			imull	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1093,8 +1093,8 @@ Main..new:		## Constructor for Main
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r10, 24(%r8)
-			## use lt_helper to compare %r11 < %r8
+			movq	%r9, 24(%r8)
+			## use lt_helper to compare %r12 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -1105,9 +1105,9 @@ Main..new:		## Constructor for Main
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r11) and rhs (%r8)
+			## push lhs (%r12) and rhs (%r8)
 			pushq	%r8
-			pushq	%r11
+			pushq	%r12
 			call	lt_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -1289,12 +1289,12 @@ Main..new:		## Constructor for Main
 			## load self[6] (stop) into %r8
 			movq	48(%rbx), %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## load self[4] (testee) into %r8
 			movq	32(%rbx), %r8
 			## assign
-			movq	%r8, %r10
-			## use le_helper to compare %r9 <= %r10
+			movq	%r8, %r9
+			## use le_helper to compare %r10 <= %r9
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -1305,9 +1305,9 @@ Main..new:		## Constructor for Main
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r9) and rhs (%r10)
-			pushq	%r10
+			## push lhs (%r10) and rhs (%r9)
 			pushq	%r9
+			pushq	%r10
 			call	le_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -1358,8 +1358,8 @@ Main..new:		## Constructor for Main
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movq	$string_4, 24(%r8)
+			movq	%rax, %r10
+			movq	$string_4, 24(%r10)
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1383,22 +1383,22 @@ Main..new:		## Constructor for Main
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			## check if %r8 is void and set result accordingly
-			cmpq	$0, %r8
+			movq	%rax, %r8
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_2
-			movq	$1, 24(%r10)
+			movq	$1, 24(%r8)
 .asm_label_2:
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r9d, %r10d
-			xorl	$1, %r10d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_7_void
 			test	%r9d, %r9d
 			jnz		.dispatch_7_void
 			## branch .dispatch_7_not_void
-			test	%r10d, %r10d
+			test	%r8d, %r8d
 			jnz		.dispatch_7_not_void
 .dispatch_7_void:
 			movq	$string_5, %rdi
@@ -1419,11 +1419,11 @@ Main..new:		## Constructor for Main
 			pushq	%rbx
 			## pushing 0 params to the stack
 			subq	$0, %rsp
-			## set receiver_obj (%r8) as self ptr (%rbx)
-			movq	%r8, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r8), %rax
+			movq	16(%r10), %rax
 			## find method abort in vtable[2]
 			movq	16(%rax), %rax
 			## call method dynamically
@@ -1442,10 +1442,10 @@ Main..new:		## Constructor for Main
 			popq	%rcx
 			## removing 0 stored params from stack (2nd time)
 			addq	$0, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r10
+			movq	%r8, %r9
 			jmp		.if_exit_6
 .if_else_6:
 			## const String
@@ -1475,7 +1475,7 @@ Main..new:		## Constructor for Main
 			movq	%rax, %r8
 			movq	$string_6, 24(%r8)
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.if_exit_6
 .if_exit_6:
 			jmp		.loop_start_1
@@ -1635,6 +1635,7 @@ IO.in_int:
 			movq	$0, -16(%rbp)
 .in_int_7:
 			movq	-16(%rbp), %r8
+
 
 			## push caller-saved regs
 			pushq	%rcx
@@ -2115,6 +2116,7 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+
 raw_in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -2178,6 +2180,7 @@ raw_in_string:
 			call	strndup
 			leave
 			ret
+
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -2213,6 +2216,7 @@ cool_str_concat:
 			movq	-8(%rbp), %rax
 			leave
 			ret
+
 cool_str_substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -2251,6 +2255,7 @@ cool_str_substr:
 			popq	%rbx
 			popq	%rbp
 			ret
+
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

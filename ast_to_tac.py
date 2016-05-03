@@ -16,7 +16,8 @@ label_counter = 0
 def new_symbol():
 	global symbol_counter
 	symbol_counter += 1
-	return "t$" + str(symbol_counter)
+	# return "t$" + str(symbol_counter)
+	return symbol_counter
 
 def new_label_num():
 	global label_counter

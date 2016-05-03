@@ -486,8 +486,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r11
-			movq	$0, 24(%r11)
+			movq	%rax, %r12
+			movq	$0, 24(%r12)
 			## default Int
 			## push caller-saved regs
 			pushq	%rcx
@@ -512,8 +512,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r12
-			movq	$0, 24(%r12)
+			movq	%rax, %r11
+			movq	$0, 24(%r11)
 			jmp		.loop_start_2
 .loop_start_2:
 			## new const Int: 777
@@ -543,9 +543,9 @@ Main.main:
 			movq	%rax, %r8
 			movl	$777, 24(%r8)
 			## assign
-			movq	%r8, %r12
+			movq	%r8, %r11
 			## assign
-			movq	%r11, %r9
+			movq	%r12, %r9
 			## new const Int: 10
 			## push caller-saved regs
 			pushq	%rcx
@@ -570,9 +570,9 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movl	$10, 24(%r10)
-			## use lt_helper to compare %r9 < %r10
+			movq	%rax, %r8
+			movl	$10, 24(%r8)
+			## use lt_helper to compare %r9 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -583,8 +583,8 @@ Main.main:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r9) and rhs (%r10)
-			pushq	%r10
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
 			pushq	%r9
 			call	lt_helper
 			addq	$16, %rsp
@@ -598,10 +598,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -613,7 +613,7 @@ Main.main:
 			jnz		.loop_exit_2
 .loop_body_2:
 			## assign
-			movq	%r11, %r10
+			movq	%r12, %r8
 			## new const Int: 1
 			## push caller-saved regs
 			pushq	%rcx
@@ -640,13 +640,13 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r9
 			movl	$1, 24(%r9)
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r8d, %r9d
-			addl	%r10d, %r9d
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
 			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
@@ -674,13 +674,13 @@ Main.main:
 			movq	%rax, %r8
 			movq	%r9, 24(%r8)
 			## assign
-			movq	%r8, %r11
+			movq	%r8, %r12
 			jmp		.loop_start_2
 .loop_exit_2:
 			## default Object
 			movq	$0, %r8
 			## assign
-			movq	%r11, %r8
+			movq	%r12, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -788,7 +788,7 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r12, %r8
+			movq	%r11, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx

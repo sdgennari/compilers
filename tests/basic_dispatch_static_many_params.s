@@ -966,7 +966,7 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -991,18 +991,18 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_1
 			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_3_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_3_void
 			## branch .dispatch_3_not_void
 			test	%r8d, %r8d
@@ -1065,8 +1065,8 @@ Main.main:
 			## moving rsp[176] to rsp[96]
 			movq	176(%rsp), %rax
 			movq	%rax, 96(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## static: lookup method in <static_type>..vtable
 			## get ptr to vtable from static type
 			movq	$A..vtable, %rax

@@ -486,7 +486,7 @@ Main.main:
 			movq	%rax, %r8
 			movl	$1, 24(%r8)
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
 			## new const Int: 2
 			## push caller-saved regs
 			pushq	%rcx
@@ -514,13 +514,13 @@ Main.main:
 			movq	%rax, %r8
 			movl	$2, 24(%r8)
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## storing param [0]
 			pushq	%r8
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r8
 			## storing param [1]
 			pushq	%r8
 			pushq	%rcx
@@ -565,11 +565,11 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r10, %r9
-			## assign
 			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			## assign
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -592,12 +592,12 @@ Main.some_method:
 			pushq	%r14
 			pushq	%r15
 .Main_some_method_2:
-			## loading param [0] into %r8
-			movq	16(%rbp), %r8
+			## loading param [0] into %r10
+			movq	16(%rbp), %r10
 			## loading param [1] into %r9
 			movq	24(%rbp), %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r10, %r8
 			## new const Int: 3
 			## push caller-saved regs
 			pushq	%rcx
@@ -622,16 +622,16 @@ Main.some_method:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movl	$3, 24(%r10)
+			movq	%rax, %r9
+			movl	$3, 24(%r9)
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
 			## plus
-			movl	%r8d, %r10d
-			addl	%r9d, %r10d
-			## box value of %r10 into %r8
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -656,7 +656,7 @@ Main.some_method:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	%r10, 24(%r8)
+			movq	%r9, 24(%r8)
 			## new const Int: 9001
 			## push caller-saved regs
 			pushq	%rcx

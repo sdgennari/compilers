@@ -258,10 +258,10 @@ Main..new:		## Constructor for Main
 			movq	$0, 24(%r8)
 			## store %r8 in self[4] (y)
 			movq	%r8, 32(%rbx)
-			## load self[4] (y) into %r9
-			movq	32(%rbx), %r9
+			## load self[4] (y) into %r8
+			movq	32(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r11
 			## new const Int: 7
 			## push caller-saved regs
 			pushq	%rcx
@@ -288,8 +288,8 @@ Main..new:		## Constructor for Main
 			popq	%rcx
 			movq	%rax, %r9
 			movl	$7, 24(%r9)
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## plus
@@ -323,10 +323,10 @@ Main..new:		## Constructor for Main
 			movq	%r9, 24(%r8)
 			## store %r8 in self[3] (x)
 			movq	%r8, 24(%rbx)
-			## load self[3] (x) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (x) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r11
 			## new const Int: 9001
 			## push caller-saved regs
 			pushq	%rcx
@@ -353,8 +353,8 @@ Main..new:		## Constructor for Main
 			popq	%rcx
 			movq	%rax, %r9
 			movl	$9001, 24(%r9)
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
 			## unbox value of %r9 into %r8
 			movq	24(%r9), %r8
 			## plus
@@ -540,6 +540,7 @@ IO.in_int:
 .in_int_7:
 			movq	-16(%rbp), %r8
 
+
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -691,12 +692,12 @@ Main.main:
 			addq	$8, %rsp
 			## storing method result in %r8
 			movq	%rax, %r8
-			## load self[4] (y) into %r9
-			movq	32(%rbx), %r9
+			## load self[4] (y) into %r8
+			movq	32(%rbx), %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## storing param [0]
-			pushq	%r8
+			pushq	%r9
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1057,6 +1058,7 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+
 raw_in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1120,6 +1122,7 @@ raw_in_string:
 			call	strndup
 			leave
 			ret
+
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1155,6 +1158,7 @@ cool_str_concat:
 			movq	-8(%rbp), %rax
 			leave
 			ret
+
 cool_str_substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1193,6 +1197,7 @@ cool_str_substr:
 			popq	%rbx
 			popq	%rbp
 			ret
+
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::

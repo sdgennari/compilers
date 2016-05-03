@@ -630,22 +630,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_1
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_3_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_3_void
 			## branch .dispatch_3_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_3_not_void
 .dispatch_3_void:
 			movq	$string_1, %rdi

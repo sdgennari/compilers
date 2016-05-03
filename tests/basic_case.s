@@ -754,9 +754,9 @@ Main.main:
 			je		.case_2_error_branch
 .case_2_A:
 			## assign
-			movq	%r11, %r8
+			movq	%r11, %r10
 			## assign
-			movq	%r8, %r10
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1075,22 +1075,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_2
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_2:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .case_5_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.case_5_void
 			## branch .case_5_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.case_5_not_void
 .case_5_void:
 			movq	$string_7, %rdi
@@ -1854,11 +1854,11 @@ Main.main:
 			call	exit
 .case_6_exit:
 			## assign
-			movq	%r9, %r10
+			movq	%r9, %r8
 			## assign
-			movq	%r10, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14

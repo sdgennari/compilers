@@ -587,12 +587,12 @@ Main.main:
 			movq	%rax, %r8
 			## assign
 			movq	%r8, %r9
-			## load self[3] (a) into %r9
-			movq	24(%rbx), %r9
+			## load self[3] (a) into %r8
+			movq	24(%rbx), %r8
 			## assign
-			movq	%r9, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			movq	%r8, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -615,8 +615,8 @@ Main.some_method:
 			pushq	%r14
 			pushq	%r15
 .Main_some_method_2:
-			## loading param [0] into %r10
-			movq	16(%rbp), %r10
+			## loading param [0] into %r11
+			movq	16(%rbp), %r11
 			## new const Int: 3000
 			## push caller-saved regs
 			pushq	%rcx
@@ -671,16 +671,16 @@ Main.some_method:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r12
-			movl	$777, 24(%r12)
-			## unbox value of %r8 into %r11
-			movq	24(%r8), %r11
-			## unbox value of %r12 into %r9
-			movq	24(%r12), %r9
+			movq	%rax, %r9
+			movl	$777, 24(%r9)
+			## unbox value of %r8 into %r10
+			movq	24(%r8), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r11d, %r8d
-			addl	%r9d, %r8d
-			## box value of %r8 into %r9
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -704,12 +704,12 @@ Main.some_method:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## assign
-			movq	%r10, %r8
+			movq	%r11, %r8
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs

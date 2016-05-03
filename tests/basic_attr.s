@@ -614,20 +614,20 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movl	$9001, 24(%r9)
+			movq	%rax, %r11
+			movl	$9001, 24(%r11)
 			## load self[3] (some_attr) into %r8
 			movq	24(%rbx), %r8
 			## assign
-			movq	%r8, %r10
-			## unbox value of %r9 into %r11
-			movq	24(%r9), %r11
-			## unbox value of %r10 into %r9
-			movq	24(%r10), %r9
+			movq	%r8, %r9
+			## unbox value of %r11 into %r10
+			movq	24(%r11), %r10
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## plus
-			movl	%r11d, %r8d
-			addl	%r9d, %r8d
-			## box value of %r8 into %r9
+			movl	%r10d, %r9d
+			addl	%r8d, %r9d
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -651,10 +651,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
+			movq	%rax, %r8
+			movq	%r9, 24(%r8)
 			## storing param [0]
-			pushq	%r9
+			pushq	%r8
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi

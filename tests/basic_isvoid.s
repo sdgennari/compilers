@@ -486,8 +486,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movq	$0, 24(%r8)
+			movq	%rax, %r9
+			movq	$0, 24(%r9)
 			## default Int
 			## push caller-saved regs
 			pushq	%rcx
@@ -541,11 +541,11 @@ Main.main:
 			movq	%rax, %r13
 			movq	$empty.string, 24(%r13)
 			## default IO
-			movq	$0, %r11
-			## default Object
 			movq	$0, %r10
+			## default Object
+			movq	$0, %r11
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -569,14 +569,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r14
+			## check if %r8 is void and set result accordingly
+			cmpq	$0, %r8
 			jnz		.asm_label_1
-			movq	$1, 24(%r8)
+			movq	$1, 24(%r14)
 .asm_label_1:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r14 into %r9
+			movq	24(%r14), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -651,10 +651,10 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.if_exit_2
 .if_else_2:
 			## const String
@@ -721,14 +721,14 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.if_exit_2
 .if_exit_2:
 			## assign
-			movq	%r12, %r9
+			movq	%r12, %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -752,14 +752,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r12
+			## check if %r8 is void and set result accordingly
+			cmpq	$0, %r8
 			jnz		.asm_label_2
-			movq	$1, 24(%r8)
+			movq	$1, 24(%r12)
 .asm_label_2:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r12 into %r9
+			movq	24(%r12), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -935,22 +935,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r12
 			## check if %r8 is void and set result accordingly
 			cmpq	$0, %r8
 			jnz		.asm_label_3
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r12)
 .asm_label_3:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r12 into %r9
+			movq	24(%r12), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .if_then_4
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.if_then_4
 			## branch .if_else_4
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.if_else_4
 .if_then_4:
 			## const String
@@ -1094,7 +1094,7 @@ Main.main:
 			jmp		.if_exit_4
 .if_exit_4:
 			## assign
-			movq	%r11, %r9
+			movq	%r10, %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1118,14 +1118,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r10
+			## check if %r8 is void and set result accordingly
+			cmpq	$0, %r8
 			jnz		.asm_label_4
-			movq	$1, 24(%r8)
+			movq	$1, 24(%r10)
 .asm_label_4:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -1200,10 +1200,10 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.if_exit_5
 .if_else_5:
 			## const String
@@ -1270,14 +1270,14 @@ Main.main:
 			popq	%rcx
 			## removing 1 stored params from stack (2nd time)
 			addq	$8, %rsp
-			## storing method result in %r9
-			movq	%rax, %r9
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.if_exit_5
 .if_exit_5:
 			## assign
-			movq	%r10, %r8
+			movq	%r11, %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1301,22 +1301,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r10
 			## check if %r8 is void and set result accordingly
 			cmpq	$0, %r8
 			jnz		.asm_label_5
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r10)
 .asm_label_5:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .if_then_6
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.if_then_6
 			## branch .if_else_6
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.if_else_6
 .if_then_6:
 			## const String
@@ -1551,9 +1551,9 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r11
+			movq	%r8, %r10
 			## assign
-			movq	%r11, %r9
+			movq	%r10, %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1577,14 +1577,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			movq	%rax, %r10
+			## check if %r8 is void and set result accordingly
+			cmpq	$0, %r8
 			jnz		.asm_label_6
-			movq	$1, 24(%r8)
+			movq	$1, 24(%r10)
 .asm_label_6:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d

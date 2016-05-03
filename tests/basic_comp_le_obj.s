@@ -506,12 +506,12 @@ Main.main:
 			pushq	%r15
 .Main_main_1:
 			## default A
-			movq	$0, %r8
+			movq	$0, %r10
 			## assign
-			movq	%r8, %r9
+			movq	%r10, %r9
 			## assign
-			movq	%r8, %r10
-			## use le_helper to compare %r9 <= %r10
+			movq	%r10, %r8
+			## use le_helper to compare %r9 <= %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -522,8 +522,8 @@ Main.main:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r9) and rhs (%r10)
-			pushq	%r10
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
 			pushq	%r9
 			call	le_helper
 			addq	$16, %rsp
@@ -537,10 +537,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d

@@ -134,6 +134,7 @@ def spill_register(block_list, register_to_spill):
 
 		it = enumerate(block.instr_list)
 		for idx, instr in it:
+
 			# If tX is op1 or op2, add TACLoad immediately before in list
 			if is_operand(instr, register_to_spill):
 				block.instr_list.insert(idx, TACLoad(register_to_spill, register_to_spill))
@@ -145,27 +146,6 @@ def spill_register(block_list, register_to_spill):
 				next(it)
 				idx = idx + 1
 
-
-		# # Build a new list of instructions with loads and stores added
-		# new_instr_list = []
-		# for instr in block.instr_list:
-		# 	# If tX is op1 or op2, add TACLoad immediately before in list
-		# 	if is_operand(instr, register_to_spill):
-		# 		new_instr_list.append(TACLoad(register_to_spill, register_to_spill))
-
-		# 	# Add current instr to list
-		# 	new_instr_list.append(instr)
-
-		# 	# If tX is assignee, add TACStore immediately after in list
-		# 	if is_assignee(instr, register_to_spill):
-		# 		new_instr_list.append(TACStore(register_to_spill))
-		# # -- end instr loop
-		# block.instr_list = new_instr_list
-
-		# print
-		# for instr in block.instr_list:
-		# 	print instr
-		# print
 	#-- end block loop
 
 
@@ -205,13 +185,25 @@ def build_register_graph(block_list):
 	register_graph = {}
 
 	for block in block_list:
-		# for idx, tac_instr in enumerate(block.instr_list):
-			# live_set = block.live_set_list[idx]
-		for tac_instr, live_set in zip(block.instr_list, block.live_set_list):
+
+		cur_live_set = copy.copy(block.live_out)
+		for tac_instr in reversed(block.instr_list):
+
+			# Update the liveness information
+			if isinstance(tac_instr, TACStaticCall) or isinstance(tac_instr, TACDynamicCall):
+				cur_live_set.add(tac_instr.receiver_obj)
+
+			if hasattr(tac_instr, 'op1'):
+				cur_live_set.add(tac_instr.op1)
+
+			if hasattr(tac_instr, 'op2'):
+				cur_live_set.add(tac_instr.op2)
 
 			# Check if the current instr has an assignee
 			assignee = None
 			if hasattr(tac_instr, "assignee"):
+				cur_live_set.discard(tac_instr.assignee)
+
 				assignee = tac_instr.assignee
 
 				# If the assignee is not in the graph, add it
@@ -219,17 +211,19 @@ def build_register_graph(block_list):
 					register_graph[assignee] = set()
 
 			# Registers in the same live set should have edges in the graph
-			for i in range(len(live_set)):
-				reg1 = live_set[i]
+			cur_live_list = list(cur_live_set);
+
+			for i in range(len(cur_live_set)):
+				reg1 = cur_live_list[i]
 
 				# If the register is not in the graph, add it
 				if reg1 not in register_graph:
 					register_graph[reg1] = set()
 
 				# Loop through other registers to add edges
-				for j in range(i+1, len(live_set)):
+				for j in range(i+1, len(cur_live_set)):
 					# Get the registers from the live set
-					reg2 = live_set[j]
+					reg2 = cur_live_list[j]
 
 					# If the register is not in the graph, add it
 					if reg2 not in register_graph:

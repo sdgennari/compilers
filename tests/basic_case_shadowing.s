@@ -489,7 +489,7 @@ Main.main:
 			movq	%rax, %r8
 			movl	$123, 24(%r8)
 			## assign
-			movq	%r8, %r11
+			movq	%r8, %r10
 			## new const Int: 777
 			## push caller-saved regs
 			pushq	%rcx
@@ -514,12 +514,12 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movl	$777, 24(%r8)
-			## assign
-			movq	%r8, %r9
+			movq	%rax, %r9
+			movl	$777, 24(%r9)
 			## assign
 			movq	%r9, %r8
+			## assign
+			movq	%r8, %r11
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -543,22 +543,22 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			## check if %r8 is void and set result accordingly
-			cmpq	$0, %r8
+			movq	%rax, %r8
+			## check if %r11 is void and set result accordingly
+			cmpq	$0, %r11
 			jnz		.asm_label_1
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .case_3_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.case_3_void
 			## branch .case_3_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.case_3_not_void
 .case_3_void:
 			movq	$string_1, %rdi
@@ -567,35 +567,35 @@ Main.main:
 			call	exit
 			jmp		.case_3_not_void
 .case_3_not_void:
-			## move type tag of %r8 into %r9
-			movq	0(%r8), %r9
+			## move type tag of %r11 into %r8
+			movq	0(%r11), %r8
 			## check for type String
 			movq	$4, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 			## check for type Int
 			movq	$1, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_Int
 			## check for type Object
 			movq	$3, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 			## check for type Bool
 			movq	$0, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 			## check for type IO
 			movq	$2, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 			## check for type Main
 			movq	$5, %rax
-			cmpq	%rax, %r9
+			cmpq	%rax, %r8
 			je		.case_2_error_branch
 .case_2_Int:
 			## assign
-			movq	%r8, %r9
+			movq	%r11, %r9
 			## assign
 			movq	%r9, %r8
 			## storing param [0]
@@ -744,7 +744,7 @@ Main.main:
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r11, %r8
+			movq	%r10, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx

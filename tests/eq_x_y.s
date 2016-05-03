@@ -37,6 +37,10 @@ Main..vtable:		## vtable for Main
 			.quad Object.abort
 			.quad Object.copy
 			.quad Object.type_name
+			.quad IO.in_int
+			.quad IO.in_string
+			.quad IO.out_int
+			.quad IO.out_string
 			.quad Main.main
 
 .globl Object..vtable
@@ -458,7 +462,11 @@ Main.main:
 			pushq	%r14
 			pushq	%r15
 .Main_main_1:
-			## default Int
+			## default Object
+			movq	$0, %r11
+			## default Object
+			movq	$0, %r10
+			## new Object
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -470,89 +478,7 @@ Main.main:
 			pushq	%r11
 			## push self ptr
 			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	$0, 24(%r9)
-			## default Bool
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	$0, 24(%r9)
-			## default String
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	$empty.string, 24(%r9)
-			## default IO
-			movq	$0, %r9
-			## default Main
-			movq	$0, %r9
-			## new const Int: 777
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
+			call	Object..new
 			## restore self ptr
 			popq	%rbx
 			## pop caller-saved regs
@@ -565,10 +491,10 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$777, 24(%r8)
 			## assign
-			movq	%r8, %r9
-			## const Bool
+			movq	%r8, %r11
+			## assign
+			movq	%r11, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -593,11 +519,29 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$1, 24(%r8)
-			## assign
-			movq	%r8, %r9
-			## const Bool
-			## push caller-saved regs
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
+			jnz		.asm_label_1
+			movq	$1, 24(%r8)
+.asm_label_1:
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .dispatch_2_void
+			test	%r9d, %r9d
+			jnz		.dispatch_2_void
+			## branch .dispatch_2_not_void
+			test	%r8d, %r8d
+			jnz		.dispatch_2_not_void
+.dispatch_2_void:
+			movq	$string_1, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+			jmp		.dispatch_2_not_void
+.dispatch_2_not_void:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -606,12 +550,23 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push self ptr
+			## save self ptr (%rbx)
 			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
+			## pushing 0 params to the stack
+			subq	$0, %rsp
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
+			## dynamic: lookup method in vtable
+			## get ptr to vtable from receiver obj
+			movq	16(%r10), %rax
+			## find method copy in vtable[3]
+			movq	24(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 0 params from stack with subq
+			addq	$0, %rsp
+			## restore self ptr (%rbx)
 			popq	%rbx
-			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -620,10 +575,56 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
+			## removing 0 stored params from stack (2nd time)
+			addq	$0, %rsp
+			## storing method result in %r8
 			movq	%rax, %r8
-			movl	$0, 24(%r8)
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r10
+			## assign
+			movq	%r11, %r9
+			## assign
+			movq	%r10, %r8
+			## use eq_helper to compare %r9 = %r8
+			## push caller-saved regs and self ptr
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
+			pushq	%r9
+			call	eq_helper
+			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .if_then_3
+			test	%r9d, %r9d
+			jnz		.if_then_3
+			## branch .if_else_3
+			test	%r8d, %r8d
+			jnz		.if_else_3
+.if_then_3:
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -649,10 +650,52 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movq	$string_1, 24(%r8)
+			movq	$string_2, 24(%r8)
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_string in vtable[8]
+			movq	64(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
 			## assign
 			movq	%r8, %r9
-			## new IO
+			jmp		.if_exit_3
+.if_else_3:
+			## const String
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -664,7 +707,7 @@ Main.main:
 			pushq	%r11
 			## push self ptr
 			pushq	%rbx
-			call	IO..new
+			call	String..new
 			## restore self ptr
 			popq	%rbx
 			## pop caller-saved regs
@@ -677,10 +720,9 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## assign
-			movq	%r8, %r9
-			## new Main
-			## push caller-saved regs
+			movq	$string_3, 24(%r8)
+			## storing param [0]
+			pushq	%r8
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -689,12 +731,24 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push self ptr
+			## save self ptr (%rbx)
 			pushq	%rbx
-			call	Main..new
-			## restore self ptr
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_string in vtable[8]
+			movq	64(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
 			popq	%rbx
-			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -703,9 +757,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
 			movq	%r8, %r9
+			jmp		.if_exit_3
+.if_exit_3:
 			## assign
 			movq	%r9, %r8
 			## move ret val %r8 into %rax
@@ -970,9 +1029,17 @@ abort.string:			## abort string for Object.abort
 error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
 
+.globl string_3
+string_3:
+			.string "false\\n"
+
+.globl string_2
+string_2:
+			.string "true\\n"
+
 .globl string_1
 string_1:
-			.string "hello cool\\n"
+			.string "ERROR: 8: Exception: dispatch on void"
 
 .globl in_int_format_str
 in_int_format_str:

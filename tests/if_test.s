@@ -354,6 +354,7 @@ IO.in_int:
 .in_int_7:
 			movq	-16(%rbp), %r8
 
+
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -485,60 +486,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r15
-			movq	$0, 24(%r15)
-			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rdi
-			movq	$0, 24(%rdi)
-			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rcx
-			movq	$0, 24(%rcx)
+			movq	%rax, %r8
+			movq	$0, 24(%r8)
 			## default Int
 			## push caller-saved regs
 			pushq	%rcx
@@ -615,8 +564,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movq	$0, 24(%r8)
+			movq	%rax, %rcx
+			movq	$0, 24(%rcx)
 			## default Int
 			## push caller-saved regs
 			pushq	%rcx
@@ -641,8 +590,60 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	$0, 24(%r9)
+			movq	%rax, %r14
+			movq	$0, 24(%r14)
+			## default Int
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r13
+			movq	$0, 24(%r13)
+			## default Int
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r15
+			movq	$0, 24(%r15)
 			## default Int
 			## push caller-saved regs
 			pushq	%rcx
@@ -693,32 +694,6 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r11
-			movq	$0, 24(%r11)
-			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
 			movq	%rax, %r12
 			movq	$0, 24(%r12)
 			## default Int
@@ -745,14 +720,10 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r13
-			movq	$0, 24(%r13)
-			## assign
-			movq	%r15, %r14
-			## assign
-			movq	%rdi, %r15
-			## use lt_helper to compare %r14 < %r15
-			## push caller-saved regs and self ptr
+			movq	%rax, %r11
+			movq	$0, 24(%r11)
+			## default Int
+			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -761,14 +732,12 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
+			## push self ptr
 			pushq	%rbx
-			## push lhs (%r14) and rhs (%r15)
-			pushq	%r15
-			pushq	%r14
-			call	lt_helper
-			addq	$16, %rsp
-			## pop self ptr and caller-saved regs
+			call	Int..new
+			## restore self ptr
 			popq	%rbx
+			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -777,89 +746,13 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r13
-			movq	%rax, %r13
-			## unbox value of %r13 into %r14
-			movq	24(%r13), %r14
-			## not
-			movl	%r14d, %r13d
-			xorl	$1, %r13d
-			## branch .if_then_2
-			test	%r14d, %r14d
-			jnz		.if_then_2
-			## branch .if_else_2
-			test	%r13d, %r13d
-			jnz		.if_else_2
-.if_then_2:
-			## assign
-			movq	%rcx, %r11
-			## assign
-			movq	%rsi, %r10
-			## use lt_helper to compare %r11 < %r10
-			## push caller-saved regs and self ptr
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			pushq	%rbx
-			## push lhs (%r11) and rhs (%r10)
-			pushq	%r10
-			pushq	%r11
-			call	lt_helper
-			addq	$16, %rsp
-			## pop self ptr and caller-saved regs
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## move comparison result into %r9
 			movq	%rax, %r9
-			## unbox value of %r9 into %r10
-			movq	24(%r9), %r10
-			## not
-			movl	%r10d, %r9d
-			xorl	$1, %r9d
-			## branch .if_then_3
-			test	%r10d, %r10d
-			jnz		.if_then_3
-			## branch .if_else_3
-			test	%r9d, %r9d
-			jnz		.if_else_3
-.if_then_3:
-			## assign
-			movq	%rdx, %r8
-			## assign
-			movq	%r8, %r13
-			## assign
-			movq	%r13, %r9
-			jmp		.if_exit_3
-.if_else_3:
+			movq	$0, 24(%r9)
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r9, %r13
-			## assign
-			movq	%r13, %r9
-			jmp		.if_exit_3
-.if_exit_3:
-			## assign
-			movq	%r9, %r8
-			jmp		.if_exit_2
-.if_else_2:
-			## assign
-			movq	%r9, %r13
-			## assign
-			movq	%r10, %r9
-			## use lt_helper to compare %r13 < %r9
+			movq	%rsi, %r8
+			## use lt_helper to compare %r9 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -870,9 +763,9 @@ Main.main:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r13) and rhs (%r9)
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
 			pushq	%r9
-			pushq	%r13
 			call	lt_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -885,10 +778,118 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## move comparison result into %rsi
+			movq	%rax, %rsi
+			## unbox value of %rsi into %r9
+			movq	24(%rsi), %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .if_then_2
+			test	%r9d, %r9d
+			jnz		.if_then_2
+			## branch .if_else_2
+			test	%r8d, %r8d
+			jnz		.if_else_2
+.if_then_2:
+			## assign
+			movq	%rdx, %r9
+			## assign
+			movq	%rcx, %r8
+			## use lt_helper to compare %r9 < %r8
+			## push caller-saved regs and self ptr
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
+			pushq	%r9
+			call	lt_helper
+			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .if_then_3
+			test	%r9d, %r9d
+			jnz		.if_then_3
+			## branch .if_else_3
+			test	%r8d, %r8d
+			jnz		.if_else_3
+.if_then_3:
+			## assign
+			movq	%r14, %r8
+			## assign
+			movq	%r8, %r9
+			## assign
+			movq	%r9, %r8
+			jmp		.if_exit_3
+.if_else_3:
+			## assign
+			movq	%r13, %r8
+			## assign
+			movq	%r8, %r9
+			## assign
+			movq	%r9, %r8
+			jmp		.if_exit_3
+.if_exit_3:
+			## assign
+			movq	%r8, %r9
+			jmp		.if_exit_2
+.if_else_2:
+			## assign
+			movq	%r15, %r9
+			## assign
+			movq	%r10, %r8
+			## use lt_helper to compare %r9 < %r8
+			## push caller-saved regs and self ptr
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			pushq	%rbx
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
+			pushq	%r9
+			call	lt_helper
+			addq	$16, %rsp
+			## pop self ptr and caller-saved regs
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -900,29 +901,29 @@ Main.main:
 			jnz		.if_else_4
 .if_then_4:
 			## assign
-			movq	%r11, %r8
+			movq	%r12, %r8
 			## assign
-			movq	%r8, %r13
+			movq	%r8, %r9
 			## assign
-			movq	%r13, %r9
+			movq	%r9, %r8
 			jmp		.if_exit_4
 .if_else_4:
 			## assign
-			movq	%r12, %r8
+			movq	%r11, %r8
 			## assign
-			movq	%r8, %r13
+			movq	%r8, %r9
 			## assign
-			movq	%r13, %r9
+			movq	%r9, %r8
 			jmp		.if_exit_4
 .if_exit_4:
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			jmp		.if_exit_2
 .if_exit_2:
 			## assign
-			movq	%r8, %r9
-			## move ret val %r9 into %rax
-			movq	%r9, %rax
+			movq	%r9, %r8
+			## move ret val %r8 into %rax
+			movq	%r8, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -1243,6 +1244,7 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+
 raw_in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1306,6 +1308,7 @@ raw_in_string:
 			call	strndup
 			leave
 			ret
+
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1341,6 +1344,7 @@ cool_str_concat:
 			movq	-8(%rbp), %rax
 			leave
 			ret
+
 cool_str_substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1379,6 +1383,7 @@ cool_str_substr:
 			popq	%rbx
 			popq	%rbp
 			ret
+
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::
