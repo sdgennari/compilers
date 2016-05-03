@@ -10,10 +10,9 @@ import sys
 
 NUM_REGISTERS = 12
 register_colors = {}
-spilled_registers = []
 
 # def allocate_registers(original_register_graph, block_list, original_combined_live_ranges):
-def allocate_registers(original_register_graph, block_list, combined_live_ranges):
+def allocate_registers(original_register_graph, block_list, combined_live_ranges, spilled_reg_list):
 	global register_colors
 
 	# Make copies of original values to avoid destorying graph
@@ -38,13 +37,19 @@ def allocate_registers(original_register_graph, block_list, combined_live_ranges
 		# If no node to remove for coloring, spill one
 		if not node_to_remove:
 			# Select node with the longest live range to spill
+			# Note: do not remove a node that was already spilled
 			max_range = -1
 			for node in combined_live_ranges:
 				live_range = combined_live_ranges[node]
-				if live_range > max_range:
+				if live_range > max_range and node not in spilled_reg_list:
 					max_range = live_range
 					node_to_remove = node
 			# -- end max loop
+
+			# if node_to_remove == None:
+			# 	for block in block_list:
+			# 		for instr in block.instr_list:
+			# 			print instr
 
 			# Add selected register to spill list
 			registers_to_spill_list.append(node_to_remove)
@@ -76,6 +81,7 @@ def allocate_registers(original_register_graph, block_list, combined_live_ranges
 
 	# Spill all required registers
 	for register in registers_to_spill_list:
+		spilled_reg_list.append(register)
 		spill_register(block_list, register)
 
 	# If registers had to be spilled, do not compute colors since the liveness will change
@@ -122,12 +128,9 @@ def allocate_registers(original_register_graph, block_list, combined_live_ranges
 
 
 def spill_register(block_list, register_to_spill):
-	global spilled_registers
 	# In comments below, let tX = register_to_spill
 
 	# print "spilling register: " + str(register_to_spill)
-
-	spilled_registers.append(register_to_spill)
 
 	# Spill register in all blocks in the list
 	for block in block_list:
@@ -186,6 +189,9 @@ def build_register_graph(block_list):
 
 	for block in block_list:
 
+		# DEBUG
+		# output_list = []
+
 		cur_live_set = copy.copy(block.live_out)
 		for tac_instr in reversed(block.instr_list):
 
@@ -212,6 +218,9 @@ def build_register_graph(block_list):
 
 			# Registers in the same live set should have edges in the graph
 			cur_live_list = list(cur_live_set);
+
+			# DEBUG
+			# output_list.append(str(tac_instr) + "\t\t" + str(cur_live_list))
 
 			for i in range(len(cur_live_set)):
 				reg1 = cur_live_list[i]
@@ -240,9 +249,14 @@ def build_register_graph(block_list):
 				if assignee != None:
 					register_graph[reg1].add(assignee)
 					register_graph[assignee].add(reg1)
+
 					
 			# -- end i loop
 		# -- end live_set loop
+		# DEBUG
+		# for string in reversed(output_list):
+		# 	print string
+		# print
 	# -- end block loop
 
 	# print "Register Graph:"

@@ -185,6 +185,11 @@ def buildBasicBlocks(TAC_instr_list):
 def computeLiveSets(block_list):
 	has_live_in_changed = True
 
+	# Reset live out of all blocks to start new iteration
+	# This needs to be reset to handle cycles in the CFG that would prevent the livesets from changing
+	for block in block_list:
+		block.live_out = set()
+
 	# Loop until live_in == live_in'
 	while has_live_in_changed:
 		# Assume live in has not changed

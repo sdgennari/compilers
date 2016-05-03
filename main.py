@@ -214,11 +214,12 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 
 		# Allocate registers
 		is_done = False
+		spilled_registers = []
 		while not is_done:
 			computeLiveSets(block_list)
 			register_graph = build_register_graph(block_list)
 			combined_live_ranges = combine_block_live_ranges(block_list)
-			is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
+			is_done = allocate_registers(register_graph, block_list, combined_live_ranges, spilled_registers)
 		# -- end while loop
 
 		# Generate asm for the block list
@@ -385,15 +386,17 @@ def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 	# 			else:
 	# 				print "\t",
 	# 			print instr
+	# 		print
 	# sys.exit(1)
 
 	# Allocate registers
 	is_done = False
+	spilled_registers = []
 	while not is_done:
 		computeLiveSets(block_list)
 		register_graph = build_register_graph(block_list)
 		combined_live_ranges = combine_block_live_ranges(block_list)
-		is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
+		is_done = allocate_registers(register_graph, block_list, combined_live_ranges, spilled_registers)
 	# -- end while loop
 
 	# Generate asm for the block list
@@ -411,11 +414,12 @@ def ast_attr_to_asm(cur_asm_list, ast_attr, type_name):
 
 	# Allocate registers
 	is_done = False
+	spilled_registers = []
 	while not is_done:
 		computeLiveSets(block_list)
 		register_graph = build_register_graph(block_list)
 		combined_live_ranges = combine_block_live_ranges(block_list)
-		is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
+		is_done = allocate_registers(register_graph, block_list, combined_live_ranges, spilled_registers)
 	# -- end while loop
 	gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_registers, type_name)
 

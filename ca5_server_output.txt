@@ -36,7 +36,7 @@ Run        cells-40-21.s                             ok-run
 Compare    cells-40-21 output                        ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:cells-40-21,6789195,12629004,40590,16718,2093554,0.002875753
+PROF:cells-40-21,6839542,12632614,41254,19617,2094679,0.003650758
  
 TEST:cje4sw-test1.cl-type
 Compile    cje4sw-test1.cl-type                      ok-compile
@@ -45,23 +45,16 @@ Run        cje4sw-test1.s                            ok-run
 Compare    cje4sw-test1 output                       ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:cje4sw-test1,21817946,38932844,87944,58051,6979973,0.007970955
+PROF:cje4sw-test1,22117708,38929197,87338,54328,6978589,0.007817301
  
 TEST:cje4sw-test2.cl-type
-Compile    cje4sw-test2.cl-type                      (your compiler outputs to stdout/stderr: should be none)
-.
-    result += get_methods_string()
-  File "main.py", line 334, in get_methods_string
-    ast_method_to_asm(cur_asm_list, ast_method, type_name)
-  File "main.py", line 396, in ast_method_to_asm
-    is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
-  File "/home/pl/sdg6vt.zip-dir/allocate_registers.py", line 79, in allocate_registers
-    spill_register(block_list, register)
-  File "/home/pl/sdg6vt.zip-dir/allocate_registers.py", line 140, in spill_register
-    block.instr_list.insert(idx, TACLoad(register_to_spill, register_to_spill))
-MemoryError
-.
- (no .cl-asm or .s file produced)
+Compile    cje4sw-test2.cl-type                      ok-compile
+Assemble   cje4sw-test2.s                            ok-assemble
+Run        cje4sw-test2.s                            ok-run
+Compare    cje4sw-test2 output                       ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:cje4sw-test2,1201257,1482852,12227,2471,257526,0.001038085
  
 TEST:crm2xu-benchmark1.cl-type
 Compile    crm2xu-benchmark1.cl-type                 ok-compile
@@ -70,7 +63,7 @@ Run        crm2xu-benchmark1.s                       ok-run
 Compare    crm2xu-benchmark1 output                  ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:crm2xu-benchmark1,936046,926236,11034,1227,165002,0.000662761
+PROF:crm2xu-benchmark1,945934,924964,11197,1225,164744,0.000718460
  
 TEST:crm2xu-benchmark2.cl-type
 Compile    crm2xu-benchmark2.cl-type                 ok-compile
@@ -79,7 +72,7 @@ Run        crm2xu-benchmark2.s                       ok-run
 Compare    crm2xu-benchmark2 output                  ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:crm2xu-benchmark2,924110,898599,11092,972,160795,0.000842911
+PROF:crm2xu-benchmark2,906697,897082,10755,1123,160544,0.000862733
  
 TEST:ctj4t-test1.cl-type
 Compile    ctj4t-test1.cl-type                       ok-compile
@@ -88,7 +81,7 @@ Run        ctj4t-test1.s                             ok-run
 Compare    ctj4t-test1 output                        ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:ctj4t-test1,965094,1027816,11056,1006,184686,0.000892887
+PROF:ctj4t-test1,967318,1026851,10839,1334,184539,0.000895360
  
 TEST:ctj4t-test2.cl-type
 Compile    ctj4t-test2.cl-type                       ok-compile
@@ -97,7 +90,7 @@ Run        ctj4t-test2.s                             ok-run
 Compare    ctj4t-test2 output                        ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:ctj4t-test2,982018,1107587,10565,945,210454,0.000896833
+PROF:ctj4t-test2,978171,1107898,10516,898,210490,0.000898896
  
 TEST:dcb6y-test1.cl-type
 Compile    dcb6y-test1.cl-type                       ok-compile
@@ -106,7 +99,7 @@ Run        dcb6y-test1.s                             ok-run
 Compare    dcb6y-test1 output                        ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:dcb6y-test1,793774,700679,9940,1238,134475,0.000727698
+PROF:dcb6y-test1,795724,701329,9783,836,134558,0.000547619
  
 TEST:dcb6y-test2.cl-type
 Compile    dcb6y-test2.cl-type                       ok-compile
@@ -115,7 +108,7 @@ Run        dcb6y-test2.s                             ok-run
 Compare    dcb6y-test2 output                        ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:dcb6y-test2,824824,763200,10326,928,144668,0.000795980
+PROF:dcb6y-test2,822157,764158,10058,868,144738,0.000801219
  
 TEST:hairy-scary-double.cl-type
 Compile    hairy-scary-double.cl-type                ok-compile
@@ -124,7 +117,7 @@ Run        hairy-scary-double.s                      ok-run
 Compare    hairy-scary-double output                 ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:hairy-scary-double,1025669,1127379,11252,1384,195263,0.000680923
+PROF:hairy-scary-double,1020896,1130038,11429,1090,195580,0.000874184
  
 TEST:hello-world.cl-type
 Compile    hello-world.cl-type                       ok-compile
@@ -133,7 +126,7 @@ Run        hello-world.s                             ok-run
 Compare    hello-world output                        ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:hello-world,671409,456740,9450,741,88899,0.000709900
+PROF:hello-world,668295,457636,9244,788,89042,0.000709757
  
 TEST:if-boolean.cl-type
 Compile    if-boolean.cl-type                        ok-compile
@@ -142,7 +135,7 @@ Run        if-boolean.s                              ok-run
 Compare    if-boolean output                         ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:if-boolean,957018,855194,11281,1043,156285,0.000926754
+PROF:if-boolean,951171,847619,10907,1225,155313,0.000853170
  
 TEST:int-basic-block.cl-type
 Compile    int-basic-block.cl-type                   ok-compile
@@ -151,7 +144,7 @@ Run        int-basic-block.s                         ok-run
 Compare    int-basic-block output                    ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:int-basic-block,747385,540462,9632,783,104018,0.000459905
+PROF:int-basic-block,737420,539791,9813,1060,104098,0.000745337
  
 TEST:int-temporary.cl-type
 Compile    int-temporary.cl-type                     ok-compile
@@ -160,7 +153,7 @@ Run        int-temporary.s                           ok-run
 Compare    int-temporary output                      ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:int-temporary,746275,542179,10082,908,103345,0.000802091
+PROF:int-temporary,735140,535660,9617,1215,102418,0.000745082
  
 TEST:jwb6mz-test1.cl-type
 Compile    jwb6mz-test1.cl-type                      ok-compile
@@ -169,7 +162,7 @@ Run        jwb6mz-test1.s                            ok-run
 Compare    jwb6mz-test1 output                       ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:jwb6mz-test1,807758,664608,10374,883,122310,0.000840769
+PROF:jwb6mz-test1,796818,653485,10123,1007,120849,0.000767013
  
 TEST:jwb6mz-test2.cl-type
 Compile    jwb6mz-test2.cl-type                      ok-compile
@@ -178,7 +171,7 @@ Run        jwb6mz-test2.s                            ok-run
 Compare    jwb6mz-test2 output                       ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:jwb6mz-test2,782711,637055,10258,971,118871,0.000787494
+PROF:jwb6mz-test2,764751,635910,9883,857,118608,0.000770786
  
 TEST:list-20.cl-type
 Compile    list-20.cl-type                           ok-compile
@@ -187,23 +180,16 @@ Run        list-20.s                                 ok-run
 Compare    list-20 output                            ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:list-20,1000624,1049196,11250,1202,182337,0.000507156
+PROF:list-20,987375,1055405,11089,1052,183210,0.000875153
  
 TEST:loop-int.cl-type
-Compile    loop-int.cl-type                          (your compiler outputs to stdout/stderr: should be none)
-.
-    result += get_methods_string()
-  File "main.py", line 334, in get_methods_string
-    ast_method_to_asm(cur_asm_list, ast_method, type_name)
-  File "main.py", line 396, in ast_method_to_asm
-    is_done = allocate_registers(register_graph, block_list, combined_live_ranges)
-  File "/home/pl/sdg6vt.zip-dir/allocate_registers.py", line 79, in allocate_registers
-    spill_register(block_list, register)
-  File "/home/pl/sdg6vt.zip-dir/allocate_registers.py", line 145, in spill_register
-    block.instr_list.insert(idx+1, TACStore(register_to_spill))
-MemoryError
-.
- (no .cl-asm or .s file produced)
+Compile    loop-int.cl-type                          ok-compile
+Assemble   loop-int.s                                ok-assemble
+Run        loop-int.s                                ok-run
+Compare    loop-int output                           ok-compare
+(no on-the-fly performance reports for x86)
+cycles, num instrs, cache refs, cache misses, branch instrs
+PROF:loop-int,2065973,3203757,17954,3978,532430,0.001510809
  
 TEST:matrix-multiply-5.cl-type
 Compile    matrix-multiply-5.cl-type                 ok-compile
@@ -212,7 +198,7 @@ Run        matrix-multiply-5.s                       ok-run
 Compare    matrix-multiply-5 output                  ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:matrix-multiply-5,2159293,3454640,18509,4089,567513,0.001532040
+PROF:matrix-multiply-5,2144000,3452690,17767,5074,567270,0.001311384
  
 TEST:mji7wb-test1.cl-type
 Compile    mji7wb-test1.cl-type                      ok-compile
@@ -221,7 +207,7 @@ Run        mji7wb-test1.s                            ok-run
 Compare    mji7wb-test1 output                       ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:mji7wb-test1,927021,894760,11170,1620,159664,0.000848136
+PROF:mji7wb-test1,906865,893937,10879,1072,159542,0.000862772
  
 TEST:mji7wb-test2.cl-type
 Compile    mji7wb-test2.cl-type                      ok-compile
@@ -230,7 +216,7 @@ Run        mji7wb-test2.s                            ok-run
 Compare    mji7wb-test2 output                       ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:mji7wb-test2,940968,919073,10448,1182,168369,0.000866571
+PROF:mji7wb-test2,942018,916915,10631,1101,167998,0.000861740
  
 TEST:mkd5m-benchmark1.cl-type
 Compile    mkd5m-benchmark1.cl-type                  ok-compile
@@ -239,7 +225,7 @@ Run        mkd5m-benchmark1.s                        ok-run
 Compare    mkd5m-benchmark1 output                   ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:mkd5m-benchmark1,889006,890144,10933,1491,158383,0.000812589
+PROF:mkd5m-benchmark1,873826,895867,10865,1049,159157,0.000861247
  
 TEST:mkd5m-benchmark2.cl-type
 Compile    mkd5m-benchmark2.cl-type                  ok-compile
@@ -248,7 +234,7 @@ Run        mkd5m-benchmark2.s                        ok-run
 Compare    mkd5m-benchmark2 output                   ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:mkd5m-benchmark2,854114,910452,10249,932,160988,0.000828228
+PROF:mkd5m-benchmark2,861079,911806,10282,1553,161242,0.000835974
  
 TEST:pi-100.cl-type
 Compile    pi-100.cl-type                            ok-compile
@@ -257,7 +243,7 @@ Run        pi-100.s                                  ok-run
 Compare    pi-100 output                             ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:pi-100,25415886,52866110,153270,105872,8383507,0.008801177
+PROF:pi-100,25335864,52885397,151931,108367,8386631,0.009078780
  
 TEST:primes-500.cl-type
 Compile    primes-500.cl-type                        ok-compile
@@ -266,7 +252,7 @@ Run        primes-500.s                              ok-run
 Compare    primes-500 output                         ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:primes-500,4434838,8417436,32120,12242,1381847,0.002537701
+PROF:primes-500,4446317,8422740,31928,9998,1382420,0.002371733
  
 TEST:zl8pj-benchmark1.cl-type
 Compile    zl8pj-benchmark1.cl-type                  ok-compile
@@ -275,7 +261,7 @@ Run        zl8pj-benchmark1.s                        ok-run
 Compare    zl8pj-benchmark1 output                   ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:zl8pj-benchmark1,960525,902730,11309,1246,161829,0.000886847
+PROF:zl8pj-benchmark1,958020,900132,11337,1230,161670,0.000854666
  
 TEST:zl8pj-benchmark2.cl-type
 Compile    zl8pj-benchmark2.cl-type                  ok-compile
@@ -284,4 +270,4 @@ Run        zl8pj-benchmark2.s                        ok-run
 Compare    zl8pj-benchmark2 output                   ok-compare
 (no on-the-fly performance reports for x86)
 cycles, num instrs, cache refs, cache misses, branch instrs
-PROF:zl8pj-benchmark2,939320,836209,11182,1648,150799,0.000885452
+PROF:zl8pj-benchmark2,924635,832531,11119,1238,150365,0.000881532
