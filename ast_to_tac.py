@@ -629,6 +629,12 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		# Evaluate case predicate exp
 		pred_symbol, pred_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.exp)
 
+		# Box predicate result if necessary
+		if pred_type_from_ast == "Int":
+			boxed_symbol = new_symbol()
+			cur_tac_list.append(TACBox(boxed_symbol, pred_symbol, "Int"))
+			pred_symbol = boxed_symbol
+
 		# Check if the predicate is void
 		void_check_boxed = new_symbol()
 		void_label_num = new_label_num()
@@ -672,11 +678,14 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			label = case_type_label_map[ast_case_elem.case_type]
 			cur_tac_list.append(TACLabel(label))
 
-			# Add ident from case branch
+			# Add ident from case branch and mark it as a boxed value
 			case_elem_symbol, _ = add_symbol(symbol_table_list, ast_case_elem.ident, ast_case_elem.case_type)
 
-			# Assign exp from case predicate to the case elem
-			cur_tac_list.append(TACAssign(ast_case_elem.case_type, case_elem_symbol, pred_symbol))
+			# Assign exp from case predicate to the case elem, unboxing if necessary
+			if ast_case_elem.case_type == "Int":
+				cur_tac_list.append(TACUnbox(case_elem_symbol, pred_symbol, "Int"))
+			else:
+				cur_tac_list.append(TACAssign(ast_case_elem.case_type, case_elem_symbol, pred_symbol))
 
 			# Generate tac for branch expression
 			branch_exp_symbol, branch_exp_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_case_elem.exp)

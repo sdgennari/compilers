@@ -352,35 +352,9 @@ IO.in_int:
 			jge	.in_int_7
 			movq	$0, -16(%rbp)
 .in_int_7:
-			movq	-16(%rbp), %r8
+			movq	-16(%rbp), %rax
 
 
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			## move result into boxed Int
-			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -427,7 +401,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -463,33 +437,9 @@ Main.main:
 			pushq	%r15
 .Main_main_1:
 			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r10
-			movq	$0, 24(%r10)
+			movq	$0, %r11
 			## default Int
-			## push caller-saved regs
+			movq	$0, %r10
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -498,12 +448,21 @@ Main.main:
 			pushq	%r9
 			pushq	%r10
 			pushq	%r11
-			## push self ptr
+			## save self ptr (%rbx)
 			pushq	%rbx
-			call	Int..new
-			## restore self ptr
+			## pushing 0 params to the stack
+			subq	$0, %rsp
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method in_int in vtable[5]
+			movq	40(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 0 params from stack with subq
+			addq	$0, %rsp
+			## restore self ptr (%rbx)
 			popq	%rbx
-			## pop caller-saved regs
 			popq	%r11
 			popq	%r10
 			popq	%r9
@@ -512,8 +471,14 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	$0, 24(%r9)
+			## removing 0 stored params from stack (2nd time)
+			addq	$0, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## assign
+			movq	%r8, %r11
+			## assign
+			movq	%r8, %r9
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -551,45 +516,10 @@ Main.main:
 			movq	%rax, %r8
 			## assign
 			movq	%r8, %r10
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self ptr (%rbx)
-			pushq	%rbx
-			## pushing 0 params to the stack
-			subq	$0, %rsp
-			## self: lookup method in vtable
-			## get ptr to vtable from self
-			movq	16(%rbx), %rax
-			## find method in_int in vtable[5]
-			movq	40(%rax), %rax
-			## call method dynamically
-			call	*%rax
-			## removing 0 params from stack with subq
-			addq	$0, %rsp
-			## restore self ptr (%rbx)
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## removing 0 stored params from stack (2nd time)
-			addq	$0, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r10, %r8
+			movq	%r11, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -631,7 +561,7 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -702,6 +632,11 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## check type tag
+			movq	(%rbx), %rax
+			cmpq	$1, %rax
+			je		copy_int
+copy_object:
 			## call malloc to make space for the new object
 			## use leaq to multiply the size by 8
 			movq	8(%rbx), %rdi
@@ -715,6 +650,11 @@ Object.copy:
 			movq	%rax, %rdi
 			call	memcpy
 			## result of mempy in %rax, so good to return
+			jmp		copy_exit
+copy_int:
+			movq	24(%rbx), %rax
+			jmp		copy_exit
+copy_exit:
 			leave
 			ret
 
@@ -805,35 +745,7 @@ String.length:
 			## call strlen to compute length
 			movq	24(%rbx), %rdi
 			call	strlen
-			movq	%rax, %r8
-			## box final result
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## move result into rax
-			movq	%r9, %rax
+			## result from strlen already in rax
 			popq	%r15
 			popq	%r14
 			popq	%r13
@@ -847,12 +759,10 @@ String.substr:
 			movq	%rsp, %rbp
 			## unbox self into rdi
 			movq	24(%rbx), %rdi
-			## unbox param[0] into rsi
-			movq	16(%rbp), %rax
-			movq	24(%rax), %rsi
-			## unbox param[1] into rdx
-			movq	24(%rbp), %rax
-			movq	24(%rax), %rdx
+			## move param[0] into rsi
+			movq	16(%rbp), %rsi
+			## move param[1] into rdx
+			movq	24(%rbp), %rdx
 			call	cool_str_substr
 			## make new box to store result (moved into r8 temporarily)
 			movq	%rax, %r8

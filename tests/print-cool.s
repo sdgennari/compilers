@@ -352,35 +352,9 @@ IO.in_int:
 			jge	.in_int_7
 			movq	$0, -16(%rbp)
 .in_int_7:
-			movq	-16(%rbp), %r8
+			movq	-16(%rbp), %rax
 
 
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			## move result into boxed Int
-			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -427,7 +401,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -463,59 +437,11 @@ Main.main:
 			pushq	%r15
 .Main_main_1:
 			## new const Int: 1
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$1, 24(%r8)
+			movq	$1, %r8
 			## storing param [0]
 			pushq	%r8
 			## new const Int: 3
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$3, 24(%r8)
+			movq	$3, %r8
 			## storing param [1]
 			pushq	%r8
 			## move self ptr into %r8
@@ -585,19 +511,19 @@ Main.main:
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
-			## branch .dispatch_2_void
+			## branch .dispatch_4_void
 			test	%r9d, %r9d
-			jnz		.dispatch_2_void
-			## branch .dispatch_2_not_void
+			jnz		.dispatch_4_void
+			## branch .dispatch_4_not_void
 			test	%r8d, %r8d
-			jnz		.dispatch_2_not_void
-.dispatch_2_void:
+			jnz		.dispatch_4_not_void
+.dispatch_4_void:
 			movq	$string_1, %rdi
 			call	raw_out_string
 			movq	$0, %rax
 			call	exit
-			jmp		.dispatch_2_not_void
-.dispatch_2_not_void:
+			jmp		.dispatch_4_not_void
+.dispatch_4_not_void:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -669,19 +595,19 @@ Main.main:
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
-			## branch .dispatch_3_void
+			## branch .dispatch_5_void
 			test	%r9d, %r9d
-			jnz		.dispatch_3_void
-			## branch .dispatch_3_not_void
+			jnz		.dispatch_5_void
+			## branch .dispatch_5_not_void
 			test	%r8d, %r8d
-			jnz		.dispatch_3_not_void
-.dispatch_3_void:
+			jnz		.dispatch_5_not_void
+.dispatch_5_void:
 			movq	$string_1, %rdi
 			call	raw_out_string
 			movq	$0, %rax
 			call	exit
-			jmp		.dispatch_3_not_void
-.dispatch_3_not_void:
+			jmp		.dispatch_5_not_void
+.dispatch_5_not_void:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -728,59 +654,11 @@ Main.main:
 			## storing param [0]
 			pushq	%r8
 			## new const Int: 4
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$4, 24(%r8)
+			movq	$4, %r8
 			## storing param [0]
 			pushq	%r8
 			## new const Int: 1
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$1, 24(%r8)
+			movq	$1, %r8
 			## storing param [1]
 			pushq	%r8
 			## new Object
@@ -842,19 +720,19 @@ Main.main:
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
-			## branch .dispatch_4_void
+			## branch .dispatch_2_void
 			test	%r9d, %r9d
-			jnz		.dispatch_4_void
-			## branch .dispatch_4_not_void
+			jnz		.dispatch_2_void
+			## branch .dispatch_2_not_void
 			test	%r8d, %r8d
-			jnz		.dispatch_4_not_void
-.dispatch_4_void:
+			jnz		.dispatch_2_not_void
+.dispatch_2_void:
 			movq	$string_2, %rdi
 			call	raw_out_string
 			movq	$0, %rax
 			call	exit
-			jmp		.dispatch_4_not_void
-.dispatch_4_not_void:
+			jmp		.dispatch_2_not_void
+.dispatch_2_not_void:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -926,19 +804,19 @@ Main.main:
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
-			## branch .dispatch_5_void
+			## branch .dispatch_3_void
 			test	%r9d, %r9d
-			jnz		.dispatch_5_void
-			## branch .dispatch_5_not_void
+			jnz		.dispatch_3_void
+			## branch .dispatch_3_not_void
 			test	%r8d, %r8d
-			jnz		.dispatch_5_not_void
-.dispatch_5_void:
+			jnz		.dispatch_3_not_void
+.dispatch_3_void:
 			movq	$string_2, %rdi
 			call	raw_out_string
 			movq	$0, %rax
 			call	exit
-			jmp		.dispatch_5_not_void
-.dispatch_5_not_void:
+			jmp		.dispatch_3_not_void
+.dispatch_3_not_void:
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -1203,6 +1081,11 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## check type tag
+			movq	(%rbx), %rax
+			cmpq	$1, %rax
+			je		copy_int
+copy_object:
 			## call malloc to make space for the new object
 			## use leaq to multiply the size by 8
 			movq	8(%rbx), %rdi
@@ -1216,6 +1099,11 @@ Object.copy:
 			movq	%rax, %rdi
 			call	memcpy
 			## result of mempy in %rax, so good to return
+			jmp		copy_exit
+copy_int:
+			movq	24(%rbx), %rax
+			jmp		copy_exit
+copy_exit:
 			leave
 			ret
 
@@ -1306,35 +1194,7 @@ String.length:
 			## call strlen to compute length
 			movq	24(%rbx), %rdi
 			call	strlen
-			movq	%rax, %r8
-			## box final result
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## move result into rax
-			movq	%r9, %rax
+			## result from strlen already in rax
 			popq	%r15
 			popq	%r14
 			popq	%r13
@@ -1348,12 +1208,10 @@ String.substr:
 			movq	%rsp, %rbp
 			## unbox self into rdi
 			movq	24(%rbx), %rdi
-			## unbox param[0] into rsi
-			movq	16(%rbp), %rax
-			movq	24(%rax), %rsi
-			## unbox param[1] into rdx
-			movq	24(%rbp), %rax
-			movq	24(%rax), %rdx
+			## move param[0] into rsi
+			movq	16(%rbp), %rsi
+			## move param[1] into rdx
+			movq	24(%rbp), %rdx
 			call	cool_str_substr
 			## make new box to store result (moved into r8 temporarily)
 			movq	%rax, %r8

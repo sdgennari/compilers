@@ -1,4 +1,4 @@
-Start Time:   Tue May  3 14:54:29 2016
+Start Time:   Wed May  4 19:23:21 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -32,7 +32,7 @@ Positive Test Cases
 t1: abort                                        ok  
 t2: alias                                        ok  
 t3: assignments                                  ok  
-t4: bigexpr                                    FAILED
+t4: bigexpr                                      ok  
 t5: big-prog-with-many-exprs                     ok  
 t6: book-list-static-dynamic-dispatch            ok  
 t7: bool-assigned-in-let                         ok  
@@ -118,4 +118,4 @@ t5: div-by-zero                                  ok
 t6: substring-bad                                ok  
 t7: mjk6zt.zip-bug_maker                         ok  
 t8: mjk6zt.zip-shallow_copy                      ok  
-End Time: Tue May  3 14:55:34 2016
+End Time: Wed May  4 19:23:56 2016

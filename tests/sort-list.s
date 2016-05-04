@@ -194,31 +194,7 @@ Cons..new:		## Constructor for Cons
 			movq	$Cons..vtable, %rax
 			movq	%rax, 16(%rbx)
 			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	$0, 24(%r8)
+			movq	$0, %r8
 			## store %r8 in self[3] (xcar)
 			movq	%r8, 24(%rbx)
 			## default List
@@ -821,12 +797,12 @@ Cons.sort:
 			pushq	%r14
 			pushq	%r15
 .Cons_sort_7:
-			## load self[3] (xcar) into %r8
-			movq	24(%rbx), %r8
+			## load self[3] (xcar) into %r9
+			movq	24(%rbx), %r9
 			## assign
-			movq	%r8, %r9
+			movq	%r9, %r8
 			## storing param [0]
-			pushq	%r9
+			pushq	%r8
 			## load self[4] (xcdr) into %r8
 			movq	32(%rbx), %r8
 			## assign
@@ -854,22 +830,22 @@ Cons.sort:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r8
 			## check if %r10 is void and set result accordingly
 			cmpq	$0, %r10
 			jnz		.asm_label_3
-			movq	$1, 24(%r9)
+			movq	$1, 24(%r8)
 .asm_label_3:
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r8d, %r9d
-			xorl	$1, %r9d
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
 			## branch .dispatch_8_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_8_void
 			## branch .dispatch_8_not_void
-			test	%r9d, %r9d
+			test	%r8d, %r8d
 			jnz		.dispatch_8_not_void
 .dispatch_8_void:
 			movq	$string_2, %rdi
@@ -1026,15 +1002,67 @@ Cons.insert:
 			pushq	%r14
 			pushq	%r15
 .Cons_insert_10:
-			## loading param [0] into %r11
-			movq	16(%rbp), %r11
+			## loading param [0] into %r12
+			movq	16(%rbp), %r12
 			## assign
-			movq	%r11, %r10
+			movq	%r12, %r11
 			## load self[3] (xcar) into %r8
 			movq	24(%rbx), %r8
 			## assign
-			movq	%r8, %r9
-			## use lt_helper to compare %r10 < %r9
+			movq	%r8, %r10
+			## box value of %r11 into %r9
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r9
+			movq	%r11, 24(%r9)
+			## box value of %r10 into %r8
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r8
+			movq	%r10, 24(%r8)
+			## use lt_helper to compare %r9 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
 			pushq	%rdx
@@ -1045,9 +1073,9 @@ Cons.insert:
 			pushq	%r10
 			pushq	%r11
 			pushq	%rbx
-			## push lhs (%r10) and rhs (%r9)
+			## push lhs (%r9) and rhs (%r8)
+			pushq	%r8
 			pushq	%r9
-			pushq	%r10
 			call	lt_helper
 			addq	$16, %rsp
 			## pop self ptr and caller-saved regs
@@ -1060,10 +1088,10 @@ Cons.insert:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			## move comparison result into %r8
-			movq	%rax, %r8
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## move comparison result into %r10
+			movq	%rax, %r10
+			## unbox value of %r10 into %r9
+			movq	24(%r10), %r9
 			## not
 			movl	%r9d, %r8d
 			xorl	$1, %r8d
@@ -1075,7 +1103,7 @@ Cons.insert:
 			jnz		.if_else_11
 .if_then_11:
 			## assign
-			movq	%r11, %r8
+			movq	%r12, %r8
 			## storing param [0]
 			pushq	%r8
 			## move self ptr into %r8
@@ -1210,7 +1238,7 @@ Cons.insert:
 			## storing param [0]
 			pushq	%r9
 			## assign
-			movq	%r11, %r8
+			movq	%r12, %r8
 			## storing param [0]
 			pushq	%r8
 			## load self[4] (xcdr) into %r8
@@ -1330,7 +1358,7 @@ Cons.insert:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
+			movq	%rax, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1355,18 +1383,18 @@ Cons.insert:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r9 is void and set result accordingly
-			cmpq	$0, %r9
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_7
 			movq	$1, 24(%r8)
 .asm_label_7:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .dispatch_14_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.dispatch_14_void
 			## branch .dispatch_14_not_void
 			test	%r8d, %r8d
@@ -1396,11 +1424,11 @@ Cons.insert:
 			## moving rsp[88] to rsp[8]
 			movq	88(%rsp), %rax
 			movq	%rax, 8(%rsp)
-			## set receiver_obj (%r9) as self ptr (%rbx)
-			movq	%r9, %rbx
+			## set receiver_obj (%r10) as self ptr (%rbx)
+			movq	%r10, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r9), %rax
+			movq	16(%r10), %rax
 			## find method init in vtable[18]
 			movq	144(%rax), %rax
 			## call method dynamically
@@ -1915,22 +1943,22 @@ Cons.init:
 			pushq	%r14
 			pushq	%r15
 .Cons_init_20:
-			## loading param [0] into %r9
-			movq	16(%rbp), %r9
-			## loading param [1] into %r8
-			movq	24(%rbp), %r8
-			## assign
-			movq	%r9, %r10
-			## store %r10 in self[3] (xcar)
-			movq	%r10, 24(%rbx)
-			## assign
-			movq	%r10, %r9
+			## loading param [0] into %r8
+			movq	16(%rbp), %r8
+			## loading param [1] into %r10
+			movq	24(%rbp), %r10
 			## assign
 			movq	%r8, %r9
-			## store %r9 in self[4] (xcdr)
-			movq	%r9, 32(%rbx)
+			## store %r9 in self[3] (xcar)
+			movq	%r9, 24(%rbx)
 			## assign
 			movq	%r9, %r8
+			## assign
+			movq	%r10, %r8
+			## store %r8 in self[4] (xcdr)
+			movq	%r8, 32(%rbx)
+			## assign
+			movq	%r8, %r9
 			## move self ptr into %r8
 			movq	%rbx, %r8
 			## assign
@@ -2007,35 +2035,9 @@ IO.in_int:
 			jge	.in_int_7
 			movq	$0, -16(%rbp)
 .in_int_7:
-			movq	-16(%rbp), %r8
+			movq	-16(%rbp), %rax
 
 
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			## move result into boxed Int
-			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -2082,7 +2084,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -2395,30 +2397,7 @@ List.car:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## new Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
+			movq	$0, %r8
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs
@@ -2858,6 +2837,42 @@ Main.iota:
 			## assign
 			movq	%r8, %r9
 			## new const Int: 0
+			movq	$0, %r8
+			## assign
+			movq	%r8, %r12
+			jmp		.loop_start_32
+.loop_start_32:
+			## assign
+			movq	%r12, %r8
+			## assign
+			movq	%r11, %r10
+			## box value of %r8 into %r9
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	Int..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r9
+			movq	%r8, 24(%r9)
+			## box value of %r10 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -2882,15 +2897,7 @@ Main.iota:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$0, 24(%r8)
-			## assign
-			movq	%r8, %r12
-			jmp		.loop_start_32
-.loop_start_32:
-			## assign
-			movq	%r12, %r9
-			## assign
-			movq	%r11, %r8
+			movq	%r10, 24(%r8)
 			## use lt_helper to compare %r9 < %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
@@ -3061,68 +3068,16 @@ Main.iota:
 			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r12, %r8
+			movq	%r12, %r9
 			## new const Int: 1
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movl	$1, 24(%r9)
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			movq	$1, %r8
 			## plus
-			movl	%r10d, %r9d
-			addl	%r8d, %r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
+			movl	%r9d, %r10d
+			addl	%r8d, %r10d
 			## assign
-			movq	%r8, %r12
+			movq	%r10, %r12
+			## assign
+			movq	%r10, %r8
 			jmp		.loop_start_32
 .loop_exit_32:
 			## default Object
@@ -3754,12 +3709,12 @@ Nil.rcons:
 			movq	%r9, %r8
 			## storing param [0]
 			pushq	%r8
-			## move self ptr into %r9
-			movq	%rbx, %r9
+			## move self ptr into %r8
+			movq	%rbx, %r8
 			## assign
-			movq	%r9, %r8
+			movq	%r8, %r9
 			## storing param [1]
-			pushq	%r8
+			pushq	%r9
 			## new Cons
 			## push caller-saved regs
 			pushq	%rcx
@@ -3784,7 +3739,7 @@ Nil.rcons:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
+			movq	%rax, %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -3808,22 +3763,22 @@ Nil.rcons:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			## check if %r10 is void and set result accordingly
-			cmpq	$0, %r10
+			movq	%rax, %r9
+			## check if %r8 is void and set result accordingly
+			cmpq	$0, %r8
 			jnz		.asm_label_16
-			movq	$1, 24(%r8)
+			movq	$1, 24(%r9)
 .asm_label_16:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
+			## unbox value of %r9 into %r10
+			movq	24(%r9), %r10
 			## not
-			movl	%r9d, %r8d
-			xorl	$1, %r8d
+			movl	%r10d, %r9d
+			xorl	$1, %r9d
 			## branch .dispatch_43_void
-			test	%r9d, %r9d
+			test	%r10d, %r10d
 			jnz		.dispatch_43_void
 			## branch .dispatch_43_not_void
-			test	%r8d, %r8d
+			test	%r9d, %r9d
 			jnz		.dispatch_43_not_void
 .dispatch_43_void:
 			movq	$string_12, %rdi
@@ -3850,11 +3805,11 @@ Nil.rcons:
 			## moving rsp[88] to rsp[8]
 			movq	88(%rsp), %rax
 			movq	%rax, 8(%rsp)
-			## set receiver_obj (%r10) as self ptr (%rbx)
-			movq	%r10, %rbx
+			## set receiver_obj (%r8) as self ptr (%rbx)
+			movq	%r8, %rbx
 			## dynamic: lookup method in vtable
 			## get ptr to vtable from receiver obj
-			movq	16(%r10), %rax
+			movq	16(%r8), %rax
 			## find method init in vtable[18]
 			movq	144(%rax), %rax
 			## call method dynamically
@@ -3873,10 +3828,10 @@ Nil.rcons:
 			popq	%rcx
 			## removing 2 stored params from stack (2nd time)
 			addq	$16, %rsp
-			## storing method result in %r8
-			movq	%rax, %r8
-			## move ret val %r8 into %rax
-			movq	%r8, %rax
+			## storing method result in %r9
+			movq	%rax, %r9
+			## move ret val %r9 into %rax
+			movq	%r9, %rax
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -3953,6 +3908,11 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
+			## check type tag
+			movq	(%rbx), %rax
+			cmpq	$1, %rax
+			je		copy_int
+copy_object:
 			## call malloc to make space for the new object
 			## use leaq to multiply the size by 8
 			movq	8(%rbx), %rdi
@@ -3966,6 +3926,11 @@ Object.copy:
 			movq	%rax, %rdi
 			call	memcpy
 			## result of mempy in %rax, so good to return
+			jmp		copy_exit
+copy_int:
+			movq	24(%rbx), %rax
+			jmp		copy_exit
+copy_exit:
 			leave
 			ret
 
@@ -4056,35 +4021,7 @@ String.length:
 			## call strlen to compute length
 			movq	24(%rbx), %rdi
 			call	strlen
-			movq	%rax, %r8
-			## box final result
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## move result into rax
-			movq	%r9, %rax
+			## result from strlen already in rax
 			popq	%r15
 			popq	%r14
 			popq	%r13
@@ -4098,12 +4035,10 @@ String.substr:
 			movq	%rsp, %rbp
 			## unbox self into rdi
 			movq	24(%rbx), %rdi
-			## unbox param[0] into rsi
-			movq	16(%rbp), %rax
-			movq	24(%rax), %rsi
-			## unbox param[1] into rdx
-			movq	24(%rbp), %rax
-			movq	24(%rax), %rdx
+			## move param[0] into rsi
+			movq	16(%rbp), %rsi
+			## move param[1] into rdx
+			movq	24(%rbp), %rdx
 			call	cool_str_substr
 			## make new box to store result (moved into r8 temporarily)
 			movq	%rax, %r8

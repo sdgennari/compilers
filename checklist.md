@@ -8,7 +8,7 @@
 
 ### Expressions
 
-- case
+- ~~case~~
 - ~~while~~
 - ~~isvoid~~
 - ~~if~~
@@ -39,13 +39,13 @@
 
 ### Internals
 
-- IO.in_int
+- ~~IO.in_int~~
 - ~~IO.in_string~~
 - ~~IO.out_int~~
 - ~~IO.out_string~~
 - ~~Object.abort~~
-- Object.copy
+- ~~Object.copy~~
 - ~~Object.type_name~~
 - ~~String.concat~~
-- String.length
-- String.substr
+- ~~String.length~~
+- ~~String.substr~~

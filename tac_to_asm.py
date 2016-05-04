@@ -981,15 +981,15 @@ def gen_asm_for_internal_str_concat(cur_asm_list):
 	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 def gen_asm_for_internal_str_substr(cur_asm_list):
-	# Unbox values into rdi, rsi, and rdx
+	# Move values into rdi, rsi, and rdx
 	cur_asm_list.append(ASMComment("unbox self into rdi"))
 	cur_asm_list.append(ASMMovQ("24(%rbx)", "%rdi"))
-	cur_asm_list.append(ASMComment("unbox param[0] into rsi"))
-	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rax"))
-	cur_asm_list.append(ASMMovQ("24(%rax)", "%rsi"))
-	cur_asm_list.append(ASMComment("unbox param[1] into rdx"))
-	cur_asm_list.append(ASMMovQ("24(%rbp)", "%rax"))
-	cur_asm_list.append(ASMMovQ("24(%rax)", "%rdx"))
+	cur_asm_list.append(ASMComment("move param[0] into rsi"))
+	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rsi"))
+	# cur_asm_list.append(ASMMovQ("24(%rax)", "%rsi"))
+	cur_asm_list.append(ASMComment("move param[1] into rdx"))
+	cur_asm_list.append(ASMMovQ("24(%rbp)", "%rdx"))
+	# cur_asm_list.append(ASMMovQ("24(%rax)", "%rdx"))
 
 	# Call string substr helper
 	cur_asm_list.append(ASMCall("cool_str_substr"))
@@ -1021,7 +1021,16 @@ def gen_asm_for_internal_abort(cur_asm_list):
 	cur_asm_list.append(custom_asm)
 
 def gen_asm_for_internal_copy(cur_asm_list):
+	# Check the type tag of the object
+	cur_asm_list.append(ASMComment("check type tag"))
+	cur_asm_list.append(ASMMovQ("(%rbx)", "%rax"))
+	int_type_tag = "$" + str(type_tag_map["Int"])
+	cur_asm_list.append(ASMCmpQ(int_type_tag, "%rax"))
+	cur_asm_list.append(ASMJmpEq("copy_int"))
+
+	# COPY OBJECTS
 	# Alloc space for the new object
+	cur_asm_list.append(ASMLabel("copy_object"))
 	cur_asm_list.append(ASMComment("call malloc to make space for the new object"))
 	cur_asm_list.append(ASMComment("use leaq to multiply the size by 8"))
 	cur_asm_list.append(ASMMovQ("8(%rbx)", "%rdi"))
@@ -1036,9 +1045,16 @@ def gen_asm_for_internal_copy(cur_asm_list):
 	cur_asm_list.append(ASMMovQ("%rbx", "%rsi"))
 	cur_asm_list.append(ASMMovQ("%rax", "%rdi"))
 	cur_asm_list.append(ASMCall("memcpy"))
-
-	# Result of memcpy in %rax
 	cur_asm_list.append(ASMComment("result of mempy in %rax, so good to return"))
+	cur_asm_list.append(ASMJmp("copy_exit"))
+
+	# COPY INT
+	cur_asm_list.append(ASMLabel("copy_int"))
+	cur_asm_list.append(ASMMovQ("24(%rbx)", "%rax"))
+	cur_asm_list.append(ASMJmp("copy_exit"))
+
+	# Include label for copy exit
+	cur_asm_list.append(ASMLabel("copy_exit"))
 
 def gen_asm_for_internal_in_string(cur_asm_list):
 	# Call in_string helper
@@ -1141,14 +1157,14 @@ def gen_asm_for_internal_in_int(cur_asm_list):
 		"\t\t\tjge\t.in_int_7\n" +
 		"\t\t\tmovq\t$0, -16(%rbp)\n" +
 		".in_int_7:\n" +
-		"\t\t\tmovq\t-16(%rbp), %r8\n" +
+		"\t\t\tmovq\t-16(%rbp), %rax\n" + 			# this is now rax instead of r8
 		"\n"
 	)
 	cur_asm_list.append(custom_asm)
 
-	gen_asm_for_new_boxed_type(cur_asm_list, "Int", "%rax")
-	cur_asm_list.append(ASMComment("move result into boxed Int"))
-	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "Int", "%rax")
+	# cur_asm_list.append(ASMComment("move result into boxed Int"))
+	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 	
 def gen_asm_for_internal_length(cur_asm_list):
@@ -1162,17 +1178,19 @@ def gen_asm_for_internal_length(cur_asm_list):
 	str_val_src = "24("+SELF_REG+")"
 	cur_asm_list.append(ASMMovQ(str_val_src, "%rdi"))
 	cur_asm_list.append(ASMCall("strlen"))
-	cur_asm_list.append(ASMMovQ("%rax", "%r8")) 
+	# cur_asm_list.append(ASMMovQ("%rax", "%r8")) 
 
 	# Make new Int box and put the result inside
 	# Note: r9 is arbitrary here
-	cur_asm_list.append(ASMComment("box final result"))
-	gen_asm_for_new_boxed_type(cur_asm_list, "Int", "%r9")
-	cur_asm_list.append(ASMMovQ("%r8", "24(%r9)"))
+	# cur_asm_list.append(ASMComment("box final result"))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "Int", "%r9")
+	# cur_asm_list.append(ASMMovQ("%r8", "24(%r9)"))
 
 	# Move final result into rax to return
-	cur_asm_list.append(ASMComment("move result into rax"))
-	cur_asm_list.append(ASMMovQ("%r9", "%rax"))
+	# cur_asm_list.append(ASMComment("move result into rax"))
+	# cur_asm_list.append(ASMMovQ("%r9", "%rax"))
+
+	cur_asm_list.append(ASMComment("result from strlen already in rax"))
 
 	# Pop all callee-saved regs
 	for reg in reversed(callee_saved_registers):

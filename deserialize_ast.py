@@ -297,6 +297,11 @@ def class_from_input(input_lines):
 	for i in range(num_features):
 		feature_list.append(feature_from_input(input_lines))
 
+	# Set the containing class for each method
+	for feature in feature_list:
+		if isinstance(feature, ASTMethod):
+			feature.containing_class = typ
+
 	return ASTClass(type_line, typ, inherits_line, class_inherits, feature_list)
 
 def ast_from_input(input_lines):
@@ -408,21 +413,15 @@ def update_global_implementation_map(ast_root):
 		# Use a copy here to include built-in functions
 		# new_method_list = copy.copy(impl_map_method_list)
 
-		# Iterate through each ast_feature
-		for ast_feature in ast_class.feature_list:
-			# Skip attributes
-			if not isinstance(ast_feature, ASTMethod):
-				continue
+		for method in impl_map_method_list:
+			for ast_class_2 in ast_root.class_list:
+				for ast_feature in ast_class_2.feature_list:
+					if not isinstance(ast_feature, ASTMethod):
+						continue
 
-			# Find the appropriate feature in the impl map and set its containing class
-			for method in impl_map_method_list:
-				if ast_feature.ident == method.ident:
-					method.formals_list = ast_feature.formals_list
-					method.ret_typ = ast_feature.ret_typ
-					break
-
-		# Set the updated list in the implementation map
-		# implementation_map[ast_class.typ] = new_method_list
+					if ast_feature.ident == method.ident and ast_feature.containing_class == method.containing_class:
+						method.formals_list = ast_feature.formals_list
+						method.ret_typ = ast_feature.ret_typ
 
 	# Configure explicit formals for builtin methods
 	for type_name in implementation_map:
@@ -439,12 +438,6 @@ def update_global_implementation_map(ast_root):
 				elif method.ident == "substr":
 					method.formals_list = [ASTFormal(0, "i", 0, "Int"), ASTFormal(0, "l", 0, "Int")]
 
-	# for type_name in implementation_map:
-	# 	print "methods for: " + type_name
-	# 	for method in implementation_map[type_name]:
-	# 		print method.containing_class + "." + method.ident
-	# 	print
-	# sys.exit(1)
 
 def make_global_parent_map(input_lines):
 	global parent_map
