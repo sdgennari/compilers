@@ -599,7 +599,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -660,9 +660,9 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r11
 			## assign
-			movq	%r9, %r11
+			movq	%r11, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -687,18 +687,18 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			## check if %r11 is void and set result accordingly
-			cmpq	$0, %r11
+			## check if %r10 is void and set result accordingly
+			cmpq	$0, %r10
 			jnz		.asm_label_1
 			movq	$1, 24(%r8)
 .asm_label_1:
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
+			## unbox value of %r8 into %r9
+			movq	24(%r8), %r9
 			## not
-			movl	%r10d, %r8d
+			movl	%r9d, %r8d
 			xorl	$1, %r8d
 			## branch .case_3_void
-			test	%r10d, %r10d
+			test	%r9d, %r9d
 			jnz		.case_3_void
 			## branch .case_3_not_void
 			test	%r8d, %r8d
@@ -710,8 +710,8 @@ Main.main:
 			call	exit
 			jmp		.case_3_not_void
 .case_3_not_void:
-			## move type tag of %r11 into %r8
-			movq	0(%r11), %r8
+			## move type tag of %r10 into %r8
+			movq	0(%r10), %r8
 			## check for type A
 			movq	$6, %rax
 			cmpq	%rax, %r8
@@ -754,9 +754,9 @@ Main.main:
 			je		.case_2_error_branch
 .case_2_A:
 			## assign
-			movq	%r11, %r10
+			movq	%r10, %r9
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -824,11 +824,11 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_2_exit
 .case_2_B:
 			## assign
-			movq	%r11, %r8
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -896,11 +896,11 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_2_exit
 .case_2_C:
 			## assign
-			movq	%r11, %r8
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -968,11 +968,11 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_2_exit
 .case_2_Int:
 			## assign
-			movq	%r11, %r8
+			movq	%r10, %r8
 			## const String
 			## push caller-saved regs
 			pushq	%rcx
@@ -1040,7 +1040,7 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
-			movq	%r8, %r10
+			movq	%r8, %r9
 			jmp		.case_2_exit
 .case_2_error_branch:
 			movq	$string_6, %rdi
@@ -1049,9 +1049,9 @@ Main.main:
 			call	exit
 .case_2_exit:
 			## assign
-			movq	%r10, %r8
+			movq	%r9, %r8
 			## assign
-			movq	%r9, %r10
+			movq	%r11, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -1393,9 +1393,11 @@ Main.main:
 			popq	%rcx
 			movq	%rax, %r8
 			## assign
+			movq	%r8, %r11
+			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r9, %r10
+			movq	%r11, %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx

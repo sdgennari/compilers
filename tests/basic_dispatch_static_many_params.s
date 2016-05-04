@@ -371,31 +371,7 @@ A.some_method:
 			## loading param [12] into %r8
 			movq	112(%rbp), %r8
 			## new const Int: 123
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$123, 24(%r8)
+			movq	$123, %r8
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs
@@ -543,7 +519,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -579,367 +555,55 @@ Main.main:
 			pushq	%r15
 .Main_main_2:
 			## new const Int: 0
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$0, 24(%r8)
+			movq	$0, %r8
 			## storing param [0]
 			pushq	%r8
 			## new const Int: 1
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$1, 24(%r8)
+			movq	$1, %r8
 			## storing param [1]
 			pushq	%r8
 			## new const Int: 2
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$2, 24(%r8)
+			movq	$2, %r8
 			## storing param [2]
 			pushq	%r8
 			## new const Int: 3
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$3, 24(%r8)
+			movq	$3, %r8
 			## storing param [3]
 			pushq	%r8
 			## new const Int: 4
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$4, 24(%r8)
+			movq	$4, %r8
 			## storing param [4]
 			pushq	%r8
 			## new const Int: 5
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$5, 24(%r8)
+			movq	$5, %r8
 			## storing param [5]
 			pushq	%r8
 			## new const Int: 6
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$6, 24(%r8)
+			movq	$6, %r8
 			## storing param [6]
 			pushq	%r8
 			## new const Int: 7
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$7, 24(%r8)
+			movq	$7, %r8
 			## storing param [7]
 			pushq	%r8
 			## new const Int: 8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$8, 24(%r8)
+			movq	$8, %r8
 			## storing param [8]
 			pushq	%r8
 			## new const Int: 9
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$9, 24(%r8)
+			movq	$9, %r8
 			## storing param [9]
 			pushq	%r8
 			## new const Int: 10
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$10, 24(%r8)
+			movq	$10, %r8
 			## storing param [10]
 			pushq	%r8
 			## new const Int: 11
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$11, 24(%r8)
+			movq	$11, %r8
 			## storing param [11]
 			pushq	%r8
 			## new const Int: 12
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$12, 24(%r8)
+			movq	$12, %r8
 			## storing param [12]
 			pushq	%r8
 			## new A

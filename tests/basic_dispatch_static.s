@@ -347,31 +347,7 @@ A.some_method:
 			## loading param [0] into %r8
 			movq	16(%rbp), %r8
 			## new const Int: 123
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$123, 24(%r8)
+			movq	$123, %r8
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs
@@ -519,7 +495,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -555,31 +531,7 @@ Main.main:
 			pushq	%r15
 .Main_main_2:
 			## new const Int: 777
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$777, 24(%r8)
+			movq	$777, %r8
 			## storing param [0]
 			pushq	%r8
 			## new A

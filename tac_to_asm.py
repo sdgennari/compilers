@@ -58,9 +58,12 @@ def gen_asm_for_tac_const_int(current_type, register_color_map, spilled_reg_loc_
 	dest_reg_offset = "24("+dest+")"
 
 	# Create a new Int and put value into box
+	# cur_asm_list.append(ASMComment("new const Int: " + str(tac_const_int.val)))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "Int", dest)
+	# cur_asm_list.append(ASMMovL(src, dest_reg_offset))
+
 	cur_asm_list.append(ASMComment("new const Int: " + str(tac_const_int.val)))
-	gen_asm_for_new_boxed_type(cur_asm_list, "Int", dest)
-	cur_asm_list.append(ASMMovL(src, dest_reg_offset))
+	cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_const_bool(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_const_bool):
@@ -100,16 +103,14 @@ def gen_asm_for_tac_default(current_type, register_color_map, spilled_reg_loc_ma
 
 	# Check for Ints, Strings, and Bools
 	cur_asm_list.append(ASMComment("default " + tac_default.type))
-	if tac_default.type == "Int" or tac_default.type == "Bool" or \
-			tac_default.type == "String":
-
+	if tac_default.type == "Bool" or tac_default.type == "String":
 		# Make a new box for the type and store the value
 		dest_reg_offset = "24("+dest+")"
 		gen_asm_for_new_boxed_type(cur_asm_list, tac_default.type, dest)
 		cur_asm_list.append(ASMMovQ(src, dest_reg_offset))
 
-	# Handle raw.Int and raw.String explicitly
-	elif tac_default.type == "raw.Int":
+	# Handle unboxed values, raw.Int and raw.String explicitly
+	elif tac_default.type == "Int" or tac_default.type == "raw.Int":
 		cur_asm_list.append(ASMMovQ(src, dest))
 
 	elif tac_default.type == "raw.String":
@@ -157,7 +158,12 @@ def gen_asm_for_tac_assign(current_type, register_color_map, spilled_reg_loc_map
 def gen_asm_for_tac_new(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_new):
 	dest = get_asm_register(register_color_map, tac_new.assignee, 64)
 	cur_asm_list.append(ASMComment("new " + tac_new.type))
-	gen_asm_for_new_boxed_type(cur_asm_list, tac_new.type, dest)
+
+	# If new type is unboxed, just move the default value into dest
+	if tac_new.type == "Int":
+		cur_asm_list.append(ASMMovQ("$0", dest))
+	else:
+		gen_asm_for_new_boxed_type(cur_asm_list, tac_new.type, dest)
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_new_self_type(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
@@ -1065,7 +1071,8 @@ def gen_asm_for_internal_out_int(cur_asm_list):
 
 	# Setup and call printf
 	cur_asm_list.append(ASMComment("setup and call printf"))
-	cur_asm_list.append(ASMMovL("24(%rax)", "%esi"))
+	# cur_asm_list.append(ASMMovL("24(%rax)", "%esi"))
+	cur_asm_list.append(ASMMovL("%eax", "%esi"))
 	cur_asm_list.append(ASMMovQ("$out_int_format_str", "%rdi"))
 	cur_asm_list.append(ASMMovL("$0", "%eax"))
 	cur_asm_list.append(ASMCall("printf"))

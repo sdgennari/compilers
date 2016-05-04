@@ -101,59 +101,11 @@ A..new:		## Constructor for A
 			movq	$A..vtable, %rax
 			movq	%rax, 16(%rbx)
 			## default Int
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	$0, 24(%r8)
+			movq	$0, %r8
 			## store %r8 in self[3] (i)
 			movq	%r8, 24(%rbx)
 			## new const Int: 9001
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$9001, 24(%r8)
+			movq	$9001, %r8
 			## store %r8 in self[3] (i)
 			movq	%r8, 24(%rbx)
 			## pop callee-saved regs
@@ -407,31 +359,7 @@ A.set_i:
 			pushq	%r15
 .A_set_i_1:
 			## new const Int: 777
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$777, 24(%r8)
+			movq	$777, %r8
 			## store %r8 in self[3] (i)
 			movq	%r8, 24(%rbx)
 			## assign
@@ -611,7 +539,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf

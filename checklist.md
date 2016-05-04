@@ -1,3 +1,5 @@
+# Integer Auto-Boxing
+
 ### Features
 
 - ~~method~~
@@ -37,25 +39,13 @@
 
 ### Internals
 
-- ~~IO.in_int~~
+- IO.in_int
 - ~~IO.in_string~~
 - ~~IO.out_int~~
 - ~~IO.out_string~~
-- Object.abort
-- ~~Object.copy~~
-- Object.type_name
-- String.concat
+- ~~Object.abort~~
+- Object.copy
+- ~~Object.type_name~~
+- ~~String.concat~~
 - String.length
 - String.substr
-
-### Priority List
-
-- self
-- abort
-- copy (x2)
-- eval order (x2)
-- case (x5)
-- SELF_TYPE
-- substring
-- type_name
-- exceptions

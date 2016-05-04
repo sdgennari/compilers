@@ -70,8 +70,6 @@ def exp_from_input(input_lines):
 		for i in range(num_exp):
 			exp_list.append(exp_from_input(input_lines))
 
-		# print caller_exp.type_from_ast
-
 		return ASTExpDynamicDispatch(typ, line, caller_exp, ident_line, ident, exp_list)
 
 	elif exp_type == "static_dispatch":
@@ -251,6 +249,7 @@ def feature_from_input(input_lines):
 		ident_line = next_int(input_lines)
 		ident = next_string(input_lines)
 
+
 		formals_list = []
 		num_formals = next_int(input_lines)
 		for i in range(num_formals):
@@ -384,7 +383,7 @@ def make_global_implementation_map(input_lines):
 			method_body = exp_from_input(input_lines)
 
 			# Make a new method and set its containing class
-			method = ASTMethod(0, method_name, formals_name_list, 0, method_body.type_from_ast, method_body)
+			method = ASTMethod(0, method_name, formals_name_list, 0, None, method_body)
 			method.containing_class = containing_class
 
 			implementation_map[cur_class].append(method)
@@ -419,12 +418,26 @@ def update_global_implementation_map(ast_root):
 			for method in impl_map_method_list:
 				if ast_feature.ident == method.ident:
 					method.formals_list = ast_feature.formals_list
-					# new_method_list.remove(method)
-					# new_method_list.append(ast_feature)
+					method.ret_typ = ast_feature.ret_typ
 					break
 
 		# Set the updated list in the implementation map
 		# implementation_map[ast_class.typ] = new_method_list
+
+	# Configure explicit formals for builtin methods
+	for type_name in implementation_map:
+		impl_map_method_list = implementation_map[type_name]
+		for method in impl_map_method_list:
+			if method.containing_class == "IO":
+				if method.ident == "out_int":
+					method.formals_list = [ASTFormal(0, "x", 0, "Int")]
+				elif method.ident == "out_string":
+					method.formals_list = [ASTFormal(0, "x", 0, "String")]
+			elif method.containing_class == "String":
+				if method.ident == "concat":
+					method.formals_list = [ASTFormal(0, "s", 0, "String")]
+				elif method.ident == "substr":
+					method.formals_list = [ASTFormal(0, "i", 0, "Int"), ASTFormal(0, "l", 0, "Int")]
 
 	# for type_name in implementation_map:
 	# 	print "methods for: " + type_name

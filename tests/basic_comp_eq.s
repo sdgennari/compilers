@@ -423,7 +423,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -459,34 +459,12 @@ Main.main:
 			pushq	%r15
 .Main_main_1:
 			## new const Int: 123
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movl	$123, 24(%r9)
+			movq	$123, %r9
 			## assign
 			movq	%r9, %r8
 			## new const Int: 2
+			movq	$2, %r9
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -511,10 +489,12 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$2, 24(%r8)
+			movq	%r9, 24(%r8)
 			## assign
 			movq	%r8, %r12
 			## new const Int: 3
+			movq	$3, %r9
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -539,7 +519,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$3, 24(%r8)
+			movq	%r9, 24(%r8)
 			## assign
 			movq	%r8, %r13
 			## new IO
@@ -572,57 +552,9 @@ Main.main:
 			## default Object
 			movq	$0, %r11
 			## new const Int: 5
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movl	$5, 24(%r9)
+			movq	$5, %r9
 			## new const Int: 7
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$7, 24(%r8)
+			movq	$7, %r8
 			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
@@ -652,57 +584,9 @@ Main.main:
 			## move comparison result into %r10
 			movq	%rax, %r10
 			## new const Int: 9001
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movl	$9001, 24(%r9)
+			movq	$9001, %r9
 			## new const Int: 777
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$777, 24(%r8)
+			movq	$777, %r8
 			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx
@@ -732,57 +616,9 @@ Main.main:
 			## move comparison result into %r10
 			movq	%rax, %r10
 			## new const Int: 444
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movl	$444, 24(%r9)
+			movq	$444, %r9
 			## new const Int: 444
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$444, 24(%r8)
+			movq	$444, %r8
 			## use eq_helper to compare %r9 = %r8
 			## push caller-saved regs and self ptr
 			pushq	%rcx

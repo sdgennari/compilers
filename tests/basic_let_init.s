@@ -423,7 +423,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -459,59 +459,11 @@ Main.main:
 			pushq	%r15
 .Main_main_1:
 			## new const Int: 777
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$777, 24(%r8)
+			movq	$777, %r8
 			## assign
-			movq	%r8, %r9
+			movq	%r8, %r12
 			## new const Int: 9001
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movl	$9001, 24(%r8)
+			movq	$9001, %r8
 			## assign
 			movq	%r8, %r10
 			## const String
@@ -543,42 +495,12 @@ Main.main:
 			## assign
 			movq	%r8, %r11
 			## assign
-			movq	%r9, %r8
+			movq	%r12, %r9
 			## assign
-			movq	%r10, %r9
-			## unbox value of %r8 into %r10
-			movq	24(%r8), %r10
-			## unbox value of %r9 into %r8
-			movq	24(%r9), %r8
+			movq	%r10, %r8
 			## plus
-			movl	%r10d, %r9d
-			addl	%r8d, %r9d
-			## box value of %r9 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r9, 24(%r8)
+			movl	%r9d, %r10d
+			addl	%r8d, %r10d
 			## assign
 			movq	%r11, %r8
 			## assign

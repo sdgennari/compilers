@@ -427,7 +427,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -486,8 +486,8 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r9
-			movq	$empty.string, 24(%r9)
+			movq	%rax, %r10
+			movq	$empty.string, 24(%r10)
 			pushq	%rcx
 			pushq	%rdx
 			pushq	%rsi
@@ -524,9 +524,11 @@ Main.main:
 			## storing method result in %r8
 			movq	%rax, %r8
 			## assign
+			movq	%r8, %r10
+			## assign
 			movq	%r8, %r9
 			## assign
-			movq	%r9, %r8
+			movq	%r10, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx

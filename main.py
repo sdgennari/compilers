@@ -189,14 +189,16 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 		# Check that the attribute has an init exp
 		if isinstance(ast_attr, ASTAttrInit):
 			# Generate the TAC for the expression
-			gen_tac_for_exp(symbol_table_list, cur_tac_list, ast_attr.exp)
+			exp_symbol, exp_type = gen_tac_for_exp(type_name, symbol_table_list, cur_tac_list, ast_attr.exp)
 
-			# Get assignee of last TAC instr and store it in the attr
-			last_tac_instr = cur_tac_list[-1]
-			if hasattr(last_tac_instr, "assignee"):
-				cur_tac_list.append(TACStoreAttr(ast_attr.feature_type, ast_attr.ident, last_tac_instr.assignee))
-			else:
-				raise ValueError("Last instr for attr init should have an assignee")
+			# If the attr is an Object and the exp is unboxed, box the result
+			if ast_attr.feature_type == "Object" and exp_type == "Int":
+				boxed_symbol = new_symbol()
+				cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, "Int"))
+				exp_symbol = boxed_symbol
+
+			# Store result it in the attr
+			cur_tac_list.append(TACStoreAttr(ast_attr.feature_type, ast_attr.ident, exp_symbol))
 
 	# for tac_instr in cur_tac_list:
 	# 	print tac_instr
@@ -348,10 +350,10 @@ def add_attrs_to_symbol_table(symbol_table_list, type_name):
 	# Use None to indicate the ident is an attr that must be loaded
 	symbol_table_list.append({})
 	for ast_attr in class_map[type_name]:
-		symbol_table_list[-1][ast_attr.ident] = None
+		symbol_table_list[-1][ast_attr.ident] = (None, ast_attr.feature_type)
 
 	# Add self explicitly to the table (self is treated like an implicit attr)
-	symbol_table_list[-1]["self"] = None
+	symbol_table_list[-1]["self"] = (None, "SELF_TYPE")
 
 def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 	symbol_table_list = []
@@ -377,15 +379,11 @@ def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 	# removeDeadCode(block_list)
 	computeLiveSets(block_list)
 
-	# if (ast_method.ident == "main"):
+	# if ast_method.ident == "main":
 	# 	print
 	# 	for block in block_list:
 	# 		for instr in block.instr_list:
-	# 			if hasattr(instr, 'cur_exp_type'):
-	# 				print instr.cur_exp_type + "\t",
-	# 			else:
-	# 				print "\t",
-	# 			print instr
+	# 			print getattr(instr, 'cur_exp_type', "").ljust(12), instr
 	# 		print
 	# sys.exit(1)
 
@@ -402,12 +400,13 @@ def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 	# Generate asm for the block list
 	gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_registers, type_name)
 
-	# for asm_instr in cur_asm_list:
-	# 	print asm_instr,
+	# if ast_method.ident == "main":
+		# for asm_instr in cur_asm_list:
+			# print asm_instr,
 
 def ast_attr_to_asm(cur_asm_list, ast_attr, type_name):
 	cur_tac_list = []
-	gen_tac_for_exp(cur_tac_list, ast_attr.exp)
+	gen_tac_for_exp(type_name, cur_tac_list, ast_attr.exp)
 
 	block_list = buildBasicBlocks(cur_tac_list)
 	computeLiveSets(block_list)
