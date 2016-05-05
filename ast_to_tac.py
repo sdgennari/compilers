@@ -53,7 +53,7 @@ def gen_tac_for_binding(current_type, symbol_table_list, cur_tac_list, ast_bindi
 		assignee_symbol, _ = add_symbol(symbol_table_list, ast_binding.ident, ast_binding.binding_type)
 
 		# Box the cur exp if the ident expects an Object (boxed), but the result is unboxed
-		if ast_binding.binding_type == "Object" and (cur_exp_type == "Int" or current_type == "String"):
+		if ast_binding.binding_type == "Object" and cur_exp_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, cur_exp_type))
 			exp_symbol = boxed_symbol
@@ -122,34 +122,29 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		exit_label = "if_exit_" + str(label_num)
 
 		# Get condition and negate it
-		cond_symbol_boxed, cond_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.cond_exp)
-
-		# Unbox condition variable
-		cond_symbol_unboxed = gen_tac_for_unbox(symbol_table_list, cur_tac_list, cond_symbol_boxed, "Bool")
-
-		# Negate condition
-		not_cond_symbol_unboxed = new_symbol()
-		cur_tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol_unboxed, cond_symbol_unboxed))
+		cond_symbol, cond_exp_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.cond_exp)
+		not_cond_symbol = new_symbol()
+		cur_tac_list.append(TACNegBool(cond_exp_type, not_cond_symbol, cond_symbol))
 
 		# Branch relies on UNBOXED values
 		# Branch to 'then' if condition is true
 		# Branch to 'else' if condition is not true
-		cur_tac_list.append(TACBt(cond_symbol_unboxed, then_label))
-		cur_tac_list.append(TACBt(not_cond_symbol_unboxed, else_label))
+		cur_tac_list.append(TACBt(cond_symbol, then_label))
+		cur_tac_list.append(TACBt(not_cond_symbol, else_label))
 
 		# 'then' exp
 		cur_tac_list.append(TACComment("then branch"))
 		cur_tac_list.append(TACLabel(then_label))
-		then_symbol, then_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.then_exp)
-		cur_tac_list.append(TACAssign(then_type_from_ast, assignee_symbol, then_symbol))
+		then_symbol, then_exp_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.then_exp)
+		cur_tac_list.append(TACAssign(then_exp_type, assignee_symbol, then_symbol))
 		# Jump over 'else' exp
 		cur_tac_list.append(TACJmp(exit_label))
 
 		# Label for 'else' exp
 		cur_tac_list.append(TACComment("else branch"))
 		cur_tac_list.append(TACLabel(else_label))
-		else_symbol, else_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.else_exp)
-		cur_tac_list.append(TACAssign(else_type_from_ast, assignee_symbol, else_symbol))
+		else_symbol, else_exp_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.else_exp)
+		cur_tac_list.append(TACAssign(else_exp_type, assignee_symbol, else_symbol))
 		# Jump to exit label to preserve child info in basic blocks
 		cur_tac_list.append(TACJmp(exit_label))
 
@@ -170,15 +165,15 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		cur_tac_list.append(TACLabel(start_label))
 
 		# Get condition and negate it
-		cond_symbol_boxed, cond_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.cond_exp)
-		cond_symbol_unboxed = gen_tac_for_unbox(symbol_table_list, cur_tac_list, cond_symbol_boxed, "Bool")
-		not_cond_symbol_unboxed = new_symbol()
-		cur_tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol_unboxed, cond_symbol_unboxed))
+		cond_symbol, cond_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.cond_exp)
+		# cond_symbol_unboxed = gen_tac_for_unbox(symbol_table_list, cur_tac_list, cond_symbol_boxed, "Bool")
+		# not_cond_symbol_unboxed = new_symbol()
+		# cur_tac_list.append(TACNegBool(cond_type_from_ast, not_cond_symbol_unboxed, cond_symbol_unboxed))
 
 		# Branch relies on UNBOXED values
 		# Branch to exit loop if condition is not true
-		cur_tac_list.append(TACBt(cond_symbol_unboxed, body_label))
-		cur_tac_list.append(TACBt(not_cond_symbol_unboxed, exit_label))
+		cur_tac_list.append(TACBt(cond_symbol, body_label))
+		cur_tac_list.append(TACJmp(exit_label))
 
 		# Add loop body label
 		cur_tac_list.append(TACComment("loop body"))
@@ -206,13 +201,16 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 
 		# If the ident is an Object and the exp is unboxed, box the exp
 		boxed_symbol = None
-		if ident_type == "Object" and (cur_exp_type == "Int" or cur_exp_type == "String"):
+		if ident_type == "Object" and cur_exp_type in ["Int", "String", "Bool"]:
 			boxed_symbol= new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, cur_exp_type))
 			exp_symbol = boxed_symbol
 
 		# If ident is unboxed and exp is boxed, unbox it
-		elif (ident_type == "Int" and cur_exp_type == "BoxedInt") or (ident_type == "String" and cur_exp_type == "BoxedString"):
+		elif (ident_type == "Int" and cur_exp_type == "BoxedInt") or \
+			(ident_type == "String" and cur_exp_type == "BoxedString") or \
+			(ident_type == "Bool" and current_type == "BoxedBool"):
+
 			unboxed_symbol = new_symbol()
 			cur_tac_list.append(TACUnbox(unboxed_symbol, exp_symbol, ident_type))
 			exp_symbol = unboxed_symbol
@@ -325,11 +323,11 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
 		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type == "Int" or left_symbol_type == "String":
+		if left_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type == "Int" or right_symbol_type == "String":
+		if right_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
 			right_symbol = boxed_symbol
@@ -341,11 +339,11 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
 		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type == "Int" or left_symbol_type == "String":
+		if left_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type == "Int" or right_symbol_type == "String":
+		if right_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
 			right_symbol = boxed_symbol		
@@ -357,11 +355,11 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
 		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type == "Int" or left_symbol_type == "String":
+		if left_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type == "Int" or right_symbol_type == "String":
+		if right_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
 			right_symbol = boxed_symbol
@@ -373,14 +371,14 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 	elif isinstance(ast_exp, ASTExpIsVoid):
 		exp_symbol, cur_exp_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.exp)
 
-		# If cur exp type is Intthen isvoid must return false
-		if cur_exp_type == "Int" or cur_exp_type == "String":
+		# If cur exp type is Int, String, or Bool, then isvoid must return false
+		if cur_exp_type == "Int" or cur_exp_type == "String" or cur_exp_type == "Bool":
 			cur_tac_list.append(TACConstBool(ast_exp.type_from_ast, assignee_symbol, "false"))
 		else:
 			cur_tac_list.append(TACIsVoid(ast_exp.type_from_ast, assignee_symbol, exp_symbol))
 
 	elif isinstance(ast_exp, ASTExpTilde):
-		# Get the boxed value
+		# Get the value
 		exp_symbol, exp_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.exp)
 
 		# Unbox the value and do 'not'
@@ -391,16 +389,11 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		cur_tac_list.append(TACNegArith(ast_exp.type_from_ast, assignee_symbol, exp_symbol))
 
 	elif isinstance(ast_exp, ASTExpNot):
-		# Get the boxed value
-		boxed_exp_symbol, boxed_exp_symbol_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.exp)
+		# Get the value
+		exp_symbol, exp_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.exp)
 
-		# Unbox the value and do 'not'
-		unboxed_exp_symbol = gen_tac_for_unbox(symbol_table_list, cur_tac_list, boxed_exp_symbol, "Bool")
-		unboxed_assignee_symbol = new_symbol()
-		cur_tac_list.append(TACNegBool(ast_exp.type_from_ast, unboxed_assignee_symbol, unboxed_exp_symbol))
-
-		# Box the answer and set assignee to pointer
-		assignee_symbol = gen_tac_for_box(symbol_table_list, cur_tac_list, unboxed_assignee_symbol, "Bool")
+		# Not value and return result
+		cur_tac_list.append(TACNegBool(ast_exp.type_from_ast, assignee_symbol, exp_symbol))
 
 	elif isinstance(ast_exp, ASTExpSelfDispatch):
 		# ExpSelfDispatch: (self, line, ident_line, ident, exp_list=[])
@@ -419,7 +412,7 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			param_symbol, param_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, exp)
 
 			# Box result if necessary
-			if formal.typ == "Object" and (param_type_from_ast == "Int" or param_type_from_ast == "String"):
+			if formal.typ == "Object" and param_type_from_ast in ["Int", "String", "Bool"]:
 				boxed_symbol = new_symbol()
 				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, param_type_from_ast))
 				param_symbol = boxed_symbol
@@ -460,7 +453,7 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			param_symbol, param_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, exp)
 
 			# Box result if necessary
-			if formal.typ == "Object" and (param_type_from_ast == "Int" or param_type_from_ast == "String"):
+			if formal.typ == "Object" and param_type_from_ast in ["Int", "String", "Bool"]:
 				boxed_symbol = new_symbol()
 				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, param_type_from_ast))
 				param_symbol = boxed_symbol
@@ -475,28 +468,28 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		cur_tac_list.extend(ro_tac_list)
 
 		# Box receiver object if necessary
-		if ro_type_from_ast == "Int" or ro_type_from_ast == "String":
+		if ro_type_from_ast in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, ro_symbol, ro_type_from_ast))
 			ro_symbol = boxed_symbol
 
 		# Check if the receiver object is void
-		void_check_boxed = new_symbol()
+		is_void_symbol = new_symbol()
 		void_label_num = new_label_num()
 		void_label = "dispatch_" + str(void_label_num) + "_void"
 		not_void_label = "dispatch_" + str(void_label_num) + "_not_void"
-		cur_tac_list.append(TACIsVoid(ro_type_from_ast, void_check_boxed, ro_symbol))
+		cur_tac_list.append(TACIsVoid(ro_type_from_ast, is_void_symbol, ro_symbol))
 
 		# Unbox result of isvoid and negate it
-		unboxed_is_void = gen_tac_for_unbox(symbol_table_list, cur_tac_list, void_check_boxed, "Bool")
-		unboxed_is_not_void = new_symbol()
+		# unboxed_is_void = gen_tac_for_unbox(symbol_table_list, cur_tac_list, void_check_boxed, "Bool")
+		# unboxed_is_not_void = new_symbol()
 		# NegBool relies on UNBOXED values
-		cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))		
+		# cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))		
 
 		# Branch relies on UNBOXED values
 		# Branch to error or rest of dispatch
-		cur_tac_list.append(TACBt(unboxed_is_void, void_label))
-		cur_tac_list.append(TACBt(unboxed_is_not_void, not_void_label))
+		cur_tac_list.append(TACBt(is_void_symbol, void_label))
+		cur_tac_list.append(TACJmp(not_void_label))
 		cur_tac_list.append(TACLabel(void_label))
 		cur_tac_list.append(TACError(ast_exp.line, "dispatch on void"))
 		cur_tac_list.append(TACJmp(not_void_label)) 		# include this to end basic block
@@ -537,7 +530,7 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			param_symbol, param_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, exp)
 
 			# Box result if necessary
-			if formal.typ == "Object" and (param_type_from_ast == "Int" or param_type_from_ast == "String"):
+			if formal.typ == "Object" and param_type_from_ast in ["Int", "String", "Bool"]:
 				boxed_symbol = new_symbol()
 				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, param_type_from_ast))
 				param_symbol = boxed_symbol
@@ -552,28 +545,28 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		cur_tac_list.extend(ro_tac_list)
 
 		# Box receiver object if necessary
-		if ro_type_from_ast == "Int" or ro_type_from_ast == "String":
+		if ro_type_from_ast in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, ro_symbol, ro_type_from_ast))
 			ro_symbol = boxed_symbol
 
 		# Check if the receiver object is void
-		void_check_boxed = new_symbol()
+		is_void_symbol = new_symbol()
 		void_label_num = new_label_num()
 		void_label = "dispatch_" + str(void_label_num) + "_void"
 		not_void_label = "dispatch_" + str(void_label_num) + "_not_void"
-		cur_tac_list.append(TACIsVoid(ro_type_from_ast, void_check_boxed, ro_symbol))
+		cur_tac_list.append(TACIsVoid(ro_type_from_ast, is_void_symbol, ro_symbol))
 
 		# Unbox result of isvoid and negate it
-		unboxed_is_void = gen_tac_for_unbox(symbol_table_list, cur_tac_list, void_check_boxed, "Bool")
-		unboxed_is_not_void = new_symbol()
+		# unboxed_is_void = gen_tac_for_unbox(symbol_table_list, cur_tac_list, void_check_boxed, "Bool")
+		# unboxed_is_not_void = new_symbol()
 		# NegBool relies on UNBOXED values
-		cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))		
+		# cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))		
 
 		# Branch relies on UNBOXED values
 		# Branch to error or rest of dispatch
-		cur_tac_list.append(TACBt(unboxed_is_void, void_label))
-		cur_tac_list.append(TACBt(unboxed_is_not_void, not_void_label))
+		cur_tac_list.append(TACBt(is_void_symbol, void_label))
+		cur_tac_list.append(TACJmp(not_void_label))
 		cur_tac_list.append(TACLabel(void_label))
 		cur_tac_list.append(TACError(ast_exp.line, "static dispatch on void"))
 		cur_tac_list.append(TACJmp(not_void_label)) 		# include this to end basic block
@@ -630,28 +623,29 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		pred_symbol, pred_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.exp)
 
 		# Box predicate result if necessary
-		if pred_type_from_ast == "Int" or pred_type_from_ast == "String":
+		if pred_type_from_ast in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, pred_symbol, pred_type_from_ast))
 			pred_symbol = boxed_symbol
 
 		# Check if the predicate is void
-		void_check_boxed = new_symbol()
+		is_void_symbol = new_symbol()
 		void_label_num = new_label_num()
 		void_label = "case_" + str(void_label_num) + "_void"
 		not_void_label = "case_" + str(void_label_num) + "_not_void"
-		cur_tac_list.append(TACIsVoid(pred_type_from_ast, void_check_boxed, pred_symbol))
+		cur_tac_list.append(TACIsVoid(pred_type_from_ast, is_void_symbol, pred_symbol))
 
 		# Unbox result of isvoid and negate it
-		unboxed_is_void = gen_tac_for_unbox(symbol_table_list, cur_tac_list, void_check_boxed, "Bool")
-		unboxed_is_not_void = new_symbol()
+		# unboxed_is_void = gen_tac_for_unbox(symbol_table_list, cur_tac_list, void_check_boxed, "Bool")
+		# unboxed_is_not_void = new_symbol()
 		# NegBool relies on UNBOXED values
-		cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))	
+		# cur_tac_list.append(TACNegBool("Bool", unboxed_is_not_void, unboxed_is_void))	
 
 		# Branch relies on UNBOXED values
 		# Branch to error or rest of case
-		cur_tac_list.append(TACBt(unboxed_is_void, void_label))
-		cur_tac_list.append(TACBt(unboxed_is_not_void, not_void_label))
+		cur_tac_list.append(TACBt(is_void_symbol, void_label))
+		cur_tac_list.append(TACJmp(not_void_label))
+
 		cur_tac_list.append(TACLabel(void_label))
 		cur_tac_list.append(TACError(ast_exp.line, "case on void"))
 		cur_tac_list.append(TACJmp(not_void_label)) 		# include this to end basic block
@@ -682,7 +676,7 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			case_elem_symbol, _ = add_symbol(symbol_table_list, ast_case_elem.ident, ast_case_elem.case_type)
 
 			# Assign exp from case predicate to the case elem, unboxing if necessary
-			if ast_case_elem.case_type == "Int" or ast_case_elem.case_type == "String":
+			if ast_case_elem.case_type in ["Int", "String", "Bool"]:
 				cur_tac_list.append(TACUnbox(case_elem_symbol, pred_symbol, ast_case_elem.case_type))
 			else:
 				cur_tac_list.append(TACAssign(ast_case_elem.case_type, case_elem_symbol, pred_symbol))
@@ -732,7 +726,7 @@ def gen_tac_for_method(symbol_table_list, cur_tac_list, ast_feature, class_name)
 	return_symbol, body_exp_type = gen_tac_for_exp(class_name, symbol_table_list, cur_tac_list, ast_feature.body_exp)
 
 	# Box the result if the body exp is unboxed but the method returns an object
-	if ast_feature.ret_typ == "Object" and (body_exp_type == "Int" or body_exp_type == "String"):
+	if ast_feature.ret_typ == "Object" and body_exp_type in ["Int", "String", "Bool"]:
 		boxed_symbol = new_symbol()
 		cur_tac_list.append(TACBox(boxed_symbol, return_symbol, body_exp_type))
 		return_symbol = boxed_symbol

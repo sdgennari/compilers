@@ -73,12 +73,13 @@ def gen_asm_for_tac_const_bool(current_type, register_color_map, spilled_reg_loc
 		src = "$0"
 
 	dest = get_asm_register(register_color_map, tac_const_bool.assignee, 64)
-	dest_reg_offset = "24("+dest+")"
+	# dest_reg_offset = "24("+dest+")"
 
 	# Create new Bool and put value into box
-	cur_asm_list.append(ASMComment("const Bool"))
-	gen_asm_for_new_boxed_type(cur_asm_list, "Bool", dest)
-	cur_asm_list.append(ASMMovL(src, dest_reg_offset))
+	# cur_asm_list.append(ASMComment("const Bool"))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "Bool", dest)
+	# cur_asm_list.append(ASMMovL(src, dest_reg_offset))
+	cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_const_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_const_string):
@@ -102,26 +103,12 @@ def gen_asm_for_tac_default(current_type, register_color_map, spilled_reg_loc_ma
 	# Change default value for Strings and raw Strings
 	if tac_default.type == "String" or tac_default.type == "raw.String":
 		src = "$empty.string"
+
+	# Get the dest register
 	dest = get_asm_register(register_color_map, tac_default.assignee, 64)
 
-	# Check for Ints, Strings, and Bools
 	cur_asm_list.append(ASMComment("default " + tac_default.type))
-	if tac_default.type == "Bool":
-		# Make a new box for the type and store the value
-		dest_reg_offset = "24("+dest+")"
-		gen_asm_for_new_boxed_type(cur_asm_list, tac_default.type, dest)
-		cur_asm_list.append(ASMMovQ(src, dest_reg_offset))
-
-	# Handle unboxed values, raw.Int and raw.String explicitly
-	elif tac_default.type == "Int" or tac_default.type == "raw.Int":
-		cur_asm_list.append(ASMMovQ(src, dest))
-
-	elif tac_default.type == "String" or tac_default.type == "raw.String":
-		cur_asm_list.append(ASMMovQ(src, dest))		
-
-	else:
-		# Move null ptr into dest
-		cur_asm_list.append(ASMMovQ(src, dest))
+	cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_label(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_label):
@@ -163,7 +150,7 @@ def gen_asm_for_tac_new(current_type, register_color_map, spilled_reg_loc_map, c
 	cur_asm_list.append(ASMComment("new " + tac_new.type))
 
 	# If new type is unboxed, just move the default value into dest
-	if tac_new.type == "Int":
+	if tac_new.type == "Int" or tac_new.type == "Bool":
 		cur_asm_list.append(ASMMovQ("$0", dest))
 	elif tac_new.type == "String":
 		cur_asm_list.append(ASMMovQ("$empty.string", dest))
@@ -713,14 +700,16 @@ def gen_asm_for_tac_is_void(current_type, register_color_map, spilled_reg_loc_ma
 	false_label = next_asm_label()
 
 	# Make a new Bool to hold the result
-	gen_asm_for_new_boxed_type(cur_asm_list, "Bool", dest)
+	# gen_asm_for_new_boxed_type(cur_asm_list, "Bool", dest)
 
 	# Compare op1_reg to $0 to see if it is void
 	cur_asm_list.append(ASMComment("check if " + op1_reg + " is void and set result accordingly"))
+	cur_asm_list.append(ASMMovQ("$0", dest))
 	cur_asm_list.append(ASMCmpQ("$0", op1_reg))
 	cur_asm_list.append(ASMJmpNz(false_label))
-	dest_reg_offset = "24(" + dest + ")"
-	cur_asm_list.append(ASMMovQ("$1", dest_reg_offset))
+	# dest_reg_offset = "24(" + dest + ")"
+	# cur_asm_list.append(ASMMovQ("$1", dest_reg_offset))
+	cur_asm_list.append(ASMMovQ("$1", dest))
 	cur_asm_list.append(ASMLabel(false_label))
 
 def gen_asm_for_tac_error(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr):
@@ -1032,8 +1021,11 @@ def gen_asm_for_internal_copy(cur_asm_list):
 	int_type_tag = "$" + str(type_tag_map["Int"])
 	cur_asm_list.append(ASMCmpQ(int_type_tag, "%rax"))
 	cur_asm_list.append(ASMJmpEq("copy_unboxed"))
-	int_type_tag = "$" + str(type_tag_map["String"])
-	cur_asm_list.append(ASMCmpQ(int_type_tag, "%rax"))
+	string_type_tag = "$" + str(type_tag_map["String"])
+	cur_asm_list.append(ASMCmpQ(string_type_tag, "%rax"))
+	cur_asm_list.append(ASMJmpEq("copy_unboxed"))
+	bool_type_tag = "$" + str(type_tag_map["Bool"])
+	cur_asm_list.append(ASMCmpQ(bool_type_tag, "%rax"))
 	cur_asm_list.append(ASMJmpEq("copy_unboxed"))
 
 	# COPY OBJECTS

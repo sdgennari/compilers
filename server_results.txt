@@ -1,4 +1,4 @@
-Start Time:   Thu May  5 01:46:49 2016
+Start Time:   Thu May  5 18:18:59 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -35,7 +35,7 @@ t3: assignments                                  ok
 t4: bigexpr                                      ok  
 t5: big-prog-with-many-exprs                     ok  
 t6: book-list-static-dynamic-dispatch            ok  
-t7: bool-assigned-in-let                         ok  
+t7: bool-assigned-in-let                       FAILED
 t8: bool-comparison                              ok  
 t9: calls-with-same-formal-name                  ok  
 t10: case-order                                  ok  
@@ -118,4 +118,4 @@ t5: div-by-zero                                  ok
 t6: substring-bad                                ok  
 t7: mjk6zt.zip-bug_maker                         ok  
 t8: mjk6zt.zip-shallow_copy                      ok  
-End Time: Thu May  5 01:47:27 2016
+End Time: Thu May  5 18:19:34 2016

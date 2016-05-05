@@ -409,7 +409,7 @@ Main.main:
 .Main_main_1:
 			## new String
 			movq	$empty.string, %r8
-			## box value of %r8 into %r10
+			## box value of %r8 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -433,48 +433,18 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r10
-			movq	%r8, 24(%r10)
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			## check if %r10 is void and set result accordingly
-			cmpq	$0, %r10
+			movq	%rax, %r9
+			movq	%r8, 24(%r9)
+			## check if %r9 is void and set result accordingly
+			movq	$0, %r8
+			cmpq	$0, %r9
 			jnz		.asm_label_1
-			movq	$1, 24(%r8)
+			movq	$1, %r8
 .asm_label_1:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
-			## not
-			movl	%r9d, %r8d
-			xorl	$1, %r8d
 			## branch .case_3_void
-			test	%r9d, %r9d
-			jnz		.case_3_void
-			## branch .case_3_not_void
 			test	%r8d, %r8d
-			jnz		.case_3_not_void
+			jnz		.case_3_void
+			jmp		.case_3_not_void
 .case_3_void:
 			movq	$string_1, %rdi
 			call	raw_out_string
@@ -482,8 +452,8 @@ Main.main:
 			call	exit
 			jmp		.case_3_not_void
 .case_3_not_void:
-			## move type tag of %r10 into %r8
-			movq	0(%r10), %r8
+			## move type tag of %r9 into %r8
+			movq	0(%r9), %r8
 			## check for type String
 			movq	$4, %rax
 			cmpq	%rax, %r8
@@ -509,8 +479,8 @@ Main.main:
 			cmpq	%rax, %r8
 			je		.case_2_error_branch
 .case_2_Int:
-			## unbox value of %r10 into %r8
-			movq	24(%r10), %r8
+			## unbox value of %r9 into %r8
+			movq	24(%r9), %r8
 			## new const String
 			movq	$string_2, %r8
 			## storing param [0]
@@ -995,55 +965,12 @@ cmp_lt_string:
 			jl		cmp_lt_true
 			jmp		cmp_lt_false
 
-			## make new true object in %rax
 cmp_lt_true:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	$1, 24(%rax)
+			movq	$1, %rax
 			jmp		cmp_lt_end
 
-			## make new false object in %rax
 cmp_lt_false:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
+			movq	$0, %rax
 			jmp		cmp_lt_end
 
 cmp_lt_end:
@@ -1105,55 +1032,12 @@ cmp_le_string:
 			jle		cmp_le_true
 			jmp		cmp_le_false
 
-			## make new true object in %rax
 cmp_le_true:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	$1, 24(%rax)
+			movq	$1, %rax
 			jmp		cmp_le_end
 
-			## make new false object in %rax
 cmp_le_false:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
+			movq	$0, %rax
 			jmp		cmp_le_end
 
 cmp_le_end:
@@ -1215,55 +1099,12 @@ cmp_eq_string:
 			je		cmp_eq_true
 			jmp		cmp_eq_false
 
-			## make new true object in %rax
 cmp_eq_true:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	$1, 24(%rax)
+			movq	$1, %rax
 			jmp		cmp_eq_end
 
-			## make new false object in %rax
 cmp_eq_false:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
+			movq	$0, %rax
 			jmp		cmp_eq_end
 
 cmp_eq_end:

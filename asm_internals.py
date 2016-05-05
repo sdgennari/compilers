@@ -318,38 +318,39 @@ def get_cmp_lt_helper_string():
 	tmp_instr_list.append("\n")
 
 	# Make true and false labels
-	tmp_instr_list.append(ASMComment("make new true object in %rax"))
+	# tmp_instr_list.append(ASMComment("make new true object in %rax"))
 	tmp_instr_list.append(ASMLabel(true_label))
-	for reg in caller_saved_registers:
-		tmp_instr_list.append(ASMPushQ(reg))
-	tmp_instr_list.append(ASMComment("save self reg"))
-	tmp_instr_list.append(ASMPushQ(SELF_REG))
+	# for reg in caller_saved_registers:
+	# 	tmp_instr_list.append(ASMPushQ(reg))
+	# tmp_instr_list.append(ASMComment("save self reg"))
+	# tmp_instr_list.append(ASMPushQ(SELF_REG))
 
-	tmp_instr_list.append(ASMCall("Bool..new"))
+	# tmp_instr_list.append(ASMCall("Bool..new"))
 
-	tmp_instr_list.append(ASMComment("restore self reg"))
-	tmp_instr_list.append(ASMPopQ(SELF_REG))
-	for reg in reversed(caller_saved_registers):
-		tmp_instr_list.append(ASMPopQ(reg))
+	# tmp_instr_list.append(ASMComment("restore self reg"))
+	# tmp_instr_list.append(ASMPopQ(SELF_REG))
+	# for reg in reversed(caller_saved_registers):
+	# 	tmp_instr_list.append(ASMPopQ(reg))
 
-	tmp_instr_list.append(ASMMovQ("$1", "24(%rax)"))
+	# tmp_instr_list.append(ASMMovQ("$1", "24(%rax)"))
+	tmp_instr_list.append(ASMMovQ("$1", "%rax"))
 	tmp_instr_list.append(ASMJmp(end_label))
 	tmp_instr_list.append(("\n"))
 
-	tmp_instr_list.append(ASMComment("make new false object in %rax"))
+	# tmp_instr_list.append(ASMComment("make new false object in %rax"))
 	tmp_instr_list.append(ASMLabel(false_label))
-	for reg in caller_saved_registers:
-		tmp_instr_list.append(ASMPushQ(reg))
-	tmp_instr_list.append(ASMComment("save self reg"))
-	tmp_instr_list.append(ASMPushQ(SELF_REG))	
+	# for reg in caller_saved_registers:
+	# 	tmp_instr_list.append(ASMPushQ(reg))
+	# tmp_instr_list.append(ASMComment("save self reg"))
+	# tmp_instr_list.append(ASMPushQ(SELF_REG))	
 
-	tmp_instr_list.append(ASMCall("Bool..new"))
+	# tmp_instr_list.append(ASMCall("Bool..new"))
 
-	tmp_instr_list.append(ASMComment("restore self reg"))
-	tmp_instr_list.append(ASMPopQ(SELF_REG))
-	for reg in reversed(caller_saved_registers):
-		tmp_instr_list.append(ASMPopQ(reg))
-
+	# tmp_instr_list.append(ASMComment("restore self reg"))
+	# tmp_instr_list.append(ASMPopQ(SELF_REG))
+	# for reg in reversed(caller_saved_registers):
+		# tmp_instr_list.append(ASMPopQ(reg))
+	tmp_instr_list.append(ASMMovQ("$0", "%rax"))
 	tmp_instr_list.append(ASMJmp(end_label))
 	tmp_instr_list.append(("\n"))
 
@@ -474,38 +475,39 @@ def get_cmp_le_helper_string():
 	tmp_instr_list.append("\n")
 
 	# Make true and false labels
-	tmp_instr_list.append(ASMComment("make new true object in %rax"))
+	# tmp_instr_list.append(ASMComment("make new true object in %rax"))
 	tmp_instr_list.append(ASMLabel(true_label))
-	for reg in caller_saved_registers:
-		tmp_instr_list.append(ASMPushQ(reg))
-	tmp_instr_list.append(ASMComment("save self reg"))
-	tmp_instr_list.append(ASMPushQ(SELF_REG))
+	# for reg in caller_saved_registers:
+		# tmp_instr_list.append(ASMPushQ(reg))
+	# tmp_instr_list.append(ASMComment("save self reg"))
+	# tmp_instr_list.append(ASMPushQ(SELF_REG))
 
-	tmp_instr_list.append(ASMCall("Bool..new"))
+	# tmp_instr_list.append(ASMCall("Bool..new"))
 
-	tmp_instr_list.append(ASMComment("restore self reg"))
-	tmp_instr_list.append(ASMPopQ(SELF_REG))
-	for reg in reversed(caller_saved_registers):
-		tmp_instr_list.append(ASMPopQ(reg))
+	# tmp_instr_list.append(ASMComment("restore self reg"))
+	# tmp_instr_list.append(ASMPopQ(SELF_REG))
+	# for reg in reversed(caller_saved_registers):
+		# tmp_instr_list.append(ASMPopQ(reg))
 
-	tmp_instr_list.append(ASMMovQ("$1", "24(%rax)"))
+	# tmp_instr_list.append(ASMMovQ("$1", "24(%rax)"))
+	tmp_instr_list.append(ASMMovQ("$1", "%rax"))
 	tmp_instr_list.append(ASMJmp(end_label))
 	tmp_instr_list.append(("\n"))
 
-	tmp_instr_list.append(ASMComment("make new false object in %rax"))
+	# tmp_instr_list.append(ASMComment("make new false object in %rax"))
 	tmp_instr_list.append(ASMLabel(false_label))
-	for reg in caller_saved_registers:
-		tmp_instr_list.append(ASMPushQ(reg))
-	tmp_instr_list.append(ASMComment("save self reg"))
-	tmp_instr_list.append(ASMPushQ(SELF_REG))
+	# for reg in caller_saved_registers:
+		# tmp_instr_list.append(ASMPushQ(reg))
+	# tmp_instr_list.append(ASMComment("save self reg"))
+	# tmp_instr_list.append(ASMPushQ(SELF_REG))
 
-	tmp_instr_list.append(ASMCall("Bool..new"))
+	# tmp_instr_list.append(ASMCall("Bool..new"))
 
-	tmp_instr_list.append(ASMComment("restore self reg"))
-	tmp_instr_list.append(ASMPopQ(SELF_REG))
-	for reg in reversed(caller_saved_registers):
-		tmp_instr_list.append(ASMPopQ(reg))
-
+	# tmp_instr_list.append(ASMComment("restore self reg"))
+	# tmp_instr_list.append(ASMPopQ(SELF_REG))
+	# for reg in reversed(caller_saved_registers):
+		# tmp_instr_list.append(ASMPopQ(reg))
+	tmp_instr_list.append(ASMMovQ("$0", "%rax"))
 	tmp_instr_list.append(ASMJmp(end_label))
 	tmp_instr_list.append(("\n"))
 
@@ -630,38 +632,39 @@ def get_cmp_eq_helper_string():
 	tmp_instr_list.append("\n")
 
 	# Make true and false labels
-	tmp_instr_list.append(ASMComment("make new true object in %rax"))
+	# tmp_instr_list.append(ASMComment("make new true object in %rax"))
 	tmp_instr_list.append(ASMLabel(true_label))
-	for reg in caller_saved_registers:
-		tmp_instr_list.append(ASMPushQ(reg))
-	tmp_instr_list.append(ASMComment("save self reg"))
-	tmp_instr_list.append(ASMPushQ(SELF_REG))
+	# for reg in caller_saved_registers:
+	# 	tmp_instr_list.append(ASMPushQ(reg))
+	# tmp_instr_list.append(ASMComment("save self reg"))
+	# tmp_instr_list.append(ASMPushQ(SELF_REG))
 
-	tmp_instr_list.append(ASMCall("Bool..new"))
+	# tmp_instr_list.append(ASMCall("Bool..new"))
 
-	tmp_instr_list.append(ASMComment("restore self reg"))
-	tmp_instr_list.append(ASMPopQ(SELF_REG))
-	for reg in reversed(caller_saved_registers):
-		tmp_instr_list.append(ASMPopQ(reg))
+	# tmp_instr_list.append(ASMComment("restore self reg"))
+	# tmp_instr_list.append(ASMPopQ(SELF_REG))
+	# for reg in reversed(caller_saved_registers):
+		# tmp_instr_list.append(ASMPopQ(reg))
 
-	tmp_instr_list.append(ASMMovQ("$1", "24(%rax)"))
+	# tmp_instr_list.append(ASMMovQ("$1", "24(%rax)"))
+	tmp_instr_list.append(ASMMovQ("$1", "%rax"))
 	tmp_instr_list.append(ASMJmp(end_label))
 	tmp_instr_list.append(("\n"))
 
-	tmp_instr_list.append(ASMComment("make new false object in %rax"))
+	# tmp_instr_list.append(ASMComment("make new false object in %rax"))
 	tmp_instr_list.append(ASMLabel(false_label))
-	for reg in caller_saved_registers:
-		tmp_instr_list.append(ASMPushQ(reg))
-	tmp_instr_list.append(ASMComment("save self reg"))
-	tmp_instr_list.append(ASMPushQ(SELF_REG))
+	# for reg in caller_saved_registers:
+	# 	tmp_instr_list.append(ASMPushQ(reg))
+	# tmp_instr_list.append(ASMComment("save self reg"))
+	# tmp_instr_list.append(ASMPushQ(SELF_REG))
 
-	tmp_instr_list.append(ASMCall("Bool..new"))
+	# tmp_instr_list.append(ASMCall("Bool..new"))
 
-	tmp_instr_list.append(ASMComment("restore self reg"))
-	tmp_instr_list.append(ASMPopQ(SELF_REG))
-	for reg in reversed(caller_saved_registers):
-		tmp_instr_list.append(ASMPopQ(reg))
-
+	# tmp_instr_list.append(ASMComment("restore self reg"))
+	# tmp_instr_list.append(ASMPopQ(SELF_REG))
+	# for reg in reversed(caller_saved_registers):
+	# 	tmp_instr_list.append(ASMPopQ(reg))
+	tmp_instr_list.append(ASMMovQ("$0", "%rax"))
 	tmp_instr_list.append(ASMJmp(end_label))
 	tmp_instr_list.append(("\n"))
 
