@@ -364,33 +364,6 @@ IO.in_string:
 			movq	%rsp, %rbp
 			## call in_string helper method
 			call	raw_in_string
-			## make new box to store result (moved into r8 temporarily)
-			movq	%rax, %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -415,9 +388,7 @@ IO.out_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
 			## loading param [0] into %rax
-			movq	16(%rbp), %rax
-			## unboxing param [0] (in %rax) into %rdi for call to raw_out_string
-			movq	24(%rax), %rdi
+			movq	16(%rbp), %rdi
 			call	raw_out_string
 			## move self ptr into %rax for return
 			movq	%rbx, %rax
@@ -437,6 +408,8 @@ Main.main:
 			pushq	%r15
 .Main_main_1:
 			## new String
+			movq	$empty.string, %r8
+			## box value of %r8 into %r10
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -461,6 +434,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r10
+			movq	%r8, 24(%r10)
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -537,32 +511,8 @@ Main.main:
 .case_2_Int:
 			## unbox value of %r10 into %r8
 			movq	24(%r10), %r8
-			## const String
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	$string_2, 24(%r8)
+			## new const String
+			movq	$string_2, %r8
 			## storing param [0]
 			pushq	%r8
 			pushq	%rcx
@@ -645,7 +595,9 @@ Object.copy:
 			## check type tag
 			movq	(%rbx), %rax
 			cmpq	$1, %rax
-			je		copy_int
+			je		copy_unboxed
+			cmpq	$4, %rax
+			je		copy_unboxed
 copy_object:
 			## call malloc to make space for the new object
 			## use leaq to multiply the size by 8
@@ -661,7 +613,7 @@ copy_object:
 			call	memcpy
 			## result of mempy in %rax, so good to return
 			jmp		copy_exit
-copy_int:
+copy_unboxed:
 			movq	24(%rbx), %rax
 			jmp		copy_exit
 copy_exit:
@@ -672,35 +624,9 @@ copy_exit:
 Object.type_name:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## make new String to hold the result
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			## move type_name from vtable[0] into String in %rax
-			movq	16(%rbx), %r8
-			movq	0(%r8), %r8
-			movq	%r8, 24(%rax)
+			## move type_name from vtable[0] into %rax
+			movq	16(%rbx), %rax
+			movq	0(%rax), %rax
 			leave
 			ret
 
@@ -711,36 +637,8 @@ String.concat:
 			## unbox self into rdi
 			movq	24(%rbx), %rdi
 			## unbox param[0] into rsi
-			movq	16(%rbp), %rax
-			movq	24(%rax), %rsi
+			movq	16(%rbp), %rsi
 			call	cool_str_concat
-			## make new box in rax to store result (moved into r8 temporarily)
-			movq	%rax, %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -774,33 +672,6 @@ String.substr:
 			## move param[1] into rdx
 			movq	24(%rbp), %rdx
 			call	cool_str_substr
-			## make new box to store result (moved into r8 temporarily)
-			movq	%rax, %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			movq	%r8, 24(%rax)
 			leave
 			ret
 

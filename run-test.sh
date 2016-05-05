@@ -36,6 +36,8 @@ do
 		echo "PASSED: $input_file"
 		rm "ref.test"
 		rm "out.test"
+		rm "$type_file"
+		rm "$asm_file"
 		num_passed=$((num_passed+1))
 	fi
 

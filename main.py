@@ -192,9 +192,9 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 			exp_symbol, exp_type = gen_tac_for_exp(type_name, symbol_table_list, cur_tac_list, ast_attr.exp)
 
 			# If the attr is an Object and the exp is unboxed, box the result
-			if ast_attr.feature_type == "Object" and exp_type == "Int":
+			if ast_attr.feature_type == "Object" and (exp_type == "Int" or exp_type == "String"):
 				boxed_symbol = new_symbol()
-				cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, "Int"))
+				cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, exp_type))
 				exp_symbol = boxed_symbol
 
 			# Store result it in the attr

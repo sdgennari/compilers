@@ -1,4 +1,4 @@
-# Integer Auto-Boxing
+# String Auto-Boxing
 
 ### Features
 

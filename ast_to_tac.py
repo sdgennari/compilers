@@ -53,9 +53,9 @@ def gen_tac_for_binding(current_type, symbol_table_list, cur_tac_list, ast_bindi
 		assignee_symbol, _ = add_symbol(symbol_table_list, ast_binding.ident, ast_binding.binding_type)
 
 		# Box the cur exp if the ident expects an Object (boxed), but the result is unboxed
-		if ast_binding.binding_type == "Object" and cur_exp_type == "Int":
+		if ast_binding.binding_type == "Object" and (cur_exp_type == "Int" or current_type == "String"):
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, cur_exp_type))
 			exp_symbol = boxed_symbol
 
 		# print "binding type: ",ast_binding.binding_type
@@ -206,15 +206,15 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 
 		# If the ident is an Object and the exp is unboxed, box the exp
 		boxed_symbol = None
-		if ident_type == "Object" and cur_exp_type == "Int":
+		if ident_type == "Object" and (cur_exp_type == "Int" or cur_exp_type == "String"):
 			boxed_symbol= new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, exp_symbol, cur_exp_type))
 			exp_symbol = boxed_symbol
 
 		# If ident is unboxed and exp is boxed, unbox it
-		elif ident_type == "Int" and cur_exp_type == "BoxedInt":
+		elif (ident_type == "Int" and cur_exp_type == "BoxedInt") or (ident_type == "String" and cur_exp_type == "BoxedString"):
 			unboxed_symbol = new_symbol()
-			cur_tac_list.append(TACUnbox(unboxed_symbol, exp_symbol, "Int"))
+			cur_tac_list.append(TACUnbox(unboxed_symbol, exp_symbol, ident_type))
 			exp_symbol = unboxed_symbol
 
 		# If the assignee symbol is None, then the ident is an attr
@@ -325,13 +325,13 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
 		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type == "Int":
+		if left_symbol_type == "Int" or left_symbol_type == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type == "Int":
+		if right_symbol_type == "Int" or right_symbol_type == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
 			right_symbol = boxed_symbol
 
 		cur_tac_list.append(TACCompL(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
@@ -341,13 +341,13 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
 		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type == "Int":
+		if left_symbol_type == "Int" or left_symbol_type == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type == "Int":
+		if right_symbol_type == "Int" or right_symbol_type == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
 			right_symbol = boxed_symbol		
 
 		cur_tac_list.append(TACCompLE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
@@ -357,13 +357,13 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
 		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type == "Int":
+		if left_symbol_type == "Int" or left_symbol_type == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type == "Int":
+		if right_symbol_type == "Int" or right_symbol_type == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
 			right_symbol = boxed_symbol
 
 		cur_tac_list.append(TACCompE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
@@ -374,7 +374,7 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		exp_symbol, cur_exp_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.exp)
 
 		# If cur exp type is Intthen isvoid must return false
-		if cur_exp_type == "Int":
+		if cur_exp_type == "Int" or cur_exp_type == "String":
 			cur_tac_list.append(TACConstBool(ast_exp.type_from_ast, assignee_symbol, "false"))
 		else:
 			cur_tac_list.append(TACIsVoid(ast_exp.type_from_ast, assignee_symbol, exp_symbol))
@@ -419,9 +419,9 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			param_symbol, param_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, exp)
 
 			# Box result if necessary
-			if formal.typ == "Object" and param_type_from_ast == "Int":
+			if formal.typ == "Object" and (param_type_from_ast == "Int" or param_type_from_ast == "String"):
 				boxed_symbol = new_symbol()
-				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, "Int"))
+				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, param_type_from_ast))
 				param_symbol = boxed_symbol
 
 			# Store the param for later use
@@ -460,9 +460,9 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			param_symbol, param_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, exp)
 
 			# Box result if necessary
-			if formal.typ == "Object" and param_type_from_ast == "Int":
+			if formal.typ == "Object" and (param_type_from_ast == "Int" or param_type_from_ast == "String"):
 				boxed_symbol = new_symbol()
-				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, "Int"))
+				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, param_type_from_ast))
 				param_symbol = boxed_symbol
 
 			# Store the param for later use
@@ -475,9 +475,9 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		cur_tac_list.extend(ro_tac_list)
 
 		# Box receiver object if necessary
-		if ro_type_from_ast == "Int":
+		if ro_type_from_ast == "Int" or ro_type_from_ast == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, ro_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, ro_symbol, ro_type_from_ast))
 			ro_symbol = boxed_symbol
 
 		# Check if the receiver object is void
@@ -537,9 +537,9 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			param_symbol, param_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, exp)
 
 			# Box result if necessary
-			if formal.typ == "Object" and param_type_from_ast == "Int":
+			if formal.typ == "Object" and (param_type_from_ast == "Int" or param_type_from_ast == "String"):
 				boxed_symbol = new_symbol()
-				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, "Int"))
+				cur_tac_list.append(TACBox(boxed_symbol, param_symbol, param_type_from_ast))
 				param_symbol = boxed_symbol
 
 			# Store the param for later use
@@ -552,9 +552,9 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		cur_tac_list.extend(ro_tac_list)
 
 		# Box receiver object if necessary
-		if ro_type_from_ast == "Int":
+		if ro_type_from_ast == "Int" or ro_type_from_ast == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, ro_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, ro_symbol, ro_type_from_ast))
 			ro_symbol = boxed_symbol
 
 		# Check if the receiver object is void
@@ -630,9 +630,9 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		pred_symbol, pred_type_from_ast = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.exp)
 
 		# Box predicate result if necessary
-		if pred_type_from_ast == "Int":
+		if pred_type_from_ast == "Int" or pred_type_from_ast == "String":
 			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, pred_symbol, "Int"))
+			cur_tac_list.append(TACBox(boxed_symbol, pred_symbol, pred_type_from_ast))
 			pred_symbol = boxed_symbol
 
 		# Check if the predicate is void
@@ -682,8 +682,8 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 			case_elem_symbol, _ = add_symbol(symbol_table_list, ast_case_elem.ident, ast_case_elem.case_type)
 
 			# Assign exp from case predicate to the case elem, unboxing if necessary
-			if ast_case_elem.case_type == "Int":
-				cur_tac_list.append(TACUnbox(case_elem_symbol, pred_symbol, "Int"))
+			if ast_case_elem.case_type == "Int" or ast_case_elem.case_type == "String":
+				cur_tac_list.append(TACUnbox(case_elem_symbol, pred_symbol, ast_case_elem.case_type))
 			else:
 				cur_tac_list.append(TACAssign(ast_case_elem.case_type, case_elem_symbol, pred_symbol))
 
@@ -732,9 +732,9 @@ def gen_tac_for_method(symbol_table_list, cur_tac_list, ast_feature, class_name)
 	return_symbol, body_exp_type = gen_tac_for_exp(class_name, symbol_table_list, cur_tac_list, ast_feature.body_exp)
 
 	# Box the result if the body exp is unboxed but the method returns an object
-	if ast_feature.ret_typ == "Object" and body_exp_type == "Int":
+	if ast_feature.ret_typ == "Object" and (body_exp_type == "Int" or body_exp_type == "String"):
 		boxed_symbol = new_symbol()
-		cur_tac_list.append(TACBox(boxed_symbol, return_symbol, "Int"))
+		cur_tac_list.append(TACBox(boxed_symbol, return_symbol, body_exp_type))
 		return_symbol = boxed_symbol
 
 	# Return the result

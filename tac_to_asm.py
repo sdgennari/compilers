@@ -55,7 +55,7 @@ def get_asm_register(register_color_map, tac_register, size=32):
 def gen_asm_for_tac_const_int(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_const_int):
 	src = "$" + str(tac_const_int.val)
 	dest = get_asm_register(register_color_map, tac_const_int.assignee, 64)
-	dest_reg_offset = "24("+dest+")"
+	# dest_reg_offset = "24("+dest+")"
 
 	# Create a new Int and put value into box
 	# cur_asm_list.append(ASMComment("new const Int: " + str(tac_const_int.val)))
@@ -84,12 +84,15 @@ def gen_asm_for_tac_const_bool(current_type, register_color_map, spilled_reg_loc
 def gen_asm_for_tac_const_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_const_string):
 	src = "$" + get_const_string_label(tac_const_string.val)
 	dest = get_asm_register(register_color_map, tac_const_string.assignee, 64)
-	dest_reg_offset = "24("+dest+")"
+	# dest_reg_offset = "24("+dest+")"
 
 	# Create new String and put raw string ptr into box
-	cur_asm_list.append(ASMComment("const String"))
-	gen_asm_for_new_boxed_type(cur_asm_list, "String", dest)
-	cur_asm_list.append(ASMMovQ(src, dest_reg_offset))
+	# cur_asm_list.append(ASMComment("const String"))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "String", dest)
+	# cur_asm_list.append(ASMMovQ(src, dest_reg_offset))
+
+	cur_asm_list.append(ASMComment("new const String"))
+	cur_asm_list.append(ASMMovQ(src, dest))
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_default(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_default):
@@ -103,7 +106,7 @@ def gen_asm_for_tac_default(current_type, register_color_map, spilled_reg_loc_ma
 
 	# Check for Ints, Strings, and Bools
 	cur_asm_list.append(ASMComment("default " + tac_default.type))
-	if tac_default.type == "Bool" or tac_default.type == "String":
+	if tac_default.type == "Bool":
 		# Make a new box for the type and store the value
 		dest_reg_offset = "24("+dest+")"
 		gen_asm_for_new_boxed_type(cur_asm_list, tac_default.type, dest)
@@ -113,7 +116,7 @@ def gen_asm_for_tac_default(current_type, register_color_map, spilled_reg_loc_ma
 	elif tac_default.type == "Int" or tac_default.type == "raw.Int":
 		cur_asm_list.append(ASMMovQ(src, dest))
 
-	elif tac_default.type == "raw.String":
+	elif tac_default.type == "String" or tac_default.type == "raw.String":
 		cur_asm_list.append(ASMMovQ(src, dest))		
 
 	else:
@@ -162,6 +165,8 @@ def gen_asm_for_tac_new(current_type, register_color_map, spilled_reg_loc_map, c
 	# If new type is unboxed, just move the default value into dest
 	if tac_new.type == "Int":
 		cur_asm_list.append(ASMMovQ("$0", dest))
+	elif tac_new.type == "String":
+		cur_asm_list.append(ASMMovQ("$empty.string", dest))
 	else:
 		gen_asm_for_new_boxed_type(cur_asm_list, tac_new.type, dest)
 
@@ -968,17 +973,17 @@ def gen_asm_for_internal_str_concat(cur_asm_list):
 	cur_asm_list.append(ASMComment("unbox self into rdi"))
 	cur_asm_list.append(ASMMovQ("24(%rbx)", "%rdi"))
 	cur_asm_list.append(ASMComment("unbox param[0] into rsi"))
-	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rax"))
-	cur_asm_list.append(ASMMovQ("24(%rax)", "%rsi"))
+	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rsi"))
+	# cur_asm_list.append(ASMMovQ("24(%rax)", "%rsi"))
 
 	# Call string concat helper
 	cur_asm_list.append(ASMCall("cool_str_concat"))
 
 	# Box result in a new String
-	cur_asm_list.append(ASMComment("make new box in rax to store result (moved into r8 temporarily)"))
-	cur_asm_list.append(ASMMovQ("%rax", "%r8"))
-	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
-	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+	# cur_asm_list.append(ASMComment("make new box in rax to store result (moved into r8 temporarily)"))
+	# cur_asm_list.append(ASMMovQ("%rax", "%r8"))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
+	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 def gen_asm_for_internal_str_substr(cur_asm_list):
 	# Move values into rdi, rsi, and rdx
@@ -995,21 +1000,21 @@ def gen_asm_for_internal_str_substr(cur_asm_list):
 	cur_asm_list.append(ASMCall("cool_str_substr"))
 
 	# Box result in a new String
-	cur_asm_list.append(ASMComment("make new box to store result (moved into r8 temporarily)"))
-	cur_asm_list.append(ASMMovQ("%rax", "%r8"))
-	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
-	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+	# cur_asm_list.append(ASMComment("make new box to store result (moved into r8 temporarily)"))
+	# cur_asm_list.append(ASMMovQ("%rax", "%r8"))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
+	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 def gen_asm_for_internal_type_name(cur_asm_list):
 	# Make new String to hold result
-	cur_asm_list.append(ASMComment("make new String to hold the result"))
-	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
+	# cur_asm_list.append(ASMComment("make new String to hold the result"))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
 
 	# Move the value of type_name from vtable into the new String
-	cur_asm_list.append(ASMComment("move type_name from vtable[0] into String in %rax"))
-	cur_asm_list.append(ASMMovQ("16("+SELF_REG+")", "%r8"))
-	cur_asm_list.append(ASMMovQ("0(%r8)", "%r8"))
-	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+	cur_asm_list.append(ASMComment("move type_name from vtable[0] into %rax"))
+	cur_asm_list.append(ASMMovQ("16("+SELF_REG+")", "%rax"))
+	cur_asm_list.append(ASMMovQ("0(%rax)", "%rax"))
+	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 def gen_asm_for_internal_abort(cur_asm_list):
 	custom_asm = ASMCustomString(
@@ -1026,7 +1031,10 @@ def gen_asm_for_internal_copy(cur_asm_list):
 	cur_asm_list.append(ASMMovQ("(%rbx)", "%rax"))
 	int_type_tag = "$" + str(type_tag_map["Int"])
 	cur_asm_list.append(ASMCmpQ(int_type_tag, "%rax"))
-	cur_asm_list.append(ASMJmpEq("copy_int"))
+	cur_asm_list.append(ASMJmpEq("copy_unboxed"))
+	int_type_tag = "$" + str(type_tag_map["String"])
+	cur_asm_list.append(ASMCmpQ(int_type_tag, "%rax"))
+	cur_asm_list.append(ASMJmpEq("copy_unboxed"))
 
 	# COPY OBJECTS
 	# Alloc space for the new object
@@ -1048,8 +1056,8 @@ def gen_asm_for_internal_copy(cur_asm_list):
 	cur_asm_list.append(ASMComment("result of mempy in %rax, so good to return"))
 	cur_asm_list.append(ASMJmp("copy_exit"))
 
-	# COPY INT
-	cur_asm_list.append(ASMLabel("copy_int"))
+	# COPY UNBOXED VALUE
+	cur_asm_list.append(ASMLabel("copy_unboxed"))
 	cur_asm_list.append(ASMMovQ("24(%rbx)", "%rax"))
 	cur_asm_list.append(ASMJmp("copy_exit"))
 
@@ -1062,18 +1070,18 @@ def gen_asm_for_internal_in_string(cur_asm_list):
 	cur_asm_list.append(ASMCall("raw_in_string"))
 
 	# Box result in a new String
-	cur_asm_list.append(ASMComment("make new box to store result (moved into r8 temporarily)"))
-	cur_asm_list.append(ASMMovQ("%rax", "%r8"))
-	gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
-	cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
+	# cur_asm_list.append(ASMComment("make new box to store result (moved into r8 temporarily)"))
+	# cur_asm_list.append(ASMMovQ("%rax", "%r8"))
+	# gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
+	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 def gen_asm_for_internal_out_string(cur_asm_list):
 	# Unbox string to get raw value
 	# Note: string value must be in specific reg (%r8) for raw assembly to work
 	cur_asm_list.append(ASMComment("loading param [0] into %rax"))
-	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rax"))
-	cur_asm_list.append(ASMComment("unboxing param [0] (in %rax) into %rdi for call to raw_out_string"))
-	cur_asm_list.append(ASMMovQ("24(%rax)", "%rdi"))
+	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rdi"))
+	# cur_asm_list.append(ASMComment("unboxing param [0] (in %rax) into %rdi for call to raw_out_string"))
+	# cur_asm_list.append(ASMMovQ("24(%rax)", "%rdi"))
 	cur_asm_list.append(ASMCall("raw_out_string"))
 
 	# Move self ptr into %rax for return value

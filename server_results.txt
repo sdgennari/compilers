@@ -1,4 +1,4 @@
-Start Time:   Wed May  4 19:23:21 2016
+Start Time:   Thu May  5 01:46:49 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -118,4 +118,4 @@ t5: div-by-zero                                  ok
 t6: substring-bad                                ok  
 t7: mjk6zt.zip-bug_maker                         ok  
 t8: mjk6zt.zip-shallow_copy                      ok  
-End Time: Wed May  4 19:23:56 2016
+End Time: Thu May  5 01:47:27 2016
