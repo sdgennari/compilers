@@ -43,6 +43,22 @@ class ASMMovQ(ASMMov):
 	def __str__(self):
 		return "\t\t\tmovq\t" + str(self.src) + ", " + str(self.dest) + "\n"
 
+# cmov src, dest
+class ASMCmov(ASMSrcDestBase):
+	pass
+
+class ASMCmovL(ASMCmov):
+	def __str__(self):
+		return "\t\t\tcmovl\t" + str(self.src) + ", " + str(self.dest) + "\n"
+
+class ASMCmovLe(ASMCmov):
+	def __str__(self):
+		return "\t\t\tcmovle\t" + str(self.src) + ", " + str(self.dest) + "\n"
+
+class ASMCmovE(ASMCmov):
+	def __str__(self):
+		return "\t\t\tcmove\t" + str(self.src) + ", " + str(self.dest) + "\n"
+
 # add src, dest
 class ASMAdd(ASMSrcDestBase):
 	pass

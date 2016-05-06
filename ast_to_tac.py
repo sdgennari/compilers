@@ -322,49 +322,73 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		left_symbol, left_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.left_exp)
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
-		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type in ["Int", "String", "Bool"]:
+		# Handle unboxed Int and Bool comparisons explicitly
+		if left_symbol_type == "Int" and right_symbol_type == "Int":
+			cur_tac_list.append(TACCompLInt(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		elif right_symbol_type == "Bool" and right_symbol_type == "Bool":
+			cur_tac_list.append(TACCompLBool(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		elif left_symbol_type == "String" and right_symbol_type == "String":
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
 			right_symbol = boxed_symbol
-
-		cur_tac_list.append(TACCompL(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+			cur_tac_list.append(TACCompL(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		else:
+			cur_tac_list.append(TACCompL(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 
 	elif isinstance(ast_exp, ASTExpLe):
 		left_symbol, left_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.left_exp)
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
-		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type in ["Int", "String", "Bool"]:
+		# Handle unboxed Int and Bool comparisons explicitly
+		# TODO: Handle unboxed Strings
+		if left_symbol_type == "Int" and right_symbol_type == "Int":
+			cur_tac_list.append(TACCompLEInt(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		elif left_symbol_type == "Bool" and right_symbol_type == "Bool":
+			cur_tac_list.append(TACCompLEBool(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		elif left_symbol_type == "String" and right_symbol_type == "String":
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
-			right_symbol = boxed_symbol		
-
-		cur_tac_list.append(TACCompLE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+			right_symbol = boxed_symbol
+			cur_tac_list.append(TACCompLE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		else:
+			cur_tac_list.append(TACCompLE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 
 	elif isinstance(ast_exp, ASTExpEq):
 		left_symbol, left_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.left_exp)
 		right_symbol, right_symbol_type = gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp.right_exp)
 
-		# Box values for comparison lhs or rhs is unboxed
-		if left_symbol_type in ["Int", "String", "Bool"]:
+		# Handle unboxed Int and Bool comparisons explicitly
+		# TODO: Handle unboxed Strings
+		if left_symbol_type == "Int" and right_symbol_type == "Int":
+			cur_tac_list.append(TACCompEInt(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		elif left_symbol_type == "Bool" and right_symbol_type == "Bool":
+			cur_tac_list.append(TACCompEBool(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		elif left_symbol_type == "String" and right_symbol_type == "String":
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
 			left_symbol = boxed_symbol
-		if right_symbol_type in ["Int", "String", "Bool"]:
 			boxed_symbol = new_symbol()
 			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
 			right_symbol = boxed_symbol
+			cur_tac_list.append(TACCompE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		else:
+			cur_tac_list.append(TACCompE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 
-		cur_tac_list.append(TACCompE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+		# Box values for comparison lhs or rhs is unboxed
+		# if left_symbol_type in ["Int", "String", "Bool"]:
+		# 	boxed_symbol = new_symbol()
+		# 	cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
+		# 	left_symbol = boxed_symbol
+		# if right_symbol_type in ["Int", "String", "Bool"]:
+		# 	boxed_symbol = new_symbol()
+		# 	cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
+		# 	right_symbol = boxed_symbol
 
 	# Handle unary expressions together
 	# ExpUnary: (self, line, exp)

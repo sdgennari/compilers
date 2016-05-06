@@ -190,18 +190,512 @@ Main..new:		## Constructor for Main
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-			## allocate space for Main (size: 3)
+			## allocate space for Main (size: 8)
 			movq	$8, %rsi
-			movq	$3, %rdi
+			movq	$8, %rdi
 			call	calloc
 			movq	%rax, %rbx
 			## store type_tag, obj_size, vtable in %rbx
 			movq	$5, %rax
 			movq	%rax, 0(%rbx)
-			movq	$3, %rax
+			movq	$8, %rax
 			movq	%rax, 8(%rbx)
 			movq	$Main..vtable, %rax
 			movq	%rax, 16(%rbx)
+			## default Int
+			movq	$0, %r8
+			## store %r8 in self[3] (out)
+			movq	%r8, 24(%rbx)
+			## default Int
+			movq	$0, %r8
+			## store %r8 in self[4] (testee)
+			movq	%r8, 32(%rbx)
+			## default Int
+			movq	$0, %r8
+			## store %r8 in self[5] (divisor)
+			movq	%r8, 40(%rbx)
+			## default Int
+			movq	$0, %r8
+			## store %r8 in self[6] (stop)
+			movq	%r8, 48(%rbx)
+			## default Object
+			movq	$0, %r8
+			## store %r8 in self[7] (m)
+			movq	%r8, 56(%rbx)
+			## new const String
+			movq	$string_1, %r8
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_string in vtable[8]
+			movq	64(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## new const Int: 2
+			movq	$2, %r8
+			## store %r8 in self[3] (out)
+			movq	%r8, 24(%rbx)
+			## load self[3] (out) into %r8
+			movq	24(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## store %r9 in self[4] (testee)
+			movq	%r9, 32(%rbx)
+			## new const Int: 500
+			movq	$500, %r8
+			## store %r8 in self[6] (stop)
+			movq	%r8, 48(%rbx)
+			jmp		.loop_start_1
+.loop_start_1:
+			movq	$1, %r8
+			## branch .loop_body_1
+			test	%r8d, %r8d
+			jnz		.loop_body_1
+			jmp		.loop_exit_1
+.loop_body_1:
+			## load self[4] (testee) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## new const Int: 1
+			movq	$1, %r8
+			## plus
+			movl	%r9d, %r10d
+			addl	%r8d, %r10d
+			## store %r10 in self[4] (testee)
+			movq	%r10, 32(%rbx)
+			## assign
+			movq	%r10, %r8
+			## new const Int: 2
+			movq	$2, %r8
+			## store %r8 in self[5] (divisor)
+			movq	%r8, 40(%rbx)
+			## assign
+			movq	%r8, %r9
+			jmp		.loop_start_2
+.loop_start_2:
+			## load self[4] (testee) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r11
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
+			movq	%r8, %r10
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## mult
+			movl	%r10d, %r8d
+			imull	%r9d, %r8d
+			## compare %r11d and %r8d inline
+			cmpl	%r8d, %r11d
+			movq	$0, %r9
+			movq	$1, %rax
+			cmovl	%rax, %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .if_then_3
+			test	%r9d, %r9d
+			jnz		.if_then_3
+			## branch .if_else_3
+			test	%r8d, %r8d
+			jnz		.if_else_3
+.if_then_3:
+			movq	$0, %r8
+			## assign
+			movq	%r8, %r10
+			jmp		.if_exit_3
+.if_else_3:
+			## load self[4] (testee) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r12
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
+			movq	%r8, %r11
+			## load self[4] (testee) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r10
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## divide
+			## if %r9d not zero, jmp over error
+			cmpl	$0, %r9d
+			jnz		.asm_label_1
+			movq	$string_2, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.asm_label_1:
+			subq	$8, %rsp
+			pushq	%rdx
+			pushq	%rax
+			pushq	%rcx
+			movl	%r9d, 24(%rsp)
+			movl	%r10d, %eax
+			cltd
+			movl	24(%rsp), %ecx
+			idivl	%ecx
+			movl	%eax, 28(%rsp)
+			popq	%rcx
+			popq	%rax
+			popq	%rdx
+			movl	4(%rsp), %r8d
+			addq	$8, %rsp
+			## mult
+			movl	%r11d, %r9d
+			imull	%r8d, %r9d
+			## minus
+			movl	%r12d, %r10d
+			subl	%r9d, %r10d
+			## new const Int: 0
+			movq	$0, %r8
+			## compare %r10d and %r8d inline
+			cmpl	%r8d, %r10d
+			movq	$0, %r9
+			movq	$1, %rax
+			cmove	%rax, %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .if_then_4
+			test	%r9d, %r9d
+			jnz		.if_then_4
+			## branch .if_else_4
+			test	%r8d, %r8d
+			jnz		.if_else_4
+.if_then_4:
+			movq	$0, %r8
+			## assign
+			movq	%r8, %r9
+			jmp		.if_exit_4
+.if_else_4:
+			movq	$1, %r8
+			## assign
+			movq	%r8, %r9
+			jmp		.if_exit_4
+.if_exit_4:
+			## assign
+			movq	%r9, %r10
+			jmp		.if_exit_3
+.if_exit_3:
+			## branch .loop_body_2
+			test	%r10d, %r10d
+			jnz		.loop_body_2
+			jmp		.loop_exit_2
+.loop_body_2:
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## new const Int: 1
+			movq	$1, %r8
+			## plus
+			movl	%r9d, %r10d
+			addl	%r8d, %r10d
+			## store %r10 in self[5] (divisor)
+			movq	%r10, 40(%rbx)
+			## assign
+			movq	%r10, %r8
+			jmp		.loop_start_2
+.loop_exit_2:
+			## default Object
+			movq	$0, %r8
+			## load self[4] (testee) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r11
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
+			movq	%r8, %r10
+			## load self[5] (divisor) into %r8
+			movq	40(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## mult
+			movl	%r10d, %r8d
+			imull	%r9d, %r8d
+			## compare %r11d and %r8d inline
+			cmpl	%r8d, %r11d
+			movq	$0, %r9
+			movq	$1, %rax
+			cmovl	%rax, %r9
+			## not
+			movl	%r9d, %r8d
+			xorl	$1, %r8d
+			## branch .if_then_5
+			test	%r9d, %r9d
+			jnz		.if_then_5
+			## branch .if_else_5
+			test	%r8d, %r8d
+			jnz		.if_else_5
+.if_then_5:
+			## load self[4] (testee) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## store %r9 in self[3] (out)
+			movq	%r9, 24(%rbx)
+			## assign
+			movq	%r9, %r8
+			## load self[3] (out) into %r8
+			movq	24(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## storing param [0]
+			pushq	%r9
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_int in vtable[7]
+			movq	56(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## new const String
+			movq	$string_3, %r8
+			## storing param [0]
+			pushq	%r8
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 1 params to the stack
+			subq	$8, %rsp
+			## moving rsp[80] to rsp[0]
+			movq	80(%rsp), %rax
+			movq	%rax, 0(%rsp)
+			## self: lookup method in vtable
+			## get ptr to vtable from self
+			movq	16(%rbx), %rax
+			## find method out_string in vtable[8]
+			movq	64(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 1 params from stack with subq
+			addq	$8, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 1 stored params from stack (2nd time)
+			addq	$8, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
+			jmp		.if_exit_5
+.if_else_5:
+			## new const Int: 0
+			movq	$0, %r8
+			## assign
+			movq	%r8, %r9
+			jmp		.if_exit_5
+.if_exit_5:
+			## load self[6] (stop) into %r8
+			movq	48(%rbx), %r8
+			## assign
+			movq	%r8, %r10
+			## load self[4] (testee) into %r8
+			movq	32(%rbx), %r8
+			## assign
+			movq	%r8, %r9
+			## compare %r10d and %r9d inline
+			cmpl	%r9d, %r10d
+			movq	$0, %r11
+			movq	$1, %rax
+			cmovle	%rax, %r11
+			## not
+			movl	%r11d, %r8d
+			xorl	$1, %r8d
+			## branch .if_then_6
+			test	%r11d, %r11d
+			jnz		.if_then_6
+			## branch .if_else_6
+			test	%r8d, %r8d
+			jnz		.if_else_6
+.if_then_6:
+			## new const String
+			movq	$string_4, %r8
+			## box value of %r8 into %r9
+			## push caller-saved regs
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## push self ptr
+			pushq	%rbx
+			call	String..new
+			## restore self ptr
+			popq	%rbx
+			## pop caller-saved regs
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			movq	%rax, %r9
+			movq	%r8, 24(%r9)
+			## check if %r9 is void and set result accordingly
+			movq	$0, %r8
+			cmpq	$0, %r9
+			jnz		.asm_label_2
+			movq	$1, %r8
+.asm_label_2:
+			## branch .dispatch_7_void
+			test	%r8d, %r8d
+			jnz		.dispatch_7_void
+			jmp		.dispatch_7_not_void
+.dispatch_7_void:
+			movq	$string_5, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+			jmp		.dispatch_7_not_void
+.dispatch_7_not_void:
+			pushq	%rcx
+			pushq	%rdx
+			pushq	%rsi
+			pushq	%rdi
+			pushq	%r8
+			pushq	%r9
+			pushq	%r10
+			pushq	%r11
+			## save self ptr (%rbx)
+			pushq	%rbx
+			## pushing 0 params to the stack
+			subq	$0, %rsp
+			## set receiver_obj (%r9) as self ptr (%rbx)
+			movq	%r9, %rbx
+			## dynamic: lookup method in vtable
+			## get ptr to vtable from receiver obj
+			movq	16(%r9), %rax
+			## find method abort in vtable[2]
+			movq	16(%rax), %rax
+			## call method dynamically
+			call	*%rax
+			## removing 0 params from stack with subq
+			addq	$0, %rsp
+			## restore self ptr (%rbx)
+			popq	%rbx
+			popq	%r11
+			popq	%r10
+			popq	%r9
+			popq	%r8
+			popq	%rdi
+			popq	%rsi
+			popq	%rdx
+			popq	%rcx
+			## removing 0 stored params from stack (2nd time)
+			addq	$0, %rsp
+			## storing method result in %r8
+			movq	%rax, %r8
+			## assign
+			movq	%r8, %r9
+			jmp		.if_exit_6
+.if_else_6:
+			## new const String
+			movq	$string_6, %r8
+			## assign
+			movq	%r8, %r9
+			jmp		.if_exit_6
+.if_exit_6:
+			jmp		.loop_start_1
+.loop_exit_1:
+			## default Object
+			movq	$0, %r8
+			## store %r8 in self[7] (m)
+			movq	%r8, 56(%rbx)
 			## pop callee-saved regs
 			popq	%r15
 			popq	%r14
@@ -406,117 +900,9 @@ Main.main:
 			pushq	%r13
 			pushq	%r14
 			pushq	%r15
-.Main_main_1:
-			## new const Int: 1
-			movq	$1, %r8
-			## new const Int: 2
-			movq	$2, %r10
-			## box value of %r8 into %r9
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## box value of %r10 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r10, 24(%r8)
-			## use eq_helper to compare %r9 = %r8
-			## push caller-saved regs and self ptr
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			pushq	%rbx
-			## push lhs (%r9) and rhs (%r8)
-			pushq	%r8
-			pushq	%r9
-			call	eq_helper
-			addq	$16, %rsp
-			## pop self ptr and caller-saved regs
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			## move comparison result into %r10
-			movq	%rax, %r10
-			## box value of %r10 into %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			movq	%r10, 24(%r8)
+.Main_main_8:
+			## new const Int: 0
+			movq	$0, %r8
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs
@@ -681,6 +1067,30 @@ abort.string:			## abort string for Object.abort
 .globl error.substr_range
 error.substr_range:		## error string for String.substr
 			.string "ERROR: 0: Exception: String.substr out of range\n"
+
+.globl string_4
+string_4:
+			.string "halt"
+
+.globl string_5
+string_5:
+			.string "ERROR: 75: Exception: dispatch on void"
+
+.globl string_2
+string_2:
+			.string "ERROR: 55: Exception: division by zero"
+
+.globl string_1
+string_1:
+			.string "2 is trivially prime.\\n"
+
+.globl string_6
+string_6:
+			.string "continue"
+
+.globl string_3
+string_3:
+			.string " is prime.\\n"
 
 .globl in_int_format_str
 in_int_format_str:

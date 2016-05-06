@@ -63,19 +63,32 @@ class TACDiv:
 		return "t$" + str(self.assignee) + " <- / " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
 
 ''' Comparisons '''
-# x <- < y z
-class TACCompL:
+class TACComp:
 	def __init__(self, cur_exp_type, assignee, op1, op2):
 		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2
 
+# x <- < y z
+class TACCompL(TACComp):
 	def __str__(self):
 		return "t$" + str(self.assignee) + " <- < " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
 
+class TACCompLInt(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- < (Int) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
+
+class TACCompLString(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- < (String) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
+
+class TACCompLBool(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- < (Bool) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
+
 # x <- <= y z
-class TACCompLE:
+class TACCompLE(TACComp):
 	def __init__(self, cur_exp_type, assignee, op1, op2):
 		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
@@ -85,8 +98,20 @@ class TACCompLE:
 	def __str__(self):
 		return "t$" + str(self.assignee) + " <- <= " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
 
+class TACCompLEInt(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- <= (Int) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)	
+
+class TACCompLEString(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- <= (String) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)	
+
+class TACCompLEBool(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- <= (Bool) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)	
+
 # x <- = y z
-class TACCompE:
+class TACCompE(TACComp):
 	def __init__(self, cur_exp_type, assignee, op1, op2):
 		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
@@ -95,6 +120,18 @@ class TACCompE:
 
 	def __str__(self):
 		return "t$" + str(self.assignee) + " <- = " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
+
+class TACCompEInt(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- = (Int) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
+
+class TACCompEString(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- = (String) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
+
+class TACCompEBool(TACComp):
+	def __str__(self):
+		return "t$" + str(self.assignee) + " <- = (Bool) " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
 
 ''' Constants '''
 # x <- int <integer>

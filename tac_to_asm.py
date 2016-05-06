@@ -357,6 +357,22 @@ def gen_asm_for_tac_comp_l(current_type, register_color_map, spilled_reg_loc_map
 	cur_asm_list.append(ASMComment("move comparison result into " + dest))
 	cur_asm_list.append(ASMMovQ("%rax", dest))
 
+def gen_asm_for_tac_comp_l_unboxed(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_l):
+	# Get lhs_reg, rhs_reg, and dest
+	op1_reg_32 = get_asm_register(register_color_map, tac_comp_l.op1)
+	op2_reg_32 = get_asm_register(register_color_map, tac_comp_l.op2)
+	dest = get_asm_register(register_color_map, tac_comp_l.assignee, 64)
+
+	# Compare 32-bit values in lhs and rhs
+	cur_asm_list.append(ASMComment("compare " + op1_reg_32 + " and " + op2_reg_32 + " inline"))
+	cur_asm_list.append(ASMCmpL(op2_reg_32, op1_reg_32))
+	cur_asm_list.append(ASMMovQ("$0", dest))
+	cur_asm_list.append(ASMMovQ("$1", "%rax"))
+	cur_asm_list.append(ASMCmovL("%rax", dest))
+
+def gen_asm_for_tac_comp_l_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_l):
+	raise NotImplementedError("Unboxed string comparison not yet implemented")
+
 def gen_asm_for_tac_comp_le(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_le):
 	# Get lhs_reg, rhs_reg, and dest
 	op1_reg = get_asm_register(register_color_map, tac_comp_le.op1, 64)
@@ -392,6 +408,22 @@ def gen_asm_for_tac_comp_le(current_type, register_color_map, spilled_reg_loc_ma
 	cur_asm_list.append(ASMComment("move comparison result into " + dest))
 	cur_asm_list.append(ASMMovQ("%rax", dest))
 
+def gen_asm_for_tac_comp_le_unboxed(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_le):
+	# Get lhs_reg, rhs_reg, and dest
+	op1_reg_32 = get_asm_register(register_color_map, tac_comp_le.op1)
+	op2_reg_32 = get_asm_register(register_color_map, tac_comp_le.op2)
+	dest = get_asm_register(register_color_map, tac_comp_le.assignee, 64)
+
+	# Compare 32-bit values in lhs and rhs
+	cur_asm_list.append(ASMComment("compare " + op1_reg_32 + " and " + op2_reg_32 + " inline"))
+	cur_asm_list.append(ASMCmpL(op2_reg_32, op1_reg_32))
+	cur_asm_list.append(ASMMovQ("$0", dest))
+	cur_asm_list.append(ASMMovQ("$1", "%rax"))
+	cur_asm_list.append(ASMCmovLe("%rax", dest))
+
+def gen_asm_for_tac_comp_le_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_le):
+	raise NotImplementedError("Unboxed string comparison not yet implemented")
+
 def gen_asm_for_tac_comp_e(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_eq):
 	# Get lhs_reg, rhs_reg, and dest
 	op1_reg = get_asm_register(register_color_map, tac_comp_eq.op1, 64)
@@ -426,6 +458,22 @@ def gen_asm_for_tac_comp_e(current_type, register_color_map, spilled_reg_loc_map
 	# Move result into dest
 	cur_asm_list.append(ASMComment("move comparison result into " + dest))
 	cur_asm_list.append(ASMMovQ("%rax", dest))
+
+def gen_asm_for_tac_comp_e_unboxed(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_eq):
+	# Get lhs_reg, rhs_reg, and dest
+	op1_reg_32 = get_asm_register(register_color_map, tac_comp_eq.op1)
+	op2_reg_32 = get_asm_register(register_color_map, tac_comp_eq.op2)
+	dest = get_asm_register(register_color_map, tac_comp_eq.assignee, 64)
+
+	# Compare 32-bit values in lhs and rhs
+	cur_asm_list.append(ASMComment("compare " + op1_reg_32 + " and " + op2_reg_32 + " inline"))
+	cur_asm_list.append(ASMCmpL(op2_reg_32, op1_reg_32))
+	cur_asm_list.append(ASMMovQ("$0", dest))
+	cur_asm_list.append(ASMMovQ("$1", "%rax"))
+	cur_asm_list.append(ASMCmovE("%rax", dest))
+
+def gen_asm_for_tac_comp_e_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_eq_string):
+	raise NotImplementedError("Unboxed string comparison not yet implemented")
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_box(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_box):
@@ -530,8 +578,6 @@ def gen_asm_for_tac_alloc_type(current_type, register_color_map, spilled_reg_loc
 	cur_asm_list.append(ASMMovQ("%rax", "8("+SELF_REG+")"))
 	cur_asm_list.append(ASMMovQ(vtable_str, "%rax"))
 	cur_asm_list.append(ASMMovQ("%rax", "16("+SELF_REG+")"))
-
-
 
 def gen_asm_for_tac_call(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_call):
 	# Note: This function assumes that all params and the receiver object
@@ -813,11 +859,29 @@ def gen_asm_for_tac_instr(current_type, register_color_map, spilled_reg_loc_map,
 	elif isinstance(tac_instr, TACCompL):
 		gen_asm_for_tac_comp_l(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
+	elif isinstance(tac_instr, TACCompLString):
+		gen_asm_for_tac_comp_l_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
+
+	elif isinstance(tac_instr, TACCompLInt) or isinstance(tac_instr, TACCompLBool):
+		gen_asm_for_tac_comp_l_unboxed(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
+
 	elif isinstance(tac_instr, TACCompLE):
 		gen_asm_for_tac_comp_le(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
+	elif isinstance(tac_instr, TACCompLEString):
+		gen_asm_for_tac_comp_le_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
+
+	elif isinstance(tac_instr, TACCompLEBool) or isinstance(tac_instr, TACCompLEInt):
+		gen_asm_for_tac_comp_le_unboxed(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
+
 	elif isinstance(tac_instr, TACCompE):
 		gen_asm_for_tac_comp_e(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
+
+	elif isinstance(tac_instr, TACCompEString):
+		gen_asm_for_tac_comp_e_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
+
+	elif isinstance(tac_instr, TACCompEBool) or isinstance(tac_instr, TACCompEInt):
+		gen_asm_for_tac_comp_e_unboxed(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
 
 	elif isinstance(tac_instr, TACBox):
 		gen_asm_for_tac_box(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_instr)
