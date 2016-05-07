@@ -352,34 +352,9 @@ IO.in_int:
 			jge	.in_int_7
 			movq	$0, -16(%rbp)
 .in_int_7:
-			movq	-16(%rbp), %r8
+			movq	-16(%rbp), %rax
 
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			## move result into boxed Int
-			movq	%r8, 24(%rax)
+
 			leave
 			ret
 
@@ -387,88 +362,8 @@ IO.in_int:
 IO.in_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## use generated code to get string
-			subq	$32, %rsp
-			movl	$20, -16(%rbp)
-			movl	$0, -12(%rbp)
-			movl	-16(%rbp), %eax
-			cltq
-			movq	%rax, %rdi
-			call	malloc
-			movq	%rax, -8(%rbp)
-.in_string_L5:
-			call	getchar
-			movb	%al, -17(%rbp)
-			cmpb	$10, -17(%rbp)
-			je	.in_string_L2
-			cmpb	$-1, -17(%rbp)
-			je	.in_string_L2
-			movl	-12(%rbp), %eax
-			movslq	%eax, %rdx
-			movq	-8(%rbp), %rax
-			addq	%rax, %rdx
-			movzbl	-17(%rbp), %eax
-			movb	%al, (%rdx)
-			addl	$1, -12(%rbp)
-			cmpb	$0, -17(%rbp)
-			jne	.in_string_L3
-			movl	$0, -12(%rbp)
-			jmp	.in_string_L2
-.in_string_L3:
-			movl	-12(%rbp), %eax
-			cmpl	-16(%rbp), %eax
-			jne	.in_string_L4
-			addl	$20, -16(%rbp)
-			movl	-16(%rbp), %eax
-			movslq	%eax, %rdx
-			movq	-8(%rbp), %rax
-			movq	%rdx, %rsi
-			movq	%rax, %rdi
-			call	realloc
-			movq	%rax, -8(%rbp)
-			jmp	.in_string_L5
-.in_string_L4:
-			jmp	.in_string_L5
-.in_string_L2:
-			movl	-12(%rbp), %eax
-			movslq	%eax, %rdx
-			movq	-8(%rbp), %rax
-			movq	%rdx, %rsi
-			movq	%rax, %rdi
-			call	strndup
-			movq	%rax, -8(%rbp)
-
-			## result is now stored at -8(%rbp)
-			## make new box in %rax to hold the str val
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			## use %r8 to move value of str into box
-			pushq	%r8
-			movq	-8(%rbp), %r8
-			movq	%r8, 24(%rax)
-			popq	%r8
+			## call in_string helper method
+			call	raw_in_string
 			leave
 			ret
 
@@ -479,7 +374,7 @@ IO.out_int:
 			## loading param [0] into %rax
 			movq	16(%rbp), %rax
 			## setup and call printf
-			movl	24(%rax), %esi
+			movl	%eax, %esi
 			movq	$out_int_format_str, %rdi
 			movl	$0, %eax
 			call	printf
@@ -493,9 +388,7 @@ IO.out_string:
 			pushq	%rbp
 			movq	%rsp, %rbp
 			## loading param [0] into %rax
-			movq	16(%rbp), %rax
-			## unboxing param [0] (in %rax) into %rdi for call to raw_out_string
-			movq	24(%rax), %rdi
+			movq	16(%rbp), %rdi
 			call	raw_out_string
 			## move self ptr into %rax for return
 			movq	%rbx, %rax
@@ -515,6 +408,10 @@ Main.main:
 			pushq	%r15
 .Main_main_1:
 			## default String
+			movq	$empty.string, %r9
+			## assign
+			movq	%r9, %r8
+			## box value of %r8 into %r9
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -538,50 +435,18 @@ Main.main:
 			popq	%rsi
 			popq	%rdx
 			popq	%rcx
-			movq	%rax, %r8
-			movq	$empty.string, 24(%r8)
-			## assign
-			movq	%r8, %r10
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Bool..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r8
-			## check if %r10 is void and set result accordingly
-			cmpq	$0, %r10
+			movq	%rax, %r9
+			movq	%r8, 24(%r9)
+			## check if %r9 is void and set result accordingly
+			movq	$0, %r8
+			cmpq	$0, %r9
 			jnz		.asm_label_1
-			movq	$1, 24(%r8)
+			movq	$1, %r8
 .asm_label_1:
-			## unbox value of %r8 into %r9
-			movq	24(%r8), %r9
-			## not
-			movl	%r9d, %r8d
-			xorl	$1, %r8d
 			## branch .case_3_void
-			test	%r9d, %r9d
-			jnz		.case_3_void
-			## branch .case_3_not_void
 			test	%r8d, %r8d
-			jnz		.case_3_not_void
+			jnz		.case_3_void
+			jmp		.case_3_not_void
 .case_3_void:
 			movq	$string_1, %rdi
 			call	raw_out_string
@@ -589,8 +454,8 @@ Main.main:
 			call	exit
 			jmp		.case_3_not_void
 .case_3_not_void:
-			## move type tag of %r10 into %r8
-			movq	0(%r10), %r8
+			## move type tag of %r9 into %r8
+			movq	0(%r9), %r8
 			## check for type String
 			movq	$4, %rax
 			cmpq	%rax, %r8
@@ -616,9 +481,16 @@ Main.main:
 			cmpq	%rax, %r8
 			je		.case_2_error_branch
 .case_2_Int:
-			## assign
-			movq	%r10, %r8
+			jmp		.case_2_exit
+.case_2_error_branch:
+			movq	$string_2, %rdi
+			call	raw_out_string
+			movq	$0, %rax
+			call	exit
+.case_2_exit:
 			## new const Int: 0
+			movq	$0, %r9
+			## box value of %r9 into %r8
 			## push caller-saved regs
 			pushq	%rcx
 			pushq	%rdx
@@ -643,20 +515,7 @@ Main.main:
 			popq	%rdx
 			popq	%rcx
 			movq	%rax, %r8
-			movl	$0, 24(%r8)
-			## assign
-			movq	%r8, %r10
-			jmp		.case_2_exit
-.case_2_error_branch:
-			movq	$string_2, %rdi
-			call	raw_out_string
-			movq	$0, %rax
-			call	exit
-.case_2_exit:
-			## assign
-			movq	%r10, %r9
-			## assign
-			movq	%r9, %r8
+			movq	%r9, 24(%r8)
 			## move ret val %r8 into %rax
 			movq	%r8, %rax
 			## pop callee-saved regs
@@ -685,14 +544,20 @@ Object.abort:
 Object.copy:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## save self reg
-			pushq	%rbx
-			## make new obj to store result (same as doing SELF_TYPE..new)
-			movq	16(%rbx), %rax
-			movq	8(%rax), %rax
-			call	*%rax
-			## restore self reg
-			popq	%rbx
+			## check type tag
+			movq	(%rbx), %rax
+			cmpq	$1, %rax
+			je		copy_unboxed
+			cmpq	$4, %rax
+			je		copy_unboxed
+			cmpq	$0, %rax
+			je		copy_unboxed
+copy_object:
+			## call malloc to make space for the new object
+			## use leaq to multiply the size by 8
+			movq	8(%rbx), %rdi
+			leaq	0(,%rdi,8), %rdi
+			call	malloc
 			## call memcpy to copy %rbx into %rax
 			## use leaq to multiply the size by 8
 			movq	8(%rbx), %rdx
@@ -701,6 +566,11 @@ Object.copy:
 			movq	%rax, %rdi
 			call	memcpy
 			## result of mempy in %rax, so good to return
+			jmp		copy_exit
+copy_unboxed:
+			movq	24(%rbx), %rax
+			jmp		copy_exit
+copy_exit:
 			leave
 			ret
 
@@ -708,35 +578,9 @@ Object.copy:
 Object.type_name:
 			pushq	%rbp
 			movq	%rsp, %rbp
-			## make new String to hold the result
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			## move type_name from vtable[0] into String in %rax
-			movq	16(%rbx), %r8
-			movq	0(%r8), %r8
-			movq	%r8, 24(%rax)
+			## move type_name from vtable[0] into %rax
+			movq	16(%rbx), %rax
+			movq	0(%rax), %rax
 			leave
 			ret
 
@@ -747,36 +591,8 @@ String.concat:
 			## unbox self into rdi
 			movq	24(%rbx), %rdi
 			## unbox param[0] into rsi
-			movq	16(%rbp), %rax
-			movq	24(%rax), %rsi
+			movq	16(%rbp), %rsi
 			call	cool_str_concat
-			## make new box in rax to store result (moved into r8 temporarily)
-			movq	%rax, %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -791,35 +607,7 @@ String.length:
 			## call strlen to compute length
 			movq	24(%rbx), %rdi
 			call	strlen
-			movq	%rax, %r8
-			## box final result
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	Int..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %r9
-			movq	%r8, 24(%r9)
-			## move result into rax
-			movq	%r9, %rax
+			## result from strlen already in rax
 			popq	%r15
 			popq	%r14
 			popq	%r13
@@ -833,40 +621,11 @@ String.substr:
 			movq	%rsp, %rbp
 			## unbox self into rdi
 			movq	24(%rbx), %rdi
-			## unbox param[0] into rsi
-			movq	16(%rbp), %rax
-			movq	24(%rax), %rsi
-			## unbox param[1] into rdx
-			movq	24(%rbp), %rax
-			movq	24(%rax), %rdx
+			## move param[0] into rsi
+			movq	16(%rbp), %rsi
+			## move param[1] into rdx
+			movq	24(%rbp), %rdx
 			call	cool_str_substr
-			## make new box to store result (moved into r8 temporarily)
-			movq	%rax, %r8
-			## push caller-saved regs
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## push self ptr
-			pushq	%rbx
-			call	String..new
-			## restore self ptr
-			popq	%rbx
-			## pop caller-saved regs
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	%rax, %rax
-			movq	%r8, 24(%rax)
 			leave
 			ret
 
@@ -990,6 +749,71 @@ raw_out_string:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
+
+raw_in_string:
+			pushq	%rbp
+			movq	%rsp, %rbp
+			subq	$32, %rsp
+			movl	$20, -16(%rbp)
+			movl	$0, -12(%rbp)
+			movl	-16(%rbp), %eax
+			cltq
+			movq	%rax, %rdi
+			call	malloc
+			movq	%rax, -8(%rbp)
+.in_str_L8:
+			call	getchar
+			movb	%al, -17(%rbp)
+			cmpb	$10, -17(%rbp)
+			je	.in_str_L2
+			cmpb	$-1, -17(%rbp)
+			je	.in_str_L2
+			movl	-12(%rbp), %eax
+			movslq	%eax, %rdx
+			movq	-8(%rbp), %rax
+			addq	%rax, %rdx
+			movzbl	-17(%rbp), %eax
+			movb	%al, (%rdx)
+			addl	$1, -12(%rbp)
+			cmpb	$0, -17(%rbp)
+			jne	.in_str_L3
+			movl	$0, -12(%rbp)
+			jmp	.in_str_L4
+.in_str_L6:
+			call	getchar
+			movb	%al, -17(%rbp)
+.in_str_L4:
+			cmpb	$10, -17(%rbp)
+			je	.L5
+			cmpb	$-1, -17(%rbp)
+			jne	.in_str_L6
+.L5:
+			jmp	.in_str_L2
+.in_str_L3:
+			movl	-12(%rbp), %eax
+			cmpl	-16(%rbp), %eax
+			jne	.in_str_L7
+			addl	$20, -16(%rbp)
+			movl	-16(%rbp), %eax
+			movslq	%eax, %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	realloc
+			movq	%rax, -8(%rbp)
+			jmp	.in_str_L8
+.in_str_L7:
+			jmp	.in_str_L8
+.in_str_L2:
+			movl	-12(%rbp), %eax
+			movslq	%eax, %rdx
+			movq	-8(%rbp), %rax
+			movq	%rdx, %rsi
+			movq	%rax, %rdi
+			call	strndup
+			leave
+			ret
+
 cool_str_concat:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1025,6 +849,7 @@ cool_str_concat:
 			movq	-8(%rbp), %rax
 			leave
 			ret
+
 cool_str_substr:
 			pushq	%rbp
 			movq	%rsp, %rbp
@@ -1063,6 +888,7 @@ cool_str_substr:
 			popq	%rbx
 			popq	%rbp
 			ret
+
 			## ::::::::::::::::::::::::::::::::::::::::
 			##  COMPARISONS
 			## ::::::::::::::::::::::::::::::::::::::::
@@ -1119,55 +945,12 @@ cmp_lt_string:
 			jl		cmp_lt_true
 			jmp		cmp_lt_false
 
-			## make new true object in %rax
 cmp_lt_true:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	$1, 24(%rax)
+			movq	$1, %rax
 			jmp		cmp_lt_end
 
-			## make new false object in %rax
 cmp_lt_false:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
+			movq	$0, %rax
 			jmp		cmp_lt_end
 
 cmp_lt_end:
@@ -1229,55 +1012,12 @@ cmp_le_string:
 			jle		cmp_le_true
 			jmp		cmp_le_false
 
-			## make new true object in %rax
 cmp_le_true:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	$1, 24(%rax)
+			movq	$1, %rax
 			jmp		cmp_le_end
 
-			## make new false object in %rax
 cmp_le_false:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
+			movq	$0, %rax
 			jmp		cmp_le_end
 
 cmp_le_end:
@@ -1339,55 +1079,12 @@ cmp_eq_string:
 			je		cmp_eq_true
 			jmp		cmp_eq_false
 
-			## make new true object in %rax
 cmp_eq_true:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
-			movq	$1, 24(%rax)
+			movq	$1, %rax
 			jmp		cmp_eq_end
 
-			## make new false object in %rax
 cmp_eq_false:
-			pushq	%rcx
-			pushq	%rdx
-			pushq	%rsi
-			pushq	%rdi
-			pushq	%r8
-			pushq	%r9
-			pushq	%r10
-			pushq	%r11
-			## save self reg
-			pushq	%rbx
-			call	Bool..new
-			## restore self reg
-			popq	%rbx
-			popq	%r11
-			popq	%r10
-			popq	%r9
-			popq	%r8
-			popq	%rdi
-			popq	%rsi
-			popq	%rdx
-			popq	%rcx
+			movq	$0, %rax
 			jmp		cmp_eq_end
 
 cmp_eq_end:

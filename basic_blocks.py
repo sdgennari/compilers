@@ -17,6 +17,10 @@ class TACBasicBlock:
 		self.live_out = set()
 		self.liveness_sets_ready = False
 
+		# Initialize empty const maps
+		self.const_in = {}
+		self.const_out = {}
+
 		# Keep a list of all live sets and live ranges
 		self.live_ranges = {}
 
@@ -45,6 +49,8 @@ class TACBasicBlock:
 		s += "\n"
 		s += "Live In: " + str(self.live_in) + "\n"
 		s += "Live Out: " + str(self.live_out) + "\n"
+		s += "Const In: " + str(self.const_in) + "\n"
+		s += "Const Out: " + str(self.const_out) + "\n"
 		for idx, instr in enumerate(self.instr_list):
 			s += str(idx) + "\t" + str(instr) + "\n"
 		return s

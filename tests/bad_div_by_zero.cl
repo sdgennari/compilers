@@ -1,5 +1,5 @@
-class Main {
+class Main inherits IO {
 	main() : Object {
-		777 / 0
+		out_int(777 / 0)
 	};
 };

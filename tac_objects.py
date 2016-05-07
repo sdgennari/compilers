@@ -17,41 +17,30 @@ class TACAssign:
 		return "t$" + str(self.assignee) + " <- " + "t$" + str(self.op1)
 
 ''' Arithmetic '''
-# x <- + y z
-class TACPlus:
+class TACArith:
 	def __init__(self, cur_exp_type, assignee, op1, op2):
 		self.cur_exp_type = cur_exp_type
 		self.assignee = assignee
 		self.op1 = op1
 		self.op2 = op2
 
+# x <- + y z
+class TACPlus(TACArith):
 	def __str__(self):
 		return "t$" + str(self.assignee) + " <- + " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
 
 # x <- - y z
-class TACMinus:
-	def __init__(self, cur_exp_type, assignee, op1, op2):
-		self.cur_exp_type = cur_exp_type
-		self.assignee = assignee
-		self.op1 = op1
-		self.op2 = op2
-
+class TACMinus(TACArith):
 	def __str__(self):
 		return "t$" + str(self.assignee) + " <- - " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
 
 # x <- * y z
-class TACMult:
-	def __init__(self, cur_exp_type, assignee, op1, op2):
-		self.cur_exp_type = cur_exp_type
-		self.assignee = assignee
-		self.op1 = op1
-		self.op2 = op2
-
+class TACMult(TACArith):
 	def __str__(self):
 		return "t$" + str(self.assignee) + " <- * " + "t$" + str(self.op1) + " " + "t$" + str(self.op2)
 
 # x <- / y z
-class TACDiv:
+class TACDiv(TACArith):
 	def __init__(self, cur_exp_type, line, assignee, op1, op2):
 		self.cur_exp_type = cur_exp_type
 		self.line = line

@@ -568,6 +568,8 @@ Object.copy:
 			je		copy_unboxed
 			cmpq	$4, %rax
 			je		copy_unboxed
+			cmpq	$0, %rax
+			je		copy_unboxed
 copy_object:
 			## call malloc to make space for the new object
 			## use leaq to multiply the size by 8

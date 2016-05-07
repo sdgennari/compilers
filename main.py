@@ -7,6 +7,7 @@ from ast_to_tac import *
 from allocate_registers import *
 from deserialize_ast import *
 from shared_vars import *
+from constant_folding import fold_constants
 import copy
 import sys
 
@@ -373,19 +374,43 @@ def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 
 	# Build basic blocks and compute liveness
 	block_list = buildBasicBlocks(cur_tac_list)
-	computeLiveSets(block_list)
+	# computeLiveSets(block_list)
 
-	# TODO: ADD DEAD CODE BACK IN LATER AFTER AUTOBOXING IS DONE
+	# if ast_method.ident == "main":
+	# 	print
+	# 	for block in block_list:
+	# 		print block
+	# 		for instr in block.instr_list:
+	# 			print getattr(instr, 'cur_exp_type', "").ljust(12), instr
+	# 		print
+
 	# removeDeadCode(block_list)
+	# computeLiveSets(block_list)
+
+	# Constant folding
+	fold_constants(block_list)
 	computeLiveSets(block_list)
 
 	# if ast_method.ident == "main":
 	# 	print
 	# 	for block in block_list:
-	# 		for instr in block.instr_list:
+	# 		print block
+			# for instr in block.instr_list:
+			# 	print getattr(instr, 'cur_exp_type', "").ljust(12), instr
+			# print
+
+	# TODO: ADD DEAD CODE BACK IN LATER AFTER AUTOBOXING IS DONE
+	# removeDeadCode(block_list)
+	# computeLiveSets(block_list)
+
+	# if ast_method.ident == "main":
+	# 	print
+	# 	for block in block_list:
+	# 		print block
+			# for instr in block.instr_list:
 	# 			print getattr(instr, 'cur_exp_type', "").ljust(12), instr
 	# 		print
-	# sys.exit(1)
+	# # sys.exit(1)
 
 	# Allocate registers
 	register_colors = None

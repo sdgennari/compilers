@@ -1,4 +1,4 @@
-Start Time:   Thu May  5 22:42:19 2016
+Start Time:   Sat May  7 15:06:45 2016
 Your UVA ID:  sdg6vt
 
 ZIP file: exists ...
@@ -21,6 +21,7 @@ Archive:  ../sdg6vt.zip
   inflating: shared_vars.py          
   inflating: tac_objects.py          
   inflating: tac_to_asm.py           
+  inflating: constant_folding.py     
 ZIP file: done ...
 Checking for main.{py,rb,ml,js,hs} ...
 main.py: found
@@ -118,4 +119,4 @@ t5: div-by-zero                                  ok
 t6: substring-bad                                ok  
 t7: mjk6zt.zip-bug_maker                         ok  
 t8: mjk6zt.zip-shallow_copy                      ok  
-End Time: Thu May  5 22:42:55 2016
+End Time: Sat May  7 15:07:22 2016
