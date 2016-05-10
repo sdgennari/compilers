@@ -1,27 +1,27 @@
 A.J. Varshneya (ajv4dg)
 Spencer Gennari (sdg6vt)
-CA4 - Compiler
-4/11/16
+CA5 - Optimized Compiler
+5/10/16
 readme.txt
 
 ### Design Decisions
 
-To convert the .cl-type file into x86 assembly, we used a series of Python files to handle each stage of the compilation process. In general, the Python files can be separated into two main categories: objects and functions, with a little bit of gray area in between. There were three pure object files: ast_nodes.py, tac_objects.py, and asm_objects, which contained objects for AST, TAC, and ASM, respectively. Since CA4 involved a much broader variety of expressions, we had to expand the TAC instructions from before so that they could appropriately keep track of type information and handle new features like case expressions.
+For CA5, we modified our Python files from CA4. At the end of CA4 our code was in great need of refactoring, so first task we tackled in CA5 was reorganizing the code. To clean up our TAC to ASM code, we abstracted most of the hard-coded internal functions into a new file: internals.py. Furthermore, most of the global variables were eliminated and instead replaced with parameters in functions. This helped our code organization a lot since global variables were no longer shared between Python files, which made debugging much easier. That said, shared_variables.py still exists, but it only holds reference variables that are created once and never modified again (if we could do it all again, we would have made an object that stored this information and then passed the aforementioned object between functions).
 
-The other Python files dealt with converting between intermediate forms. The AST to TAC conversion was fairly simple, so it could be handled in a single file: ast_to_tac.py. However, converting TAC to ASM proved far more difficult. The register allocation done in CA3 was abstracted into allocate_registers.py and the tac_to_asm.py file was greatly expanded. Furthermore, main.py handles laying out the actual assembly in the file to ensure that components are processed in the appropriate order (ie. all expressions are parsed before the constant strings are created since there is no way to know what the constant strings are ahead of time). Having so many files did present the challenge of sharing information between files. Unfortunately, the original Python files had a lot of global variables which caused a large amount of confusing throughout the coding process (a major refactor is coming...).
+In terms of actual Python files included in the submission, each stage of the compilation process and independent optimization was included in its own file. However, since some optimizations were best implemented during a stage in the compilation process, such as autoboxing during AST to TAC conversion, not every optimization was abstracted away into its own file. The three specific optimization files included are: 1) basic_blocks.py, which handles dead code elimination (we're still bad at naming, even after all this time...), 2) allocate_registers.py, which handles graph coloring for efficient register allocation, and 3) constant_folding.py, which iterates over a given CFG to find constants that can be folded. It is important to note that, although constant_folding.py is not actually used in the final implementation of the compiler since we could not get it to be fully semantics preserving, we still included it for reference.
 
 ### Testing
 
-Since CA4 was a very large assignment with many different components, it was crucial to test each new feature as it was added. Thus, we tested each feature by first verifying that the TAC was properly generated and then by verifying that the TAC to ASM conversion worked. This process helped us figure out problems early since TAC provided a high-level abstraction of the code that was going to be generated. Once we were sure that the general structure of the program was correct, we moved on to outputting the specific assembly instructions. After working through basic examples, we created harder test cases to highlight some of the more difficult bugs. Files test1.cl - test4.cl represent some of the bugs that gave us the most trouble.
+Throughout the development of CA5, we focused a lot on making sure that our optimizations were semantics preserving. Whenever we added a new optimization, we would implement a small part of it (such as autoboxing for Ints only) using a subset of tests that related specifically to the optimization. Once it reached a large enough checkpoint, we would then run it against all of our test cases from CA4 and CA5 to make sure they still worked properly. test1.cl - test4.cl are examples of the more intricate test cases we used to make sure our optimizations were reducing the number of cycles while still handling all the edge cases.
 
-test1.cl - shadowing
-This file deals with the different possible scenarios for variable shadowing. Specifically, it checks that let, case, method, and attributes all shadow one another when they are supposed to. test1.cl also makes sure that the scope of variables is appropriately managed.
+test1.cl - autoboxing (aka The Decepticon Test Case)
+This file does everything possible to destroy autoboxing for Ints, Strings, and Bools. For each type, it makes sure that assigning a value to an Object automatically boxes it so that dispatch will work properly. Additionally, it checks that isvoid still works on boxed and unboxed values. Finally, it makes sure that params and return types for methods are boxed.
 
-test2.cl - copy
-test2.cl focuses on the details of the internal copy method. Specifically, it makes sure that shallow copying is appropriately handled and that copied objects do not modify each other (so long as their attributes are shallow). Additionally, this test checks that deep object pointers are kept consistent even if an object is copied.
+test2.cl - register allocation
+test2.cl focuses on good register allocation. It makes 16 variables to use all possible x86 registers (assuming linear register allocation) and then prints them at the very end to keep them alive throughout the entire program. After making the variables, it then does a large nested arithmetic expression that causes 400 virtual registers to be live at the same time. This helps check that the register allocation algorithm in the compiler is fast.
 
-test3.cl - SELF_TYPE
-This test contains chained dispatch expressions to test whether self, static, and dynamic dispatch are working correctly with emphasis on the use of SELF_TYPE. We test that functions returning SELF_TYPE in chains evaluate to objects of the correct type and that we can statically call inherited methods. The test also checks method overriding and self dispatch in nested let statements.
+test3.cl - dead code elimination
+This test is designed to reward good dead code elimination by performing a large number of dead operations in a loop and then allocating a series of dead objects. A compiler that optimizes away dead code would not have to spend time performing the unnecessary arithmetic or allocating memory on the heap for the new object, so it will have much better performance.
 
-test4.cl - case
-Depending on the order in which the case branches are encountered, we can verify that the correct branch is chosen. There is an attribute, let, and case variable which tests scoping on the case. The test also exposes a failure when there is no branch that matches the type type of the given expression.
+test4.cl - constant folding
+Although our compiler (at the time of submission) does not properly implement constant folding, we still made test4.cl about constant folding since we spent a fair amount of time trying to implement it. It first checks the basics of constant folding, as well as branching with separate assignments. The real trick that we didn't catch for a long time was integer overflow when folding constants, so the last section of test4.cl makes sure that overflow is handled correctly.

@@ -328,13 +328,14 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		elif right_symbol_type == "Bool" and right_symbol_type == "Bool":
 			cur_tac_list.append(TACCompLBool(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 		elif left_symbol_type == "String" and right_symbol_type == "String":
-			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
-			left_symbol = boxed_symbol
-			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
-			right_symbol = boxed_symbol
-			cur_tac_list.append(TACCompL(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+			cur_tac_list.append(TACCompLString(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+			# boxed_symbol = new_symbol()
+			# cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
+			# left_symbol = boxed_symbol
+			# boxed_symbol = new_symbol()
+			# cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
+			# right_symbol = boxed_symbol
+			# cur_tac_list.append(TACCompL(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 		else:
 			cur_tac_list.append(TACCompL(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 
@@ -349,13 +350,14 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		elif left_symbol_type == "Bool" and right_symbol_type == "Bool":
 			cur_tac_list.append(TACCompLEBool(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 		elif left_symbol_type == "String" and right_symbol_type == "String":
-			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
-			left_symbol = boxed_symbol
-			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
-			right_symbol = boxed_symbol
-			cur_tac_list.append(TACCompLE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+			cur_tac_list.append(TACCompLEString(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+			# boxed_symbol = new_symbol()
+			# cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
+			# left_symbol = boxed_symbol
+			# boxed_symbol = new_symbol()
+			# cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
+			# right_symbol = boxed_symbol
+			# cur_tac_list.append(TACCompLE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 		else:
 			cur_tac_list.append(TACCompLE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 
@@ -370,13 +372,14 @@ def gen_tac_for_exp(current_type, symbol_table_list, cur_tac_list, ast_exp):
 		elif left_symbol_type == "Bool" and right_symbol_type == "Bool":
 			cur_tac_list.append(TACCompEBool(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 		elif left_symbol_type == "String" and right_symbol_type == "String":
-			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
-			left_symbol = boxed_symbol
-			boxed_symbol = new_symbol()
-			cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
-			right_symbol = boxed_symbol
-			cur_tac_list.append(TACCompE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+			cur_tac_list.append(TACCompEString(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
+			# boxed_symbol = new_symbol()
+			# cur_tac_list.append(TACBox(boxed_symbol, left_symbol, left_symbol_type))
+			# left_symbol = boxed_symbol
+			# boxed_symbol = new_symbol()
+			# cur_tac_list.append(TACBox(boxed_symbol, right_symbol, right_symbol_type))
+			# right_symbol = boxed_symbol
+			# cur_tac_list.append(TACCompE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 		else:
 			cur_tac_list.append(TACCompE(ast_exp.type_from_ast, assignee_symbol, left_symbol, right_symbol))
 

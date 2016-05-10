@@ -1,56 +1,48 @@
-class A inherits Main {
-	a() : A {
-		(new B)
-	};
-
-	me() : SELF_TYPE {
-		self
-	};
-
-	b() : String {
-		"nice ?"
-	};
-};
-
-class B inherits A {
-	a : SELF_TYPE;
-	b : Int <- 1;
-	me() : SELF_TYPE {
-		self
-	};
-	c() : Int {
-		b <- 2
-	};
-	d() : Int {
-		b
-	};
-};
-
+(* Dead Code Elimination *)
 class Main inherits IO {
-	a() : A {
-		new A
-	};
-
-	b() : String {
-		"plz work\n"
-	};
-
-	f() : SELF_TYPE {
-		self
-	};
-
 	main() : Object {
-		{
-		(new SELF_TYPE).out_string(self.a().f().b());
-		(new B)@IO.out_string((new B)@A.a().a().a().me().b());
-		out_int((new B).me().d());
-		let a : Int <- 123456 in {
-			let a : Int <- 123 in {
-				let a : Int <- 1 in {
-					out_int(a);
-					};
-				};
-			};
+		let
+			dead_x : Int,
+			dead_y : Int,
+			dead_beef : Int <- 2147483647 + 1588444912,
+			dead_c0de : Int <- 2147483647 + 1588445405,
+			i : Int,
+			dead_obj : Object
+		in {
+			while i < 1000000 loop {
+				dead_beef <- 1 + 2 + 3 + 4 + 5;
+				dead_x <- 10 / 5 / 2;
+				dead_y <- 1 * 2 * 3 * 4 * 5;
+				i <- i + 1;
+			} pool;
+
+			dead_c0de <- 1 * 2 / 4 * 5 * 6 * 7 * 8 * 9;
+
+			-- Allocate a bunch of dead objects
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+			dead_obj <- new Object;
+
+			out_int(i);
+			out_string("\n");
+			abort();
 		}
 	};
 };

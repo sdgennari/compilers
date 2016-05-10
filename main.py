@@ -200,19 +200,10 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 			# Store result it in the attr
 			cur_tac_list.append(TACStoreAttr(ast_attr.feature_type, ast_attr.ident, exp_symbol))
 
-	# for tac_instr in cur_tac_list:
-	# 	print tac_instr
-	# print
-	# return
-
 	if len(cur_tac_list) != 0:
 		# Build basic blocks and compute liveness
 		block_list = buildBasicBlocks(cur_tac_list)
 		computeLiveSets(block_list)
-
-		# if type_name == "Main":
-		# 	for block in block_list:
-		# 		print block
 
 		# Allocate registers
 		register_colors = None
@@ -234,11 +225,6 @@ def gen_asm_for_constructor(cur_asm_list, type_name):
 	]
 
 	gen_asm_for_method_end(cur_asm_list)
-
-	# print "new",type_name,":"
-	# for asm_instr in cur_asm_list:
-	# 	print asm_instr,
-	# print
 
 def format_asm_const_string(const_int):
 	return "$" + str(const_int)
@@ -365,27 +351,12 @@ def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 	cur_tac_list = []
 	gen_tac_for_method(symbol_table_list, cur_tac_list, ast_method, type_name)
 
-	# print len(cur_tac_list)
-	# for tac_instr in cur_tac_list:
-	# 	print tac_instr
-	# print
-	# sys.exit(1)
-
 	# Build basic blocks and compute liveness
 	block_list = buildBasicBlocks(cur_tac_list)
 	computeLiveSets(block_list)
 
-	# TODO: ADD DEAD CODE BACK IN LATER AFTER AUTOBOXING IS DONE
-	# removeDeadCode(block_list)
+	removeDeadCode(block_list)
 	computeLiveSets(block_list)
-
-	# if ast_method.ident == "main":
-	# 	print
-	# 	for block in block_list:
-	# 		for instr in block.instr_list:
-	# 			print getattr(instr, 'cur_exp_type', "").ljust(12), instr
-	# 		print
-	# sys.exit(1)
 
 	# Allocate registers
 	register_colors = None
@@ -399,10 +370,6 @@ def ast_method_to_asm(cur_asm_list, ast_method, type_name):
 
 	# Generate asm for the block list
 	gen_asm_for_block_list(cur_asm_list, block_list, register_colors, spilled_registers, type_name)
-
-	# if ast_method.ident == "main":
-		# for asm_instr in cur_asm_list:
-			# print asm_instr,
 
 def ast_attr_to_asm(cur_asm_list, ast_attr, type_name):
 	cur_tac_list = []
@@ -452,7 +419,7 @@ if __name__ == "__main__":
 
 	result += get_program_start_string()
 
-	# # Note: This must be called AFTER asm for all expressions has been generated
+	# Note: This must be called AFTER asm for all expressions has been generated
 	result += get_constants_string()
 
 	result += get_helper_strings()

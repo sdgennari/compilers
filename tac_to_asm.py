@@ -371,7 +371,31 @@ def gen_asm_for_tac_comp_l_unboxed(current_type, register_color_map, spilled_reg
 	cur_asm_list.append(ASMCmovL("%rax", dest))
 
 def gen_asm_for_tac_comp_l_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_l):
-	raise NotImplementedError("Unboxed string comparison not yet implemented")
+		# Get lhs, rhs, and dest
+	op1_reg = get_asm_register(register_color_map, tac_comp_l.op1, 64)
+	op2_reg = get_asm_register(register_color_map, tac_comp_l.op2, 64)
+	dest = get_asm_register(register_color_map, tac_comp_l.assignee, 64)
+
+	# Compare strings with strcmp
+	cur_asm_list.append(ASMComment("save caller regs and self"))
+	for reg in caller_saved_registers:
+		cur_asm_list.append(ASMPushQ(reg))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
+
+	cur_asm_list.append(ASMComment("call string comparision inline"))
+	cur_asm_list.append(ASMMovQ(op1_reg, "%rdi"))
+	cur_asm_list.append(ASMMovQ(op2_reg, "%rsi"))
+	cur_asm_list.append(ASMCall("strcmp"))
+
+	cur_asm_list.append(ASMComment("restore self and caller regs"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
+	for reg in reversed(caller_saved_registers):
+		cur_asm_list.append(ASMPopQ(reg))
+
+	cur_asm_list.append(ASMCmpL("$0", "%eax"))
+	cur_asm_list.append(ASMMovQ("$0", dest))
+	cur_asm_list.append(ASMMovQ("$1", "%rax"))
+	cur_asm_list.append(ASMCmovL("%rax", dest))
 
 def gen_asm_for_tac_comp_le(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_le):
 	# Get lhs_reg, rhs_reg, and dest
@@ -422,7 +446,31 @@ def gen_asm_for_tac_comp_le_unboxed(current_type, register_color_map, spilled_re
 	cur_asm_list.append(ASMCmovLe("%rax", dest))
 
 def gen_asm_for_tac_comp_le_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_le):
-	raise NotImplementedError("Unboxed string comparison not yet implemented")
+	# Get lhs, rhs, and dest
+	op1_reg = get_asm_register(register_color_map, tac_comp_le.op1, 64)
+	op2_reg = get_asm_register(register_color_map, tac_comp_le.op2, 64)
+	dest = get_asm_register(register_color_map, tac_comp_le.assignee, 64)
+
+	# Compare strings with strcmp
+	cur_asm_list.append(ASMComment("save caller regs and self"))
+	for reg in caller_saved_registers:
+		cur_asm_list.append(ASMPushQ(reg))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
+
+	cur_asm_list.append(ASMComment("call string comparision inline"))
+	cur_asm_list.append(ASMMovQ(op1_reg, "%rdi"))
+	cur_asm_list.append(ASMMovQ(op2_reg, "%rsi"))
+	cur_asm_list.append(ASMCall("strcmp"))
+
+	cur_asm_list.append(ASMComment("restore self and caller regs"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
+	for reg in reversed(caller_saved_registers):
+		cur_asm_list.append(ASMPopQ(reg))
+
+	cur_asm_list.append(ASMCmpL("$0", "%eax"))
+	cur_asm_list.append(ASMMovQ("$0", dest))
+	cur_asm_list.append(ASMMovQ("$1", "%rax"))
+	cur_asm_list.append(ASMCmovLe("%rax", dest))
 
 def gen_asm_for_tac_comp_e(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_eq):
 	# Get lhs_reg, rhs_reg, and dest
@@ -472,8 +520,32 @@ def gen_asm_for_tac_comp_e_unboxed(current_type, register_color_map, spilled_reg
 	cur_asm_list.append(ASMMovQ("$1", "%rax"))
 	cur_asm_list.append(ASMCmovE("%rax", dest))
 
-def gen_asm_for_tac_comp_e_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_eq_string):
-	raise NotImplementedError("Unboxed string comparison not yet implemented")
+def gen_asm_for_tac_comp_e_string(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_comp_eq):
+		# Get lhs, rhs, and dest
+	op1_reg = get_asm_register(register_color_map, tac_comp_eq.op1, 64)
+	op2_reg = get_asm_register(register_color_map, tac_comp_eq.op2, 64)
+	dest = get_asm_register(register_color_map, tac_comp_eq.assignee, 64)
+
+	# Compare strings with strcmp
+	cur_asm_list.append(ASMComment("save caller regs and self"))
+	for reg in caller_saved_registers:
+		cur_asm_list.append(ASMPushQ(reg))
+	cur_asm_list.append(ASMPushQ(SELF_REG))
+
+	cur_asm_list.append(ASMComment("call string comparision inline"))
+	cur_asm_list.append(ASMMovQ(op1_reg, "%rdi"))
+	cur_asm_list.append(ASMMovQ(op2_reg, "%rsi"))
+	cur_asm_list.append(ASMCall("strcmp"))
+
+	cur_asm_list.append(ASMComment("restore self and caller regs"))
+	cur_asm_list.append(ASMPopQ(SELF_REG))
+	for reg in reversed(caller_saved_registers):
+		cur_asm_list.append(ASMPopQ(reg))
+
+	cur_asm_list.append(ASMCmpL("$0", "%eax"))
+	cur_asm_list.append(ASMMovQ("$0", dest))
+	cur_asm_list.append(ASMMovQ("$1", "%rax"))
+	cur_asm_list.append(ASMCmovE("%rax", dest))
 
 # BOXED + UNBOXED
 def gen_asm_for_tac_box(current_type, register_color_map, spilled_reg_loc_map, cur_asm_list, tac_box):
@@ -1027,16 +1099,9 @@ def gen_asm_for_internal_str_concat(cur_asm_list):
 	cur_asm_list.append(ASMMovQ("24(%rbx)", "%rdi"))
 	cur_asm_list.append(ASMComment("unbox param[0] into rsi"))
 	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rsi"))
-	# cur_asm_list.append(ASMMovQ("24(%rax)", "%rsi"))
 
 	# Call string concat helper
 	cur_asm_list.append(ASMCall("cool_str_concat"))
-
-	# Box result in a new String
-	# cur_asm_list.append(ASMComment("make new box in rax to store result (moved into r8 temporarily)"))
-	# cur_asm_list.append(ASMMovQ("%rax", "%r8"))
-	# gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
-	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 def gen_asm_for_internal_str_substr(cur_asm_list):
 	# Move values into rdi, rsi, and rdx
@@ -1052,22 +1117,11 @@ def gen_asm_for_internal_str_substr(cur_asm_list):
 	# Call string substr helper
 	cur_asm_list.append(ASMCall("cool_str_substr"))
 
-	# Box result in a new String
-	# cur_asm_list.append(ASMComment("make new box to store result (moved into r8 temporarily)"))
-	# cur_asm_list.append(ASMMovQ("%rax", "%r8"))
-	# gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
-	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
-
 def gen_asm_for_internal_type_name(cur_asm_list):
-	# Make new String to hold result
-	# cur_asm_list.append(ASMComment("make new String to hold the result"))
-	# gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
-
 	# Move the value of type_name from vtable into the new String
 	cur_asm_list.append(ASMComment("move type_name from vtable[0] into %rax"))
 	cur_asm_list.append(ASMMovQ("16("+SELF_REG+")", "%rax"))
 	cur_asm_list.append(ASMMovQ("0(%rax)", "%rax"))
-	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
 
 def gen_asm_for_internal_abort(cur_asm_list):
 	custom_asm = ASMCustomString(
@@ -1125,19 +1179,11 @@ def gen_asm_for_internal_in_string(cur_asm_list):
 	cur_asm_list.append(ASMComment("call in_string helper method"))
 	cur_asm_list.append(ASMCall("raw_in_string"))
 
-	# Box result in a new String
-	# cur_asm_list.append(ASMComment("make new box to store result (moved into r8 temporarily)"))
-	# cur_asm_list.append(ASMMovQ("%rax", "%r8"))
-	# gen_asm_for_new_boxed_type(cur_asm_list, "String", "%rax")
-	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
-
 def gen_asm_for_internal_out_string(cur_asm_list):
 	# Unbox string to get raw value
 	# Note: string value must be in specific reg (%r8) for raw assembly to work
 	cur_asm_list.append(ASMComment("loading param [0] into %rax"))
 	cur_asm_list.append(ASMMovQ("16(%rbp)", "%rdi"))
-	# cur_asm_list.append(ASMComment("unboxing param [0] (in %rax) into %rdi for call to raw_out_string"))
-	# cur_asm_list.append(ASMMovQ("24(%rax)", "%rdi"))
 	cur_asm_list.append(ASMCall("raw_out_string"))
 
 	# Move self ptr into %rax for return value
@@ -1226,10 +1272,6 @@ def gen_asm_for_internal_in_int(cur_asm_list):
 	)
 	cur_asm_list.append(custom_asm)
 
-	# gen_asm_for_new_boxed_type(cur_asm_list, "Int", "%rax")
-	# cur_asm_list.append(ASMComment("move result into boxed Int"))
-	# cur_asm_list.append(ASMMovQ("%r8", "24(%rax)"))
-
 	
 def gen_asm_for_internal_length(cur_asm_list):
 	# Push all callee-saved regs
@@ -1242,17 +1284,6 @@ def gen_asm_for_internal_length(cur_asm_list):
 	str_val_src = "24("+SELF_REG+")"
 	cur_asm_list.append(ASMMovQ(str_val_src, "%rdi"))
 	cur_asm_list.append(ASMCall("strlen"))
-	# cur_asm_list.append(ASMMovQ("%rax", "%r8")) 
-
-	# Make new Int box and put the result inside
-	# Note: r9 is arbitrary here
-	# cur_asm_list.append(ASMComment("box final result"))
-	# gen_asm_for_new_boxed_type(cur_asm_list, "Int", "%r9")
-	# cur_asm_list.append(ASMMovQ("%r8", "24(%r9)"))
-
-	# Move final result into rax to return
-	# cur_asm_list.append(ASMComment("move result into rax"))
-	# cur_asm_list.append(ASMMovQ("%r9", "%rax"))
 
 	cur_asm_list.append(ASMComment("result from strlen already in rax"))
 
